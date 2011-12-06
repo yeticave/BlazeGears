@@ -1,0 +1,8 @@
+@charset "utf-8";
+
+
+*[class|="BlazeGears"] .Clear {
+	clear: both;
+	height: 0px;
+	overflow: hidden;
+}

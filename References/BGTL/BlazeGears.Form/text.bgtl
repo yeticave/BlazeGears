@@ -1,0 +1,16 @@
+<div class='Field'>
+	<div class='Valid' id='{{getElementId()}}_valid'></div>
+	<div class='Invalid' id='{{getElementId()}}_invalid'></div>
+	<label class='Label' for='{{getElementId()}}'>{{label}}</label>
+	<div class='Input'>
+		<input id='{{getElementId()}}' name='{{getId()}}' type='text' value='{{value}}'
+			%for (var i in attribs) {%
+				{{i}}='{{attribs[i]}}'
+			%}%
+			%for (var i in events) {%
+				on{{i}}='{{events[i]}}'
+			%}%
+		/>
+	</div>
+	<div class='Clear'></div>
+</div>

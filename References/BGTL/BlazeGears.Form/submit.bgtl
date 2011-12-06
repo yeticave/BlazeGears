@@ -1,0 +1,12 @@
+<div class='Field'>
+	<div class='Button'>
+		<input id='{{getElementId()}}' name='{{getId()}}' type='submit' value='{{value}}'
+			%for (var i in attribs) {%
+				{{i}}='{{attribs[i]}}'
+			%}%
+			%for (var i in events) {%
+				on{{i}}='{{events[i]}}'
+			%}%
+		/>
+	</div>
+</div>

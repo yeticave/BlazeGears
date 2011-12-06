@@ -1,0 +1,17 @@
+@charset "utf-8";
+
+
+.BlazeGears-Paginator {}
+
+	.BlazeGears-Paginator .CurrentPage,
+	.BlazeGears-Paginator .NextPage,
+	.BlazeGears-Paginator .PreviousPage {
+		float: left;
+		height: 30px;
+		line-height: 30px;
+		text-align: center;
+	}
+	
+	.BlazeGears-Paginator .CurrentPage {
+		margin: 0 20px;
+	}

@@ -1,0 +1,33 @@
+<div class='Field'>
+	<div class='Valid' id='{{getElementId()}}_valid'></div>
+	<div class='Invalid' id='{{getElementId()}}_invalid'></div>
+	<label class='Label' for='{{getElementId()}}'>{{label}}</label>
+	<div class='Input'>
+		<select id='{{getElementId()}}' name='{{getId()}}'
+			%for (var i in attribs) {%
+				{{i}}='{{attribs[i]}}'
+			%}%
+			%for (var i in events) {%
+				on{{i}}='{{events[i]}}'
+			%}%
+		>
+			%var options = getOptions();%
+			%for (var i in options) {%
+				<option id='{{options[i].getElementId()}}' value='{{options[i].value}}'
+					%if (options[i].selected || options[i].value == value) {%
+						selected='selected'
+					%}%
+					%for (var j in options[i].attribs) {%
+						{{j}}='{{options[i].attribs[j]}}'
+					%}%
+					%for (var j in options[i].events) {%
+						on{{j}}='{{options[i].events[j]}}'
+					%}%
+				>
+					{{options[i].label}}
+				</option>
+			%}%
+		</select>
+	</div>
+	<div class='Clear'></div>
+</div>

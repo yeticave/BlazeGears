@@ -1,0 +1,34 @@
+@charset "utf-8";
+
+
+.BlazeGears-Form {}
+	
+	.BlazeGears-Form .Field {
+		margin-bottom: 10px;
+	}
+	
+		.BlazeGears-Form .Field .Button {
+			text-align: center;
+		}
+		
+		.BlazeGears-Form .Field .Input {
+			float: left;
+			line-height: 30px;
+			width: 60%;
+		}
+		
+		.BlazeGears-Form .Field .Invalid {
+			color: red;
+		}
+		
+		.BlazeGears-Form  .Field .Label {
+			display: block;
+			float: left;
+			height: 30px;
+			line-height: 30px;
+			width: 40%;
+		}
+		
+		.BlazeGears-Form .Field .Valid {
+			color: green;
+		}

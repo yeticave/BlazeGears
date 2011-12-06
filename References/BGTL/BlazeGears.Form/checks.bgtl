@@ -1,0 +1,24 @@
+<div class='Field'>
+	<div class='Valid' id='{{getElementId()}}_valid'></div>
+	<div class='Invalid' id='{{getElementId()}}_invalid'></div>
+	<label class='Label' for='{{getElementId()}}'>{{label}}</label>
+	<div class='Input'>
+		%var options = getOptions();%
+		%for (var i in options) {%
+			<div>
+				<input id='{{options[i].getElementId()}}' name='{{options[i].getId()}}' type='checkbox' value='{{options[i].value}}'
+					%if (options[i].selected || options[i].value == value) {%
+						checked='checked'
+					%}%
+					%for (var j in options[i].attribs) {%
+						{{j}}='{{options[i].attribs[j]}}'
+					%}%
+					%for (var j in options[i].events) {%
+						on{{j}}='{{options[i].events[j]}}'
+					%}%
+				/> <label for='{{options[i].getElementId()}}'>{{options[i].label}}</label>
+			</div>
+		%}%
+	</div>
+	<div class='Clear'></div>
+</div>

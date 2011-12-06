@@ -1,0 +1,36 @@
+Document: 8. XML Requests
+
+XML request are done by a wrapper around either the XMLHttpRequest object or an ActiveX component, depending on the browser.
+
+The example below will fetch data from an arbitrary server-side script.
+
+(code)
+	xml_request = new BlazeGears.XMLRequest();
+	
+	xml_request.onAbort = function(self) {
+		alert("Request aborted!");
+	}
+	
+	xml_request.onError = function(self) {
+		alert("Error code: " + self.getStatus());
+	}
+	
+	xml_request.onSend = function(self) {
+		alert("Request started!");
+	}
+	
+	xml_request.onSuccess = function(self) {
+		alert(self.getResponse(false)); // alerts the result in plain text format
+	}
+	
+	xml_request.url = "http://www.example.com/fetch_data.php"; // the url sans the query
+	xml_request.query = { // the query part of the url
+		category: "news&rumors",
+		order_by: "date",
+		page: 5
+	}; // after escaping it will look like this: ?category=news%26rumors&order_by=date&page=5
+	xml_request.send();
+(end)
+
+See Also:
+	<BlazeGears.XMLRequest>
