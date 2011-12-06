@@ -27,12 +27,12 @@ Homepage: http://www.yeticave.com
 /*
 Class: BlazeGears.Formats
 
-A class that handles various string formatting tasks.
+A singleton class that handles various string formatting tasks.
 
 Superclasses:
 	<BlazeGears.BaseClass>
 */
-BlazeGears.Formats = BlazeGears.Class(BlazeGears.BaseClass, {
+BlazeGears.Formats = BlazeGears.Singleton(BlazeGears.BaseClass, {
 	/*
 	Field: date_format
 	
