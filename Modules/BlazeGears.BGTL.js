@@ -1,8 +1,8 @@
 /*
 BlazeGears JavaScript Toolkit
-Version 1.0.0-s, August 29, 2011
+Version 1.0.1-s, January 29th, 2012
 
-Copyright (c) 2011 Gabor Soos
+Copyright (c) 2011-2012 Gabor Soos
 
 This software is provided 'as-is', without any express or implied warranty. In
 no event will the authors be held liable for any damages arising from the use of
