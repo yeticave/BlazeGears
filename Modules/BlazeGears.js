@@ -787,24 +787,31 @@ BlazeGears = new function() {
 			
 			// searches the superclasses for a method
 			instance.__super__ = function(name) {
+				var done = false;
 				var functions;
 				var new_name = name;
 				var parents = blazegears_class.__declaration__.magic.parents;
+				var result;
 				
 				for (var i in parents) {
 					if(self.is(parents[i].__declaration__.public[name])) {
 						arguments[0] = instance;
-						parents[i].__declaration__.public[new_name].apply(instance, arguments);
-						return;
+						result = parents[i].__declaration__.public[new_name].apply(instance, arguments);
+						done = true;
+						break;
 					}
 				}
-				for (var i in parents) {
-					if(self.is(parents[i].__declaration__.static[name])) {
-						arguments[0] = blazegears_class;
-						parents[i].__declaration__.static[new_name].apply(blazegears_class, arguments);
-						return;
+				if (!done) {
+					for (var i in parents) {
+						if(self.is(parents[i].__declaration__.static[name])) {
+							arguments[0] = blazegears_class;
+							result = parents[i].__declaration__.static[new_name].apply(blazegears_class, arguments);
+							break;
+						}
 					}
 				}
+				
+				return result;
 			}
 			
 			// public members
@@ -853,14 +860,17 @@ BlazeGears = new function() {
 			var functions;
 			var new_name = name;
 			var parents = blazegears_class.__declaration__.magic.parents;
+			var result;
 			
 			for (var i in parents) {
 				if(self.is(parents[i].__declaration__.static[name])) {
 					arguments[0] = blazegears_class;
-					parents[i].__declaration__.static[new_name].apply(blazegears_class, arguments);
-					return;
+					result = parents[i].__declaration__.static[new_name].apply(blazegears_class, arguments);
+					break;
 				}
 			}
+			
+			return result;
 		}
 		
 		// static members
