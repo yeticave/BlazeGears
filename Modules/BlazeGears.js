@@ -712,17 +712,18 @@ BlazeGears = new function() {
 	}
 	
 	var declareClass = function() {
+		var blazegears_class;
 		var declaration = {"magic": {}, "public": {}, "static": {}};
+		var key;
 		var parents = [];
 		var raw_declaration = {};
-		var template;
 		
 		// find the superclasses
 		for (var i = 0; i < arguments.length - 1; i++) {
 			parents.push(arguments[i]);
 		}
 		
-		// find the declaration
+		// find the declaration object
 		if (arguments.length > 0) {
 			raw_declaration = arguments[arguments.length - 1];
 		}
@@ -736,37 +737,44 @@ BlazeGears = new function() {
 			}
 		}
 		
-		// regroup the keys from the declaration into groups
+		// regroup the keys of the declaration
 		for (var i in raw_declaration) {
 			if (i == "__init__") {
 				declaration.public.__init__ = raw_declaration.__init__;
 			} else if (i.substr(0, 2) == "__" && i.substr(i.length - 2, 2) == "__") {
 				declaration.magic[i.substr(0, i.length - 2).substr(2)] = raw_declaration[i];
 			} else if (i.substr(0, 1) == "$") {
-				declaration.static[i.substr(1)] = raw_declaration[i];
+				key = i.substr(1);
+				if (self.is(declaration.public[key])) {
+					delete declaration.public[key];
+				}
+				declaration.static[key] = raw_declaration[i];
 			} else {
+				if (self.is(declaration.static[key])) {
+					delete declaration.static[key];
+				}
 				declaration.public[i] = raw_declaration[i];
 			}
 		}
 		declaration.magic.parents = parents;
 		
 		// start declaring the class
-		template = function() {
+		blazegears_class = function() {
 			var instance = this; // self reference
-			var new_arguments;
+			var constructor_arguments;
 			
-			// handles the singleton instances
-			if (template.__declaration__.magic.singleton) {
-				if (template.__singleton__ == null) {
-					template.__singleton__ = instance;
+			// if the class is a singleton and it's already initialized, just return the reference to the previous one
+			if (blazegears_class.__declaration__.magic.singleton) {
+				if (blazegears_class.__singleton__ == null) {
+					blazegears_class.__singleton__ = instance;
 				} else {
-					return template.__singleton__;
+					return blazegears_class.__singleton__;
 				}
 			}
 			
-			instance.__class__ = template; // self reference for the class
+			instance.__class__ = blazegears_class; // self reference for the class
 			
-			// applies the self reference to the methods
+			// applies the self reference to the public methods
 			instance.__method__ = function(name, arguments) {
 				var new_arguments = [instance];
 				
@@ -774,14 +782,14 @@ BlazeGears = new function() {
 					new_arguments.push(arguments[i]);
 				}
 				
-				return template.__declaration__.public[name].apply(instance, new_arguments);
+				return blazegears_class.__declaration__.public[name].apply(instance, new_arguments);
 			}
 			
 			// searches the superclasses for a method
 			instance.__super__ = function(name) {
 				var functions;
 				var new_name = name;
-				var parents = template.__declaration__.magic.parents;
+				var parents = blazegears_class.__declaration__.magic.parents;
 				
 				for (var i in parents) {
 					if(self.is(parents[i].__declaration__.public[name])) {
@@ -792,64 +800,64 @@ BlazeGears = new function() {
 				}
 				for (var i in parents) {
 					if(self.is(parents[i].__declaration__.static[name])) {
-						arguments[0] = template;
-						parents[i].__declaration__.static[new_name].apply(template, arguments);
+						arguments[0] = blazegears_class;
+						parents[i].__declaration__.static[new_name].apply(blazegears_class, arguments);
 						return;
 					}
 				}
 			}
 			
 			// public members
-			for (var i in template.__declaration__.public) {
-				if (self.isFunction(template.__declaration__.public[i])) {
+			for (var i in blazegears_class.__declaration__.public) {
+				if (self.isFunction(blazegears_class.__declaration__.public[i])) {
 					eval("instance[i] = function() {return instance.__method__('" + i + "', arguments);}");
-				} else if (self.isArray(template.__declaration__.public[i]) || self.isObject(template.__declaration__.public[i])) {
-					instance[i] = self.cloneArray(template.__declaration__.public[i]);
+				} else if (self.isArray(blazegears_class.__declaration__.public[i]) || self.isObject(blazegears_class.__declaration__.public[i])) {
+					instance[i] = self.cloneArray(blazegears_class.__declaration__.public[i]);
 				} else {
-					instance[i] = template.__declaration__.public[i];
+					instance[i] = blazegears_class.__declaration__.public[i];
 				}
 			}
 			
 			// static methods
-			for (var i in template.__declaration__.static) {
-				if (self.isFunction(template.__declaration__.static[i])) {
-					eval("instance[i] = function() {return template.__method__('" + i + "', arguments);}");
+			for (var i in blazegears_class.__declaration__.static) {
+				if (self.isFunction(blazegears_class.__declaration__.static[i])) {
+					eval("instance[i] = function() {return blazegears_class.__method__('" + i + "', arguments);}");
 				}
 			}
 			
 			// calls the constructor if there's one
-			if (self.is(template.__declaration__.public.__init__)) {
-				new_arguments = [instance];
+			if (self.is(blazegears_class.__declaration__.public.__init__)) {
+				constructor_arguments = [instance];
 				for (var i = 0; i < arguments.length; i++) {
-					new_arguments.push(arguments[i]);
+					constructor_arguments.push(arguments[i]);
 				}
-				template.__declaration__.public.__init__.apply(instance, new_arguments);
+				blazegears_class.__declaration__.public.__init__.apply(instance, constructor_arguments);
 			}
 			
 			return instance;
 		}
 		
 		// applies the self reference to the static methods
-		template.__method__ = function(name, arguments) {
-			var new_arguments = [template];
+		blazegears_class.__method__ = function(name, arguments) {
+			var new_arguments = [blazegears_class];
 			
 			for (var i = 0; i < arguments.length; i++) {
 				new_arguments.push(arguments[i]);
 			}
 			
-			return template.__declaration__.static[name].apply(template, new_arguments);
+			return blazegears_class.__declaration__.static[name].apply(blazegears_class, new_arguments);
 		}
 		
 		// searches the superclasses for a static method
-		template.__super__ = function(name) {
+		blazegears_class.__super__ = function(name) {
 			var functions;
 			var new_name = name;
-			var parents = template.__declaration__.magic.parents;
+			var parents = blazegears_class.__declaration__.magic.parents;
 			
 			for (var i in parents) {
 				if(self.is(parents[i].__declaration__.static[name])) {
-					arguments[0] = template;
-					parents[i].__declaration__.static[new_name].apply(template, arguments);
+					arguments[0] = blazegears_class;
+					parents[i].__declaration__.static[new_name].apply(blazegears_class, arguments);
 					return;
 				}
 			}
@@ -858,17 +866,17 @@ BlazeGears = new function() {
 		// static members
 		for (var i in declaration.static) {
 			if (self.isFunction(declaration.static[i])) {
-				eval("template[i] = function() {return template.__method__('" + i + "', arguments);}");
+				eval("blazegears_class[i] = function() {return blazegears_class.__method__('" + i + "', arguments);}");
 			} else if (self.isArray(declaration.static[i]) || self.isObject(declaration.static[i])) {
-				template[i] = self.cloneArray(declaration.static[i]);
+				blazegears_class[i] = self.cloneArray(declaration.static[i]);
 			} else {
-				template[i] = declaration.static[i];
+				blazegears_class[i] = declaration.static[i];
 			}
 		}
-		template.__declaration__ = declaration;
-		template.__singleton__ = null;
+		blazegears_class.__declaration__ = declaration;
+		blazegears_class.__singleton__ = null;
 		
-		return template;
+		return blazegears_class;
 	}
 	
 	var isConstructOf = function(variable, constructor) {
