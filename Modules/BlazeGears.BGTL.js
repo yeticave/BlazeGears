@@ -103,12 +103,12 @@ BlazeGears.BGTL = BlazeGears.Singleton(BlazeGears.BaseClass, {
 		};
 		
 		// start declaring the object
-		result = "new function() {\n";
-		result += "\tthis.execute = function(" + self._param_var + ") {\n";
-		result += "\t\tif (!BlazeGears.is(" + self._param_var + "))" + self._param_var + " = {};\n"
-		result += "\t\tvar " + self._result_var + " = '';\n"
-		result += "\t\twith (" + self._param_var + ") {\n";
-		result += "\t\t\ttry {\n";
+		result = "new function() {";
+		result += "this.execute = function(" + self._param_var + ") {";
+		result += "if (!BlazeGears.is(" + self._param_var + "))" + self._param_var + " = {};"
+		result += "var " + self._result_var + " = '';"
+		result += "with (" + self._param_var + ") {";
+		result += "try {";
 		
 		do {
 			// find the nearest opening control tag
@@ -123,7 +123,7 @@ BlazeGears.BGTL = BlazeGears.Singleton(BlazeGears.BaseClass, {
 				if ((index == 0 || template.charAt(index - 1) != "\\")) { // if it's not escaped
 					// add all the prior text as escaped text
 					if (index != 0) {
-						result += "\t\t\t\t" + self._result_var + " += \"" + self._escape(template.substr(0, index)) + "\";\n";
+						result += self._result_var + " += \"" + self._escape(template.substr(0, index)) + "\";";
 					}
 					
 					// remove the opening tag
@@ -153,15 +153,15 @@ BlazeGears.BGTL = BlazeGears.Singleton(BlazeGears.BaseClass, {
 						
 						switch (method) {
 							case "html":
-								result += "\t\t\t\t" + self._result_var + " += " + script.replace() + ";\n";
+								result += self._result_var + " += " + script.replace() + ";";
 								break;
 							
 							case "statement":
-								result += "\t\t\t\t" + script + "\n";
+								result += script;
 								break;
 							
 							case "variable":
-								result += "\t\t\t\t" + self._result_var + " += BlazeGears.escape(" + script + ");\n";
+								result += self._result_var + " += BlazeGears.escape(" + script + ");";
 								break;
 						}
 					}
@@ -171,17 +171,17 @@ BlazeGears.BGTL = BlazeGears.Singleton(BlazeGears.BaseClass, {
 		
 		// add the rest as escaped text
 		if (template.length > 0) {
-			result += "\t\t\t\t" + self._result_var + "+=\"" + self._escape(template) + "\";\n";
+			result += self._result_var + "+=\"" + self._escape(template) + "\";";
 		}
 		
 		// finish declaring the object
-		result += "\t\t\t}\n";
-		result += "\t\t\tcatch (exception) {\n";
-		result += "\t\t\t\tBlazeGears.error('BlazeGears.BGTL', exception);\n";
-		result += "\t\t\t}\n";
-		result += "\t\t}\n";
-		result += "\t\treturn " + self._result_var + ";\n";
-		result += "\t}\n";
+		result += "}";
+		result += "catch (exception) {";
+		result += "BlazeGears.error('BlazeGears.BGTL', exception);";
+		result += "}";
+		result += "}";
+		result += "return " + self._result_var + ";";
+		result += "}";
 		result += "}";
 		
 		// try to compile the object
