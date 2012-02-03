@@ -7,7 +7,7 @@
      \/___/ \/____/\/__/\/_/ \/____/\/____/ \/___/ \/____/\/__/\/_/ \/_/\/___/ 
 
                                JavaScript Toolkit
-                        Version 1.0.0-s, August 29, 2011
+                      Version 1.0.1-s.1, February 3rd, 2012
                                www.blazegears.com
 
 
@@ -101,5 +101,15 @@
   V. Version History
 --------------------------------------------------------------------------------
 
-  - Version 1.0.0-s, August 29, 2011
-    The first public release.
+  - Version 1.0.1-s.1, February 3rd, 2012
+    - Updated the readme and license files.
+  
+  - Version 1.0.1-s, January 29th, 2012
+    - Fixed the declaration of BlazeGears.Formats, which is now a singleton.
+    - Fixed the bug where declaring an instance and a static member of the same
+      name would let them coexist, instead of overwriting the prior member.
+    - Fixed the bug where the BlazeGears.Class.__super__ method would never
+      return anything.
+  
+  - Version 1.0.0-s, August 29th, 2011
+    - The first public release.
