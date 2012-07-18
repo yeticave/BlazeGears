@@ -7,7 +7,7 @@
      \/___/ \/____/\/__/\/_/ \/____/\/____/ \/___/ \/____/\/__/\/_/ \/_/\/___/ 
 
                                JavaScript Toolkit
-                      Version 1.0.1-s.1, February 3rd, 2012
+                        Version 1.0.2-s, July 17th, 2012
                                www.blazegears.com
 
 
@@ -51,8 +51,8 @@
   
   The second file that's supposed to be included is "BlazeGears.BaseClass.js",
   which is the superclass for all the standard BlazeGears classes. However, if
-  you're not planning to use any of these classes, the BaseClass can be omitted
-  as well.
+  you're not planning to use any of these classes, the BaseClass can be
+  omitted as well.
   
   After this, the rest of the classes can be included as well. Please note
   that the classes won't automatically include their superclasses or
@@ -101,13 +101,22 @@
   V. Version History
 --------------------------------------------------------------------------------
 
+  - Version 1.0.2-s, July 17th, 2012
+    - Fixed the bug where the BlazeGears.Class.__super__ method wouldn't do
+      anything, when it can't find the sought method. Now it will throw an
+      error in such a case.
+    - Fixed the bug where the BlazeGears.createEntity method wouldn't do
+      anything, if the suggested entity ID was already in use. Now it will
+      throw an error in such a case.
+  
   - Version 1.0.1-s.1, February 3rd, 2012
     - Updated the readme and license files.
   
   - Version 1.0.1-s, January 29th, 2012
     - Fixed the declaration of BlazeGears.Formats, which is now a singleton.
-    - Fixed the bug where declaring an instance and a static member of the same
-      name would let them coexist, instead of overwriting the prior member.
+    - Fixed the bug where declaring an instance and a static member of the
+      same name would let them coexist, instead of overwriting the prior
+      member.
     - Fixed the bug where the BlazeGears.Class.__super__ method would never
       return anything.
   
