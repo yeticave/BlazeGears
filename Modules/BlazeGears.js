@@ -201,7 +201,9 @@ BlazeGears = new function() {
 			entities[id] = value;
 			result = id;
 		} else {
-			if (!self.is(entities[id])) {
+			if (self.is(entities[id])) {
+				throw new Error("The suggested Entity ID is already in use.");
+			} else {
 				entities[id] = value;
 				result = id;
 			}
