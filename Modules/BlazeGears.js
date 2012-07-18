@@ -793,6 +793,7 @@ BlazeGears = new function() {
 				var parents = blazegears_class.__declaration__.magic.parents;
 				var result;
 				
+				// search for a public member
 				for (var i in parents) {
 					if(self.is(parents[i].__declaration__.public[name])) {
 						arguments[0] = instance;
@@ -801,14 +802,22 @@ BlazeGears = new function() {
 						break;
 					}
 				}
+				
+				// search for a static member
 				if (!done) {
 					for (var i in parents) {
 						if(self.is(parents[i].__declaration__.static[name])) {
 							arguments[0] = blazegears_class;
 							result = parents[i].__declaration__.static[new_name].apply(blazegears_class, arguments);
+							done = true;
 							break;
 						}
 					}
+				}
+				
+				// member not found, throw an error
+				if (!done) {
+					throw new Error("Member not found.");
 				}
 				
 				return result;
