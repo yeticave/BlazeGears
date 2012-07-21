@@ -1,6 +1,6 @@
 /*
 BlazeGears JavaScript Toolkit
-Version 1.0.2-s, July 17th, 2012
+Version 1.0.3-s, July 21st, 2012
 
 Copyright (c) 2011-2012 Gabor Soos
 
@@ -78,7 +78,7 @@ BlazeGears = new function() {
 	
 	Default Members:
 		__class__ - Refers to the class itself.
-		__super__ - Searches the superclasses for a method.
+		__super__ - Searches the superclasses for a method. Will throw an exception, if the sought method doesn't exist.
 	*/
 	self.Class = function() {
 		if (arguments.length > 0) {

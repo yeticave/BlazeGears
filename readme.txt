@@ -7,7 +7,7 @@
      \/___/ \/____/\/__/\/_/ \/____/\/____/ \/___/ \/____/\/__/\/_/ \/_/\/___/ 
 
                                JavaScript Toolkit
-                        Version 1.0.2-s, July 17th, 2012
+                        Version 1.0.3-s, July 21st, 2012
                                www.blazegears.com
 
 
@@ -101,6 +101,13 @@
   V. Version History
 --------------------------------------------------------------------------------
 
+  - Version 1.0.3-s, July 21st, 2012
+    - Reverted the fix made to the BlazeGears.createEntity function in the
+      previous release, because the original functionality was correct.
+    - Fixed the bug where the static version of the BlazeGears.Class.__super__
+      method wouldn't do anything, when it can't find the sought method. Now
+      it will throw an error in such a case.
+  
   - Version 1.0.2-s, July 17th, 2012
     - Fixed the bug where the BlazeGears.Class.__super__ method wouldn't do
       anything, when it can't find the sought method. Now it will throw an
