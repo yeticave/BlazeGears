@@ -868,6 +868,7 @@ BlazeGears = new function() {
 		
 		// searches the superclasses for a static method
 		blazegears_class.__super__ = function(name) {
+			var done = false;
 			var functions;
 			var new_name = name;
 			var parents = blazegears_class.__declaration__.magic.parents;
@@ -877,8 +878,13 @@ BlazeGears = new function() {
 				if(self.is(parents[i].__declaration__.static[name])) {
 					arguments[0] = blazegears_class;
 					result = parents[i].__declaration__.static[new_name].apply(blazegears_class, arguments);
+					done = true;
 					break;
 				}
+			}
+			
+			if (!done) {
+				throw new Error("Member not found.");
 			}
 			
 			return result;
