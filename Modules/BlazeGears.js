@@ -44,7 +44,7 @@ BlazeGears = new function() {
 		display_errors - If it's true, <error> will display the messages on-screen. Defaults to false.
 		entity_id_length - The length of the IDs used for entities. Defaults to 10.
 		entity_id_prefix - This prefix will be applied to every entity ID to avoid clashes. It doesn't count towards the length of the ID. Defaults to "blazegears_entity_".
-		escape_encoding - The default encoding used by <escape>. Defaults to "html".
+		escape_encoding - The default encoding used by <escapeString>. Defaults to "html".
 	*/
 	self.config = {
 		display_errors: false,
@@ -138,26 +138,35 @@ BlazeGears = new function() {
 	/*
 	Function: cloneArray
 	
-	Creates an exact copy of an array, dictionary, or object.
+	A depreciated alias for <cloneObject>.
+	*/
+	self.cloneArray = function(source) {
+		return self.cloneObject(source);
+	}
+	
+	/*
+	Function: cloneObject
+	
+	Creates an exact copy of an object.
 	
 	Arguments:
-		array - The array to be copied.
+		source - The object to be cloned.
 	
 	Return Value:
-		Returns a reference to the newly created array.
+		Returns a reference to the newly created object.
 	*/
-	self.cloneArray = function(array) {
-		var new_array = self.isArray(array) ? [] : {};
+	self.cloneObject = function(source) {
+		var clone = self.isArray(source) ? [] : {};
 		
-		for (i in array) {
-			if (array[i] && self.isObject(array[i]) && array[i] != null) {
-				new_array[i] = self.cloneArray(array[i]);
+		for (i in source) {
+			if (source[i] && self.isObject(source[i]) && source[i] != null) {
+				clone[i] = self.cloneObject(source[i]);
 			} else {
-				new_array[i] = array[i];
+				clone[i] = source[i];
 			}
 		}
 		
-		return new_array;
+		return clone;
 	}
 	
 	/*
@@ -314,6 +323,15 @@ BlazeGears = new function() {
 	/*
 	Function: escape
 	
+	A depreciated alias for <escapeString>.
+	*/
+	self.escape = function(text, encoding) {
+		return self.escapeString(text, encoding);
+	}
+	
+	/*
+	Function: escapeString
+	
 	Escapes a string based on the selected encoding.
 	
 	Arguments:
@@ -328,7 +346,7 @@ BlazeGears = new function() {
 		newlines - Only escapes the carriage return and new line characters.
 		utf-8 - All non-ASCII and HTML control characters will be escaped.
 	*/
-	self.escape = function(text, encoding) {
+	self.escapeString = function(text, encoding) {
 		if (!self.is(encoding)) encoding = self.config.escape_encoding;
 		
 		var code;
@@ -388,31 +406,10 @@ BlazeGears = new function() {
 	/*
 	Function: generateFlash
 	
-	Generates the cross-browser HTML code for a Flash application.
-	
-	Arguments:
-		id - The ID value for the OBJECT tag of the application.
-		filename - The filename of the application.
-		width - The width of the application.
-		height - The height of the application.
-		[params = {}] - A dictionary that defines the parameters for the application. The keys will be used as the names of the parameters.
-	
-	Return Value:
-		Returns the generated HTML code.
+	A depreciated alias for <renderFlash>.
 	*/
 	self.generateFlash = function(id, filename, width, height, params) {
-		if (!self.is(params)) params = {};
-		
-		var result = "";
-		
-		result += "<!--[if !IE]>--><object data='" + filename + "' height='" + height + "' id='" + id + "' type='application/x-shockwave-flash' width='" + width + "'><!--<![endif]-->";
-		result += "<!--[if IE]><object classid='clsid:D27CDB6E-AE6D-11cf-96B8-444553540000' codebase='http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0' height='" + height + "' width='" + width + "' ><param name='movie' value='" + filename + "' /><![endif]-->";
-		for (var i in params) {
-			result += "<param name='" + i + "' value='" + params[i] + "' />";
-		}
-		result += "</object>";
-		
-		return result;
+		return self.renderFlash(id, filename, width, height, params);
 	}
 	
 	/*
@@ -520,7 +517,7 @@ BlazeGears = new function() {
 				if (once) {
 					included_js.push(filename);
 				}
-				document.write("<script src='" + self.escape(filename) + "' type='text/javascript'></script>");
+				document.write("<script src='" + self.escapeString(filename) + "' type='text/javascript'></script>");
 			}
 		}
 	}
@@ -683,6 +680,36 @@ BlazeGears = new function() {
 	}
 	
 	/*
+	Function: renderFlash
+	
+	Generates the cross-browser HTML code for a Flash application.
+	
+	Arguments:
+		id - The ID value for the OBJECT tag of the application.
+		filename - The filename of the application.
+		width - The width of the application.
+		height - The height of the application.
+		[params = {}] - A dictionary that defines the parameters for the application. The keys will be used as the names of the parameters.
+	
+	Return Value:
+		Returns the generated HTML code.
+	*/
+	self.renderFlash = function(id, filename, width, height, params) {
+		if (!self.is(params)) params = {};
+		
+		var result = "";
+		
+		result += "<!--[if !IE]>--><object data='" + filename + "' height='" + height + "' id='" + id + "' type='application/x-shockwave-flash' width='" + width + "'><!--<![endif]-->";
+		result += "<!--[if IE]><object classid='clsid:D27CDB6E-AE6D-11cf-96B8-444553540000' codebase='http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0' height='" + height + "' width='" + width + "' ><param name='movie' value='" + filename + "' /><![endif]-->";
+		for (var i in params) {
+			result += "<param name='" + i + "' value='" + params[i] + "' />";
+		}
+		result += "</object>";
+		
+		return result;
+	}
+	
+	/*
 	Function: updateEntity
 	
 	Changes the value of an entity.
@@ -828,7 +855,7 @@ BlazeGears = new function() {
 				if (self.isFunction(blazegears_class.__declaration__.public[i])) {
 					eval("instance[i] = function() {return instance.__method__('" + i + "', arguments);}");
 				} else if (self.isArray(blazegears_class.__declaration__.public[i]) || self.isObject(blazegears_class.__declaration__.public[i])) {
-					instance[i] = self.cloneArray(blazegears_class.__declaration__.public[i]);
+					instance[i] = self.cloneObject(blazegears_class.__declaration__.public[i]);
 				} else {
 					instance[i] = blazegears_class.__declaration__.public[i];
 				}
@@ -893,7 +920,7 @@ BlazeGears = new function() {
 			if (self.isFunction(declaration.static[i])) {
 				eval("blazegears_class[i] = function() {return blazegears_class.__method__('" + i + "', arguments);}");
 			} else if (self.isArray(declaration.static[i]) || self.isObject(declaration.static[i])) {
-				blazegears_class[i] = self.cloneArray(declaration.static[i]);
+				blazegears_class[i] = self.cloneObject(declaration.static[i]);
 			} else {
 				blazegears_class[i] = declaration.static[i];
 			}

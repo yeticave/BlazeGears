@@ -144,58 +144,10 @@ BlazeGears.Form = BlazeGears.Class(BlazeGears.BaseClass, {
 	/*
 	Method: generate
 	
-	Generates the code for the form and outputs it into the target <element>, if there's one.
-	
-	Return Value:
-		Returns the generated code of the form.
+	A depreciated alias for <render>.
 	*/
 	generate: function(self) {
-		var element;
-		var result;
-		
-		// generate the opening of the form
-		if (!self.is(self.events.submit)) {
-			self.events.submit = "";
-		}
-		result = "<form action='" + self.action + "' id='" + self._id + "'";
-		for (var i in self.attribs) {
-			result += " " + i + "='" + self.escape(self.attribs[i]) + "'";
-		}
-		for (var i in self.events) {
-			result += " on" + i + "='" + self.escape(self.events[i]);
-			if (i == "submit") {
-				result += "; return BlazeGears.getEntity(\"" + self._id + "\")._submit();";
-			}
-			result += "'";
-		}
-		result += ">";
-		
-		// compile the templates
-		for (var i in self.templates) {
-			self._templates[i] = self._bgtl.parse(self.templates[i]);
-		}
-		
-		// generate the fields and add the html chunks
-		for (var i in self._fields) {
-			if (self._fields[i][0] == "field") {
-				result += self._fields[i][2]._generate();
-			} else if (self._fields[i][0] == "html") {
-				result += self._fields[i][1];
-			}
-		}
-		result += "</form>";
-		
-		// output the form into the target element, if there's any
-		if (self.element != null && self.isString(self.element)) {
-			element = document.getElementById(self.element);
-		} else {
-			element = self.element;
-		}
-		if (element != null) {
-			element.innerHTML = result;
-		}
-		
-		return result;
+		return self.render();
 	},
 	
 	/*
@@ -233,6 +185,63 @@ BlazeGears.Form = BlazeGears.Class(BlazeGears.BaseClass, {
 	*/
 	getId: function(self) {
 		return self._id;
+	},
+	
+	/*
+	Method: render
+	
+	Renders the form and places it into the target <element>, if there's one.
+	
+	Return Value:
+		Returns the markup for the form.
+	*/
+	render: function(self) {
+		var element;
+		var result;
+		
+		// render the opening of the form
+		if (!self.is(self.events.submit)) {
+			self.events.submit = "";
+		}
+		result = "<form action='" + self.action + "' id='" + self._id + "'";
+		for (var i in self.attribs) {
+			result += " " + i + "='" + self.escapeString(self.attribs[i]) + "'";
+		}
+		for (var i in self.events) {
+			result += " on" + i + "='" + self.escapeString(self.events[i]);
+			if (i == "submit") {
+				result += "; return BlazeGears.getEntity(\"" + self._id + "\")._submit();";
+			}
+			result += "'";
+		}
+		result += ">";
+		
+		// compile the templates
+		for (var i in self.templates) {
+			self._templates[i] = self._bgtl.parseTemplate(self.templates[i]);
+		}
+		
+		// render the fields and add the html chunks
+		for (var i in self._fields) {
+			if (self._fields[i][0] == "field") {
+				result += self._fields[i][2]._render();
+			} else if (self._fields[i][0] == "html") {
+				result += self._fields[i][1];
+			}
+		}
+		result += "</form>";
+		
+		// output the form into the target element, if there's any
+		if (self.element != null && self.isString(self.element)) {
+			element = document.getElementById(self.element);
+		} else {
+			element = self.element;
+		}
+		if (element != null) {
+			element.innerHTML = result;
+		}
+		
+		return result;
 	},
 	
 	/*
@@ -448,7 +457,7 @@ BlazeGears.Form.Field = BlazeGears.Class(BlazeGears.BaseClass, {
 		self._type = type;
 	},
 	
-	_generate: function(self) {
+	_render: function(self) {
 		var result = null;
 		var template;
 		
@@ -456,10 +465,10 @@ BlazeGears.Form.Field = BlazeGears.Class(BlazeGears.BaseClass, {
 			self.texts = self._parent.texts[self._type];
 		}
 		if (self.template != null) {
-			template = self._parent._bgtl.parse(self.template);
-			result = template.execute(self);
+			template = self._parent._bgtl.parseTemplate(self.template);
+			result = template.render(self);
 		} else if (self.is(self._parent._templates[self._type])) {
-			result = self._parent._templates[self._type].execute(self);
+			result = self._parent._templates[self._type].render(self);
 		}
 		
 		return result;
@@ -492,11 +501,11 @@ BlazeGears.Form.Field = BlazeGears.Class(BlazeGears.BaseClass, {
 			}
 			if (!rule_result) {
 				if (self._rules[i][2] != null) {
-					invalid_content += "<div>" + self.escape(self._rules[i][2]) +  "</div>";
+					invalid_content += "<div>" + self.escapeString(self._rules[i][2]) +  "</div>";
 				}
 				result = false;
 			} else if (self._rules[i][3] != null) {
-				valid_content += "<div>" + self.escape(self._rules[i][3]) +  "</div>";
+				valid_content += "<div>" + self.escapeString(self._rules[i][3]) +  "</div>";
 			}
 			if (invalid_element != null) {
 				if (invalid_content.length > 0) {

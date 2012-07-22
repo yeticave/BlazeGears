@@ -94,61 +94,10 @@ BlazeGears.Paginator = BlazeGears.Class(BlazeGears.BaseClass, {
 	/*
 	Method: generate
 	
-	Generates the code for the paginator and outputs it into the target elements.
-	
-	Return Value:
-		Returns the generated code.
+	A depreciated alias for <render>.
 	*/
 	generate: function(self) {
-		var element;
-		var page;
-		var result;
-		
-		// verify that the page number is correct
-		page = self._fragvar.getValue();
-		if (page == null) {
-			self._page = 1;
-		} else {
-			self._page = parseInt(page);
-		}
-		if (self._page < 0 || isNaN(self._page)) {
-			self._page = 1;
-		}
-		if (self._page > self._pages) {
-			self._page = self._pages;
-		}
-		
-		// execute the template and update the elements
-		result = self._bgtl.execute(self.template, self);
-		if (self.element != null) {
-			if (self.isArray(self.element)) {
-				for (var i in self.element) {
-					if (self.isString(self.element[i])) {
-						element = document.getElementById(self.element[i]);
-						if (element == null) {
-							self.error("BlazeGears.Paginator", "Invalid element!", self.element[i]);
-						} else {
-							element.innerHTML = result;
-						}
-					} else {
-						self.element[i].innerHTML = result;
-					}
-				}
-			} else {
-				if (self.isString(self.element)) {
-					element = document.getElementById(self.element);
-					if (element == null) {
-						self.error("BlazeGears.Paginator", "Invalid element!", self.element);
-					} else {
-						element.innerHTML = result;
-					}
-				} else {
-					self.element.innerHTML = result;
-				}
-			}
-		}
-		
-		return result;
+		return self.render();
 	},
 	
 	/*
@@ -217,28 +166,88 @@ BlazeGears.Paginator = BlazeGears.Class(BlazeGears.BaseClass, {
 	},
 	
 	/*
+	Method: render
+	
+	Renders the paginator and places it into the target <element>, if there's one.
+	
+	Return Value:
+		Returns the markup for the paginator.
+	*/
+	render: function(self) {
+		var element;
+		var page;
+		var result;
+		
+		// verify that the page number is correct
+		page = self._fragvar.getValue();
+		if (page == null) {
+			self._page = 1;
+		} else {
+			self._page = parseInt(page);
+		}
+		if (self._page < 0 || isNaN(self._page)) {
+			self._page = 1;
+		}
+		if (self._page > self._pages) {
+			self._page = self._pages;
+		}
+		
+		// render the template and update the elements
+		result = self._bgtl.renderTemplate(self.template, self);
+		if (self.element != null) {
+			if (self.isArray(self.element)) {
+				for (var i in self.element) {
+					if (self.isString(self.element[i])) {
+						element = document.getElementById(self.element[i]);
+						if (element == null) {
+							self.error("BlazeGears.Paginator", "Invalid element!", self.element[i]);
+						} else {
+							element.innerHTML = result;
+						}
+					} else {
+						self.element[i].innerHTML = result;
+					}
+				}
+			} else {
+				if (self.isString(self.element)) {
+					element = document.getElementById(self.element);
+					if (element == null) {
+						self.error("BlazeGears.Paginator", "Invalid element!", self.element);
+					} else {
+						element.innerHTML = result;
+					}
+				} else {
+					self.element.innerHTML = result;
+				}
+			}
+		}
+		
+		return result;
+	},
+	
+	/*
 	Method: setPages
 	
-	Sets the number of pages and regenarates the paginator.
+	Sets the number of pages and re-renders the paginator.
 	
 	Arguments:
 		pages - The new number of pages.
 	
 	Return Value:
-		Returns the generated code.
+		Returns the markup for the paginator.
 	
 	See Also:
-		- <generate>
 		- <getPages>
+		- <render>
 	*/
 	setPages: function(self, pages) {
 		self._pages = pages;
 		
-		return self.generate();
+		return self.render();
 	},
 	
 	_update: function(self) {
-		self.generate();
+		self.render();
 		self.onChange.call(self, self);
 	}
 });

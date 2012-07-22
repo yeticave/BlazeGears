@@ -27,7 +27,7 @@ Homepage: http://www.yeticave.com
 /*
 Class: BlazeGears.BGTL
 
-A singleton class that parses and executes HTML templates written in the BlazeGears Templating Language.
+A singleton class that parses and renders HTML templates written in the BlazeGears Templating Language.
 
 The language's syntax is based on a mix of JavaScript and <BottlePy's Simple Template at http://bottlepy.org/docs/dev/stpl.html>.
 
@@ -49,26 +49,23 @@ BlazeGears.BGTL = BlazeGears.Singleton(BlazeGears.BaseClass, {
 	/*
 	Method: execute
 	
-	Parses, executes, and finally discards a template.
-	
-	Paremeters:
-		template - The string to be parsed.
-		[params = {}] - A dictionary of arguments used for the execution.
-	
-	Return Value:
-		Returns the result of the executed template.
+	A depreciated alias for <renderTemplate>.
 	*/
 	execute: function(self, template, params) {
-		if (!self.is(params)) params = {};
-		
-		var bgtl = self.parse(template);
-		var result = bgtl.execute(params);
-		
-		return result;
+		return self.renderTemplate(template, params);
 	},
 	
 	/*
 	Method: parse
+	
+	A depreciated alias for <parseTemplate>.
+	*/
+	parse: function(self, template) {
+		return self.parseTemplate(template);
+	},
+	
+	/*
+	Method: parseTemplate
 	
 	Parses a string and creates a template object of it.
 	
@@ -76,9 +73,9 @@ BlazeGears.BGTL = BlazeGears.Singleton(BlazeGears.BaseClass, {
 		template - The string to be parsed.
 	
 	Return Value:
-		Returns a template object, which has a single method, called execute. The method will take a dictionary as its one and only argument. The keys of the dictionary will be converted to variable names then. The method will return the result of the template.
+		Returns a template object, which has a single method, called render. The method will take a dictionary as its one and only argument. The keys of the dictionary will be converted to variable names then. The method will return the result of the template.
 	*/
-	parse: function(self, template) {
+	parseTemplate: function(self, template) {
 		var breaker;
 		var breakers;
 		var config;
@@ -104,7 +101,7 @@ BlazeGears.BGTL = BlazeGears.Singleton(BlazeGears.BaseClass, {
 		
 		// start declaring the object
 		result = "new function() {";
-		result += "this.execute = function(" + self._param_var + ") {";
+		result += "this.render = function(" + self._param_var + ") {";
 		result += "if (!BlazeGears.is(" + self._param_var + "))" + self._param_var + " = {};"
 		result += "var " + self._result_var + " = '';"
 		result += "with (" + self._param_var + ") {";
@@ -161,7 +158,7 @@ BlazeGears.BGTL = BlazeGears.Singleton(BlazeGears.BaseClass, {
 								break;
 							
 							case "variable":
-								result += self._result_var + " += BlazeGears.escape(" + script + ");";
+								result += self._result_var + " += BlazeGears.escapeString(" + script + ");";
 								break;
 						}
 					}
@@ -181,7 +178,8 @@ BlazeGears.BGTL = BlazeGears.Singleton(BlazeGears.BaseClass, {
 		result += "}";
 		result += "}";
 		result += "return " + self._result_var + ";";
-		result += "}";
+		result += "};";
+		result += "this.execute = this.render;";
 		result += "}";
 		
 		// try to compile the object
@@ -194,8 +192,29 @@ BlazeGears.BGTL = BlazeGears.Singleton(BlazeGears.BaseClass, {
 		return result;
 	},
 	
+	/*
+	Method: renderTemplate
+	
+	Parses, renders, and finally discards a template.
+	
+	Paremeters:
+		template - The string to be parsed.
+		[params = {}] - A dictionary of arguments used for the execution.
+	
+	Return Value:
+		Returns the rendered template.
+	*/
+	renderTemplate: function(self, template, params) {
+		if (!self.is(params)) params = {};
+		
+		var bgtl = self.parseTemplate(template);
+		var result = bgtl.render(params);
+		
+		return result;
+	},
+	
 	_escape: function(self, text) {
-		return BlazeGears.escape(text, {9: "\\t", 10: "\\n", 13: "\\r", 34: "\\\"", 92: "\\"});
+		return BlazeGears.escapeString(text, {9: "\\t", 10: "\\n", 13: "\\r", 34: "\\\"", 92: "\\"});
 	},
 	
 	_findNearest: function(self, text, array) {

@@ -31,8 +31,13 @@ A class that puts all the functions from the <BlazeGears> namespace into an obje
 */
 BlazeGears.BaseClass = BlazeGears.Class({
 	// Method: cloneArray
-	cloneArray: function(self, object) {
-		return BlazeGears.cloneArray(object);
+	cloneArray: function(self, source) {
+		return BlazeGears.cloneArray(source);
+	},
+	
+	// Method: cloneObject
+	cloneObject: function(self, source) {
+		return BlazeGears.cloneObject(source);
 	},
 	
 	// Method: createEntity
@@ -63,6 +68,11 @@ BlazeGears.BaseClass = BlazeGears.Class({
 	// Method: escape
 	escape: function(self, text, encoding) {
 		return BlazeGears.escape(text, encoding);
+	},
+	
+	// Method: escapeString
+	escapeString: function(self, text, encoding) {
+		return BlazeGears.escapeString(text, encoding);
 	},
 	
 	// Method: generateFlash
@@ -128,6 +138,11 @@ BlazeGears.BaseClass = BlazeGears.Class({
 	// Method: isString
 	isString: function(self, variable) {
 		return BlazeGears.isString(variable);
+	},
+	
+	// Method: renderFlash
+	renderFlash: function(self, id, filename, width, height, params) {
+		return BlazeGears.renderFlash(id, filename, width, height, params);
 	},
 	
 	// Method: updateEntity
