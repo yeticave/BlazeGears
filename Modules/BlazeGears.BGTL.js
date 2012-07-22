@@ -67,13 +67,16 @@ BlazeGears.BGTL = BlazeGears.Singleton(BlazeGears.BaseClass, {
 	/*
 	Method: parseTemplate
 	
-	Parses a string and creates a template object of it.
+	Parses a string into a template object.
 	
 	Paremeters:
 		template - The string to be parsed.
 	
 	Return Value:
-		Returns a template object, which has a single method, called render. The method will take a dictionary as its one and only argument. The keys of the dictionary will be converted to variable names then. The method will return the result of the template.
+		Returns a template object, which implements the <BlazeGears.BGTL.TemplateInterface>.
+	
+	See Alsp:
+		<BlazeGears.BGTL.TemplateInterface>
 	*/
 	parseTemplate: function(self, template) {
 		var breaker;
