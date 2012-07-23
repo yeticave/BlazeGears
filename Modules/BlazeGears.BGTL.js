@@ -42,7 +42,7 @@ Control Tags:
 	
 	Apart from the closing tags, tags can be terminated by line breaks, too.
 */
-BlazeGears.BGTL = BlazeGears.Singleton(BlazeGears.BaseClass, {
+BlazeGears.BGTL = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 	_param_var: "bgtl_params",
 	_result_var: "bgtl_result",
 	

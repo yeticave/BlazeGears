@@ -36,7 +36,7 @@ Dependencies:
 	- <BlazeGears.BGTL>
 	- <BlazeGears.FragVars>
 */
-BlazeGears.Paginator = BlazeGears.Class(BlazeGears.BaseClass, {
+BlazeGears.Paginator = BlazeGears.Classes.declareClass(BlazeGears.BaseClass, {
 	// Group: Variables
 	
 	// Field: element

@@ -32,7 +32,7 @@ A singleton class that handles various string formatting tasks.
 Superclasses:
 	<BlazeGears.BaseClass>
 */
-BlazeGears.Formats = BlazeGears.Singleton(BlazeGears.BaseClass, {
+BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 	/*
 	Field: date_format
 	

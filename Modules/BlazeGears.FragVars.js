@@ -32,7 +32,7 @@ A singleton class that handles variables stored in the fragment section of the c
 Superclasses:
 	<BlazeGears.Styles>
 */
-BlazeGears.FragVars = BlazeGears.Singleton(BlazeGears.Styles, {
+BlazeGears.FragVars = BlazeGears.Classes.declareSingleton(BlazeGears.Styles, {
 	// Field: ie_history
 	// If it's true, upon updating the URL the changes will be saved, so the the forward and back buttons will properly work under Internet Explorer.
 	ie_history: true,
@@ -312,7 +312,7 @@ A class that represents a single FragVar.
 Superclasses:
 	<BlazeGears.BaseClass>
 */
-BlazeGears.FragVars.FragVar = BlazeGears.Class(BlazeGears.BaseClass, {
+BlazeGears.FragVars.FragVar = BlazeGears.Classes.declareClass(BlazeGears.BaseClass, {
 	_id: null,
 	_parent: null,
 	

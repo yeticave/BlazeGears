@@ -35,7 +35,7 @@ Superclasses:
 Dependencies:
 	<BlazeGears.BGTL>
 */
-BlazeGears.Form = BlazeGears.Class(BlazeGears.BaseClass, {
+BlazeGears.Form = BlazeGears.Classes.declareClass(BlazeGears.BaseClass, {
 	// Field: action
 	// The action property of the form.
 	action: "",
@@ -289,7 +289,7 @@ A class that represents a field of a form object.
 Superclasses:
 	<BlazeGears.BaseClass>
 */
-BlazeGears.Form.Field = BlazeGears.Class(BlazeGears.BaseClass, {
+BlazeGears.Form.Field = BlazeGears.Classes.declareClass(BlazeGears.BaseClass, {
 	// Field: attribs
 	// Each key of this dictionary will be an attribute of the field.
 	attribs: {},
@@ -537,7 +537,7 @@ This can either mean radio buttons, checkboxes, or select-list options.
 Superclasses:
 	<BlazeGears.BaseClass>
 */
-BlazeGears.Form.Option = BlazeGears.Class(BlazeGears.BaseClass, {
+BlazeGears.Form.Option = BlazeGears.Classes.declareClass(BlazeGears.BaseClass, {
 	// Field: attribs
 	// Each key of this dictionary will be an attribute of the option.
 	attribs: {},

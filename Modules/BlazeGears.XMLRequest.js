@@ -32,7 +32,7 @@ A class that can be used for making AJAX requests.
 Superclasses:
 	<BlazeGears.BaseClass>
 */
-BlazeGears.XMLRequest = BlazeGears.Class(BlazeGears.BaseClass, {
+BlazeGears.XMLRequest = BlazeGears.Classes.declareClass(BlazeGears.BaseClass, {
 	// Group: Variables
 	
 	// Field: async

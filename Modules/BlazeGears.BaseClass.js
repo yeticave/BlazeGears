@@ -29,7 +29,7 @@ Class: BlazeGears.BaseClass
 
 A class that puts all the functions from the <BlazeGears> namespace into an object-oriented context.
 */
-BlazeGears.BaseClass = BlazeGears.Class({
+BlazeGears.BaseClass = BlazeGears.Classes.declareClass({
 	// Method: cloneArray
 	cloneArray: function(self, source) {
 		return BlazeGears.cloneArray(source);

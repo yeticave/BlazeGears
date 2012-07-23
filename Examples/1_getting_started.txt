@@ -15,6 +15,7 @@ The example below will show how to include all the standard classes.
 	<script type="text/javascript">
 		// <![CDATA[
 		BlazeGears.includeJs([
+			"BlazeGears/Modules/BlazeGears.Classes.js",
 			"BlazeGears/Modules/BlazeGears.BaseClass.js",
 			"BlazeGears/Modules/BlazeGears.BGTL.js",
 			"BlazeGears/Modules/BlazeGears.Formats.js",

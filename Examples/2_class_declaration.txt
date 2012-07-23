@@ -3,8 +3,7 @@ Document: 2. Class Declaration
 The BlazeGears class declaration interface is largely based on the concepts used by the Python language. It supports constructors, self-references, singletons, regular and multiple inheritance, superclass searching, and static members.
 
 See Also:
-	- <BlazeGears.Class>
-	- <BlazeGears.Singleton>
+	<BlazeGears.Classes>
 
 
 Topic: Declaring a Class
@@ -14,7 +13,7 @@ The class declaring method handles arguments dynamically. The last argument must
 The example below will show the usage of constructors and self-references.
 
 (code)
-	MyClass = BlazeGears.Class({
+	MyClass = BlazeGears.Classes.declareClass({
 		my_property: null, // property
 		
 		// the constructor, sets the value of the property
@@ -42,7 +41,7 @@ Topic: Singletons
 Singletons work almost the same as regular classes do, but upon trying to create a second instance, the reference to the for the first instance will be returned instead.
 
 (code)
-	MySingleton = BlazeGears.Singleton({
+	MySingleton = BlazeGears.Classes.declareSingleton({
 		my_property: "I'm a class!"
 	});
 	
@@ -60,7 +59,7 @@ Besides regular inheritance, BlazeGears also supports multiple inheritance. For 
 There's a magical method available to all instances, called "super", which will search the superclasses in order of priority for a method, and calls it if it's available.
 
 (code)
-	Canine = BlazeGears.Class({
+	Canine = BlazeGears.Classes.declareClass({
 		__init__: function(self, name) {
 			self.name = name;
 		},
@@ -74,19 +73,19 @@ There's a magical method available to all instances, called "super", which will 
 		}
 	});
 	
-	Fox = BlazeGears.Class(Canine, { // regular inheritance
+	Fox = BlazeGears.Classes.declareClass(Canine, { // regular inheritance
 		greet: function(self) {
 			alert("Hi there! I'm a fox!");
 		}
 	});
 	
-	Dog = BlazeGears.Class({
+	Dog = BlazeGears.Classes.declareClass({
 		bark: function(self) {
 			alert("Woof!");
 		}
 	});
 	
-	Hellhound = BlazeGears.Class(Dog, Canine, { // multiple inheritance
+	Hellhound = BlazeGears.Classes.declareClass(Dog, Canine, { // multiple inheritance
 		__init__: function(self, name, type) {
 			self.__super__("__init__", name); // calling the super's constructor
 			self.bark();
@@ -105,7 +104,7 @@ Topic: Static Members
 To make a member static the dollar sign prefix must be used. In the case of static methods the self-references will point to the class itself instead of the instance. The same reference is also available for the regular methods through the use of a magical property, called "class".
 
 (code)
-	MyClass = BlazeGears.Class({
+	MyClass = BlazeGears.Classes.declareClass({
 		$my_static_property: 5, // static property
 		
 		// calls the static method and tells the value of the static property

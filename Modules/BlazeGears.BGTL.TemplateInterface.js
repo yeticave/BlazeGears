@@ -1,7 +1,10 @@
 /*
 Class: BlazeGears.BGTL.TemplateInterface
 
-Parsed templates will implement this interface. It's just being used for documentation and has no actual functionality.
+Parsed templates will implement this interface.
+
+Note:
+	This class has no actual functionality, it just being used for documentation.
 
 See Also:
 	<BlazeGears.BGTL.parseTemplate>

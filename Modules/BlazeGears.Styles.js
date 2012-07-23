@@ -32,7 +32,7 @@ A singleton class that performs some common CSS and other visual tasks.
 Superclasses:
 	<BlazeGears.BaseClass>
 */
-BlazeGears.Styles = BlazeGears.Singleton(BlazeGears.BaseClass, {
+BlazeGears.Styles = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 	/*
 	Method: alignElements
 	
