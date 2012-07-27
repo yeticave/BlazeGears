@@ -9,7 +9,7 @@ Note:
 See Also:
 	<BlazeGears.BGTL.parseTemplate>
 */
-BlazeGears.BGTL.TemplateInterface = new function()
+BlazeGears.BGTL.TemplateInterface = function()
 {
 	var self = this;
 	

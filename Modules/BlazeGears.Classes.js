@@ -1,33 +1,32 @@
+/*
+Class: BlazeGears.Classes
+
+This namespace contains the functions and interfaces that can be used declare classes that has advantages over regular JavaScript classes.
+The declaration of a class is being done by passing an object to one of the class declaring functions. 
+
+Declaration Object Notes:
+ - Each key of the object will be a member of the class.
+ - Every key must be unique, not even keys of different types (public or static) are allowed to match. This doesn't effect magical keys, as they are special to begin with.
+ - Every method must have "self" as their first argument. This argument will be pushed to the front of the argument list, and it's guaranteed, that it will point either to the instance for instance methods or to the class for static methods.
+ - Keys starting with the dollar sign (e.g. "$static") will created as static members of the class.
+ - Keys starting with an underscore (e.g. "_protected") are considered protected/private by convention. Members like these in BlazeGears are not documented, meant to be used only internally, and might change without warning or notice.
+ - Keys starting and ending with double underscores (e.g. the constructor) will be considered magical. Using keys like these for declaring your own functionality is not advised.
+ - Objects should never be initialized in the declaration of the class, as the constructor will try to create a copy of every object member.
+*/
 BlazeGears.Classes = new function() {
 	var self = this;
 	var bg = BlazeGears;
 	
 	/*
-	Function: Class
+	Function: declareClass
 	
 	Declares a class.
 	
 	Arguments:
-		This method handles arguments dynamically. The last argument must a dictionary, this will be the declaration, and all the prior ones will be the superclasses of the class.
+		This method takes a variable amount of arguments. The last argument must the declaration object and all the prior ones will be the superclasses of the class.
 	
 	Return Value:
-		Returns a reference to the declared class.
-	
-	Declaration Notes:
-		- Each key of the declaration will be a member of the class.
-		- Every key must be unique, not even keys of different types (public or static) are allowed to match. This doesn't effect magical keys, as they are special to begin with.
-		- Every method must have "self" as their first argument. This will be used for self reference. It's not needed to provide this argument upon calling the method, since it will be applied automatically. This will refer to the instance for instance methods and the to the class for static methods.
-		- Keys starting with the dollar sign (e.g. "$static") will be static members of the class.
-		- Keys starting with an underscore (e.g. "_protected") will be considered protected/private. Members like these are not documented, meant to be used only internally, and might change without warning or notice.
-		- Keys starting and ending with double underscores (e.g. the constructor) will be considered magical. Using keys like this is not advised, as they might become part of the special keys one day.
-		- Objects should never be initialized in the declaration of the class, except if there are static.
-	
-	Optional Magic Keys:
-		__init__ - The constructor of the class.
-	
-	Default Members:
-		__class__ - Refers to the class itself.
-		__super__ - Searches the superclasses for a method. Will throw an exception, if the sought method doesn't exist.
+		Returns the declared class, which implements the <BlazeGears.Classes.ClassInterface>.
 	*/
 	self.declareClass = function() {
 		if (arguments.length > 0) {
@@ -40,7 +39,13 @@ BlazeGears.Classes = new function() {
 	/*
 	Function: declareSingleton
 	
-	Acts the same as <declareClass>, but upon trying to create a second instance of the class, it will return the reference for the first instance.
+	Declares a singleton.
+	
+	Arguments:
+		This method takes a variable amount of arguments. The last argument must the declaration object and all the prior ones will be the superclasses of the class.
+	
+	Return Value:
+		Returns the declared class, which implements the <BlazeGears.Classes.SingletonInterface>.
 	*/
 	self.declareSingleton = function() {
 		if (arguments.length > 0) {
@@ -114,11 +119,11 @@ BlazeGears.Classes = new function() {
 			instance.__class__ = blazegears_class; // self reference for the class
 			
 			// applies the self reference to the public methods
-			instance.__method__ = function(name, arguments) {
+			instance.__method__ = function(name, parameters) {
 				var new_arguments = [instance];
 				
-				for (var i = 0; i < arguments.length; i++) {
-					new_arguments.push(arguments[i]);
+				for (var i = 0; i < parameters.length; i++) {
+					new_arguments.push(parameters[i]);
 				}
 				
 				return blazegears_class.__declaration__.public[name].apply(instance, new_arguments);
@@ -165,7 +170,7 @@ BlazeGears.Classes = new function() {
 			// public members
 			for (var i in blazegears_class.__declaration__.public) {
 				if (bg.isFunction(blazegears_class.__declaration__.public[i])) {
-					eval("instance[i] = function() {return instance.__method__('" + i + "', arguments);}");
+					eval("instance[i] = function() { return instance.__method__('" + i + "', arguments); }");
 				} else if (bg.isArray(blazegears_class.__declaration__.public[i]) || bg.isObject(blazegears_class.__declaration__.public[i])) {
 					instance[i] = bg.cloneObject(blazegears_class.__declaration__.public[i]);
 				} else {
@@ -176,7 +181,7 @@ BlazeGears.Classes = new function() {
 			// static methods
 			for (var i in blazegears_class.__declaration__.static) {
 				if (bg.isFunction(blazegears_class.__declaration__.static[i])) {
-					eval("instance[i] = function() {return blazegears_class.__method__('" + i + "', arguments);}");
+					eval("instance[i] = function() { return blazegears_class.__method__('" + i + "', arguments); }");
 				}
 			}
 			
@@ -193,11 +198,11 @@ BlazeGears.Classes = new function() {
 		}
 		
 		// applies the self reference to the static methods
-		blazegears_class.__method__ = function(name, arguments) {
+		blazegears_class.__method__ = function(name, parameters) {
 			var new_arguments = [blazegears_class];
 			
-			for (var i = 0; i < arguments.length; i++) {
-				new_arguments.push(arguments[i]);
+			for (var i = 0; i < parameters.length; i++) {
+				new_arguments.push(parameters[i]);
 			}
 			
 			return blazegears_class.__declaration__.static[name].apply(blazegears_class, new_arguments);
@@ -230,7 +235,7 @@ BlazeGears.Classes = new function() {
 		// static members
 		for (var i in declaration.static) {
 			if (bg.isFunction(declaration.static[i])) {
-				eval("blazegears_class[i] = function() {return blazegears_class.__method__('" + i + "', arguments);}");
+				eval("blazegears_class[i] = function() { return blazegears_class.__method__('" + i + "', arguments); }");
 			} else if (bg.isArray(declaration.static[i]) || bg.isObject(declaration.static[i])) {
 				blazegears_class[i] = bg.cloneObject(declaration.static[i]);
 			} else {
