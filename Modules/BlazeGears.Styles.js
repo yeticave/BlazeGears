@@ -40,23 +40,23 @@ BlazeGears.Styles = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 	
 	Arguments:
 		element - The absolutely positioned element. It can be either an ID or a reference to an actual element.
-		element_vert - The vertical pivot point of the element. The usable values are "top", "bottom", "middle", and null. When it's null, the X coordinate won't be modified.
-		element_hor - The horizontal pivot point of the element. The usable values are "left", "right", "center", and null. When it's null, the Y coordinate won't be modified.
+		vertical_element_pivot - The vertical pivot point of the element. The usable values are "top", "bottom", "middle", and null. When it's null, the X coordinate won't be modified.
+		horizontal_element_pivot - The horizontal pivot point of the element. The usable values are "left", "right", "center", and null. When it's null, the Y coordinate won't be modified.
 		target - The target element. It can be either an ID or a reference to an actual element.
-		[target_vert = "top"] - The vertical pivot point of the target. The usable values are "top", "bottom", and "middle".
-		[target_hor = "left"] - The horizontal pivot point of the target. The usable values are "left", "right", and "center"
+		[vertical_target_pivot = "top"] - The vertical pivot point of the target. The usable values are "top", "bottom", and "middle".
+		[horizontal_target_pivot = "left"] - The horizontal pivot point of the target. The usable values are "left", "right", and "center"
 	
 	See Also:
 		- <getPosition>
 		- <setPosition>
 	*/
-	alignElements: function(self, element, element_vert, element_hor, target, target_vert, target_hor) {
-		if (!self.is(target_hor)) target_hor = "left";
-		if (!self.is(target_vert)) target_vert = "top";
+	alignElements: function(self, element, vertical_element_pivot, horizontal_element_pivot, target, vertical_target_pivot, horizontal_target_pivot) {
+		if (!self.is(horizontal_target_pivot)) horizontal_target_pivot = "left";
+		if (!self.is(vertical_target_pivot)) vertical_target_pivot = "top";
 		
-		var position = self.getPosition(target, target_vert, target_hor);
+		var position = self.getPosition(target, vertical_target_pivot, horizontal_target_pivot);
 		
-		self.setPosition(element, element_vert, element_hor, position[0], position[1]);
+		self.setPosition(element, vertical_element_pivot, horizontal_element_pivot, position[0], position[1]);
 	},
 	
 	/*
@@ -79,15 +79,15 @@ BlazeGears.Styles = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 	
 	Arguments:
 		element - The element. It can be either an ID or a reference to an actual element.
-		[vert = "left"] - The vertical pivot point of the element. The usable values are "top", "bottom", and "middle".
-		[hor = "top"] - The horizontal pivot point of the element. The usable values are "left", "right", and "center".
+		[vertical_pivot = "left"] - The vertical pivot point of the element. The usable values are "top", "bottom", and "middle".
+		[horizontal_pivot = "top"] - The horizontal pivot point of the element. The usable values are "left", "right", and "center".
 	
 	Return Value:
 		Retuns an array, which will have the X coordinate as its first index, and the Y coordinate as its second index. If the element doesn't exist, it will return null.
 	*/
-	getPosition: function(self, element, vert, hor) {
-		if (!self.is(hor)) hor = "left";
-		if (!self.is(vert)) vert = "top";
+	getPosition: function(self, element, vertical_pivot, horizontal_pivot) {
+		if (!self.is(horizontal_pivot)) horizontal_pivot = "left";
+		if (!self.is(vertical_pivot)) vertical_pivot = "top";
 		
 		var id = element
 		var result = null;
@@ -101,14 +101,14 @@ BlazeGears.Styles = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 		
 		if (element != null) {
 			result = [0, 0];
-			if (hor == "right") {
+			if (horizontal_pivot == "right") {
 				result[0] += element.offsetWidth;
-			} else if (hor == "center") {
+			} else if (horizontal_pivot == "center") {
 				result[0] += element.offsetWidth / 2;
 			}
-			if (vert == "bottom") {
+			if (vertical_pivot == "bottom") {
 				result[1] += element.offsetHeight;
-			} else if (vert == "middle") {
+			} else if (vertical_pivot == "middle") {
 				result[1] += element.offsetHeight / 2;
 			}
 			
@@ -137,14 +137,14 @@ BlazeGears.Styles = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 	
 	Arguments:
 		element - The absolutely positioned element. It can be either an ID or a reference to an actual element.
-		[vert = null] - The vertical pivot point of the target. The usable values are "left", "right", "center", and null. When it's null, the X coordinate won't be modified.
-		[hor = null] - The horizontal pivot point of the target. The usable values are "left", "right", "center", and null. When it's null, the Y coordinate won't be modified.
+		[vertical_pivot = null] - The vertical pivot point of the target. The usable values are "left", "right", "center", and null. When it's null, the X coordinate won't be modified.
+		[horizontal_pivot = null] - The horizontal pivot point of the target. The usable values are "left", "right", "center", and null. When it's null, the Y coordinate won't be modified.
 		[x = 0] - The X coordinate.
 		[y = 0] - The X coordinate.
 	*/
-	setPosition: function(self, element, vert, hor, x, y) {
-		if (!self.is(hor)) hor = null;
-		if (!self.is(vert)) vert = null;
+	setPosition: function(self, element, vertical_pivot, horizontal_pivot, x, y) {
+		if (!self.is(horizontal_pivot)) horizontal_pivot = null;
+		if (!self.is(vertical_pivot)) vertical_pivot = null;
 		if (!self.is(x)) x = 0;
 		if (!self.is(y)) y = 0;
 		
@@ -156,19 +156,19 @@ BlazeGears.Styles = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 		}
 		
 		if (element != null) {
-			if (hor == "right") {
+			if (horizontal_pivot == "right") {
 				x -= element.offsetWidth;
-			} else if (hor == "center") {
+			} else if (horizontal_pivot == "center") {
 				x -= element.offsetWidth / 2;
-			} else if (hor != "left") {
+			} else if (horizontal_pivot != "left") {
 				x = null;
 			}
 			
-			if (vert == "bottom") {
+			if (vertical_pivot == "bottom") {
 				y -= element.offsetHeight;
-			} else if (vert == "middle") {
+			} else if (vertical_pivot == "middle") {
 				y -= element.offsetHeight / 2;
-			} else if (vert != "top") {
+			} else if (vertical_pivot != "top") {
 				y = null;
 			}
 			

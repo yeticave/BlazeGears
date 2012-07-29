@@ -33,7 +33,7 @@ The example below will show the usage of constructors and self-references.
 
 The constructor method of the class is a magical member and will be called each time an instance of the class is created. Magical members can be recognized from the double underscores surrounding their names.
 
-Self-references are meant to replace the *this* keyword, because its' value might change depending on the context where the method's called from. When a method is called, the self-reference will be pushed in the front of its' argument list by a wrapper. These arguments called "self" in all the standard BlazeGears methods.
+Self-references are meant to replace the *this* keyword, because its' value might change depending on the context where the method's called from. When a method is called, the self-reference will be pushed in the front of its' argument list by a wrapper. These arguments are called "self" in all the standard BlazeGears methods.
 
 
 Topic: Singletons

@@ -78,10 +78,10 @@ BlazeGears = new function() {
 	
 	Arguments:
 		selector - The selector of the style sheet. An array of selectors can also be provided.
-		props - A dictionary of properties.
+		properties - A dictionary of properties.
 		[media = "all"] - The media property of the style sheet.
 	*/
-	self.StyleSheet = function(selector, props, media) {
+	self.StyleSheet = function(selector, properties, media) {
 		if (!self.is(media)) media = "all";
 		
 		var result = "<style media='" + media + "' type='text/css'>";
@@ -97,8 +97,8 @@ BlazeGears = new function() {
 			result += selector;
 		}
 		result += "{";
-		for (var i in props) {
-			result += i + ":" + props[i] + ";";
+		for (var i in properties) {
+			result += i + ":" + properties[i] + ";";
 		}
 		result += "}";
 		result += "</style>";
@@ -378,8 +378,8 @@ BlazeGears = new function() {
 	
 	A depreciated alias for <renderFlash>.
 	*/
-	self.generateFlash = function(id, filename, width, height, params) {
-		return self.renderFlash(id, filename, width, height, params);
+	self.generateFlash = function(id, filename, width, height, parameters) {
+		return self.renderFlash(id, filename, width, height, parameters);
 	}
 	
 	/*
@@ -659,20 +659,20 @@ BlazeGears = new function() {
 		filename - The filename of the application.
 		width - The width of the application.
 		height - The height of the application.
-		[params = {}] - A dictionary that defines the parameters for the application. The keys will be used as the names of the parameters.
+		[parameters = {}] - A dictionary that defines the parameters for the application. The keys will be used as the names of the parameters.
 	
 	Return Value:
 		Returns the generated HTML code.
 	*/
-	self.renderFlash = function(id, filename, width, height, params) {
-		if (!self.is(params)) params = {};
+	self.renderFlash = function(id, filename, width, height, parameters) {
+		if (!self.is(parameters)) parameters = {};
 		
 		var result = "";
 		
 		result += "<!--[if !IE]>--><object data='" + filename + "' height='" + height + "' id='" + id + "' type='application/x-shockwave-flash' width='" + width + "'><!--<![endif]-->";
 		result += "<!--[if IE]><object classid='clsid:D27CDB6E-AE6D-11cf-96B8-444553540000' codebase='http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0' height='" + height + "' width='" + width + "' ><param name='movie' value='" + filename + "' /><![endif]-->";
-		for (var i in params) {
-			result += "<param name='" + i + "' value='" + params[i] + "' />";
+		for (var i in parameters) {
+			result += "<param name='" + i + "' value='" + parameters[i] + "' />";
 		}
 		result += "</object>";
 		

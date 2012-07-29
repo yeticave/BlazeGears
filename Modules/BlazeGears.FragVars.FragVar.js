@@ -28,19 +28,19 @@ BlazeGears.FragVars.FragVar = BlazeGears.Classes.declareClass(BlazeGears.BaseCla
 	
 	Arguments:
 		addend - The FragVar's value will be increased by this value.
-		[base = 0] - If the value of the FragVar isn't a number, this will be treated as the original value.
+		[default_value = 0] - If the value of the FragVar isn't a number, this will be treated as the original value.
 	*/
-	add: function(self, addend, base) {
-		if (!self.is(base)) base = 0;
+	add: function(self, addend, default_value) {
+		if (!self.is(default_value)) default_value = 0;
 		
 		var value = self.getValue();
 		
 		if (value == null) {
-			value = base;
+			value = default_value;
 		}
 		value = parseFloat(value);
 		if (isNaN(value)) {
-			value = base;
+			value = default_value;
 		}
 		value += addend;
 		self.setValue(value);

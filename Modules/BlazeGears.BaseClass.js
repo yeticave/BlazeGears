@@ -76,8 +76,8 @@ BlazeGears.BaseClass = BlazeGears.Classes.declareClass({
 	},
 	
 	// Method: generateFlash
-	generateFlash: function(self, id, filename, width, height, params) {
-		return BlazeGears.generateFlash(id, filename, width, height, params);
+	generateFlash: function(self, id, filename, width, height, parameters) {
+		return BlazeGears.generateFlash(id, filename, width, height, parameters);
 	},
 	
 	// Method: getEntity
@@ -141,8 +141,8 @@ BlazeGears.BaseClass = BlazeGears.Classes.declareClass({
 	},
 	
 	// Method: renderFlash
-	renderFlash: function(self, id, filename, width, height, params) {
-		return BlazeGears.renderFlash(id, filename, width, height, params);
+	renderFlash: function(self, id, filename, width, height, parameters) {
+		return BlazeGears.renderFlash(id, filename, width, height, parameters);
 	},
 	
 	// Method: updateEntity

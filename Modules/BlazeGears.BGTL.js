@@ -43,16 +43,16 @@ Control Tags:
 	Apart from the closing tags, tags can be terminated by line breaks, too.
 */
 BlazeGears.BGTL = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
-	_param_var: "bgtl_params",
-	_result_var: "bgtl_result",
+	_parameters_var: "bgtl_parameters",
+	_result_variable: "bgtl_result",
 	
 	/*
 	Method: execute
 	
 	A depreciated alias for <renderTemplate>.
 	*/
-	execute: function(self, template, params) {
-		return self.renderTemplate(template, params);
+	execute: function(self, template, parameters) {
+		return self.renderTemplate(template, parameters);
 	},
 	
 	/*
@@ -104,10 +104,10 @@ BlazeGears.BGTL = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 		
 		// start declaring the object
 		result = "new function() {";
-		result += "this.render = function(" + self._param_var + ") {";
-		result += "if (!BlazeGears.is(" + self._param_var + "))" + self._param_var + " = {};"
-		result += "var " + self._result_var + " = '';"
-		result += "with (" + self._param_var + ") {";
+		result += "this.render = function(" + self._parameters_var + ") {";
+		result += "if (!BlazeGears.is(" + self._parameters_var + "))" + self._parameters_var + " = {};"
+		result += "var " + self._result_variable + " = '';"
+		result += "with (" + self._parameters_var + ") {";
 		result += "try {";
 		
 		do {
@@ -123,7 +123,7 @@ BlazeGears.BGTL = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 				if ((index == 0 || template.charAt(index - 1) != "\\")) { // if it's not escaped
 					// add all the prior text as escaped text
 					if (index != 0) {
-						result += self._result_var + " += \"" + self._escape(template.substr(0, index)) + "\";";
+						result += self._result_variable + " += \"" + self._escape(template.substr(0, index)) + "\";";
 					}
 					
 					// remove the opening tag
@@ -153,7 +153,7 @@ BlazeGears.BGTL = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 						
 						switch (method) {
 							case "html":
-								result += self._result_var + " += " + script.replace() + ";";
+								result += self._result_variable + " += " + script.replace() + ";";
 								break;
 							
 							case "statement":
@@ -161,7 +161,7 @@ BlazeGears.BGTL = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 								break;
 							
 							case "variable":
-								result += self._result_var + " += BlazeGears.escapeString(" + script + ");";
+								result += self._result_variable + " += BlazeGears.escapeString(" + script + ");";
 								break;
 						}
 					}
@@ -171,7 +171,7 @@ BlazeGears.BGTL = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 		
 		// add the rest as escaped text
 		if (template.length > 0) {
-			result += self._result_var + "+=\"" + self._escape(template) + "\";";
+			result += self._result_variable + "+=\"" + self._escape(template) + "\";";
 		}
 		
 		// finish declaring the object
@@ -180,7 +180,7 @@ BlazeGears.BGTL = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 		result += "BlazeGears.error('BlazeGears.BGTL', exception);";
 		result += "}";
 		result += "}";
-		result += "return " + self._result_var + ";";
+		result += "return " + self._result_variable + ";";
 		result += "};";
 		result += "this.execute = this.render;";
 		result += "}";
@@ -202,16 +202,16 @@ BlazeGears.BGTL = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 	
 	Paremeters:
 		template - The string to be parsed.
-		[params = {}] - A dictionary of arguments used for the execution.
+		[parameters = {}] - A dictionary of arguments used for the execution.
 	
 	Return Value:
 		Returns the rendered template.
 	*/
-	renderTemplate: function(self, template, params) {
-		if (!self.is(params)) params = {};
+	renderTemplate: function(self, template, parameters) {
+		if (!self.is(parameters)) parameters = {};
 		
 		var bgtl = self.parseTemplate(template);
-		var result = bgtl.render(params);
+		var result = bgtl.render(parameters);
 		
 		return result;
 	},

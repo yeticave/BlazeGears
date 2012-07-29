@@ -112,7 +112,7 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 	
 	Arguments:
 		[date = new Date()] - The date to be formatted.
-		[config = {}] - A dictionary that defines how the date should be formatted. The missing keys will be copied from <date_format>.
+		[configuration = {}] - A dictionary that defines how the date should be formatted. The missing keys will be copied from <date_format>.
 	
 	Return Value:
 		Returns the formatted date.
@@ -137,17 +137,17 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 		- <date_format>
 		- <texts>
 	*/
-	formatDate: function(self, date, config) {
+	formatDate: function(self, date, configuration) {
 		if (!self.is(date)) date = new Date();
-		if (!self.is(config)) config = {};
+		if (!self.is(configuration)) configuration = {};
 		
 		var properties = ["syntax", "parser"];
 		var result;
 		
 		// default the missing configuration keys
 		for (var i in properties) {
-			if (!self.is(config[properties[i]])) {
-				config[properties[i]] = self.date_format[properties[i]];
+			if (!self.is(configuration[properties[i]])) {
+				configuration[properties[i]] = self.date_format[properties[i]];
 			}
 		}
 		
@@ -168,17 +168,17 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 		}
 		
 		// use the selected parser
-		switch (config.parser) {
+		switch (configuration.parser) {
 			case "php":
-				result = self._formatPhpDate(date, config.syntax);
+				result = self._formatPhpDate(date, configuration.syntax);
 				break;
 			
 			case "unix":
-				result = self._formatUnixDate(date, config.syntax);
+				result = self._formatUnixDate(date, configuration.syntax);
 				break;
 			
 			default:
-				result = config.syntax;
+				result = configuration.syntax;
 		}
 		
 		return result;
@@ -191,7 +191,7 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 	
 	Arguments:
 		filesize - The file size to be formatted in bytes.
-		[config = {}] - A dictionary that defines how the number should be formatted. The missing keys will be copied from <number_format>.
+		[configuration = {}] - A dictionary that defines how the number should be formatted. The missing keys will be copied from <number_format>.
 	
 	Return Value:
 		Returns the formatted filesize.
@@ -201,7 +201,7 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 		- <number_format>
 		- <texts>
 	*/
-	formatFilesize: function(self, filesize, config) {
+	formatFilesize: function(self, filesize, configuration) {
 		var unit = 0;
 		
 		// check the filesize
@@ -215,7 +215,7 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 			filesize = Math.round(filesize / 1024);
 			unit++;
 		}
-		filesize = self.formatNumber(filesize, config);
+		filesize = self.formatNumber(filesize, configuration);
 		
 		return filesize + self.texts.filesizes[unit];
 	},
@@ -227,7 +227,7 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 	
 	Arguments:
 		number - The number to be formatted.
-		[config = {}] - A dictionary that defines how the number should be formatted. The missing keys will be copied from <number_format>.
+		[configuration = {}] - A dictionary that defines how the number should be formatted. The missing keys will be copied from <number_format>.
 	
 	Return Value:
 		Returns the formatted number.
@@ -235,8 +235,8 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 	See Also:
 		<number_format>
 	*/
-	formatNumber: function(self, number, config) {
-		if (!self.is(config)) config = {};
+	formatNumber: function(self, number, configuration) {
+		if (!self.is(configuration)) configuration = {};
 		
 		var counter = 0;
 		var decimal;
@@ -248,8 +248,8 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 		
 		// default the missing configuration keys
 		for (var i in properties) {
-			if (!self.is(config[properties[i]])) {
-				config[properties[i]] = self.number_format[properties[i]];
+			if (!self.is(configuration[properties[i]])) {
+				configuration[properties[i]] = self.number_format[properties[i]];
 			}
 		}
 		
@@ -265,19 +265,19 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 		}
 		decimal = number - Math.floor(number);
 		number = Math.floor(number);
-		digits = number.toString().length % config.group_length;
+		digits = number.toString().length % configuration.group_length;
 		
 		// create the decimals
-		if (config.decimal_length > 0) {
+		if (configuration.decimal_length > 0) {
 			// calculate the actual decimal part
-			decimal = Math.round(decimal * Math.pow(10, config.decimal_length));
+			decimal = Math.round(decimal * Math.pow(10, configuration.decimal_length));
 			decimal = decimal.toString();
-			while (decimal.length < config.decimal_length) {
+			while (decimal.length < configuration.decimal_length) {
 				decimal = "0" + decimal;
 			}
 			
 			// remove the unnecessary zeroes
-			if (!config.force_decimals) {
+			if (!configuration.force_decimals) {
 				for (var i = decimal.length - 1; i >= 0; i--) {
 					if (decimal.charAt(i) == "0") {
 						decimal = decimal.substr(0, i);
@@ -289,7 +289,7 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 			
 			// apply the decimal separator
 			if (decimal.length > 0) {
-				decimal = config.decimal_delimiter + decimal;
+				decimal = configuration.decimal_delimiter + decimal;
 			}
 		} else {
 			decimal = "";
@@ -305,29 +305,29 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 		
 		// assing the digits to their groups
 		while (number.length > 0) {
-			groups[counter] = number.substr(0, config.group_length);
-			number = number.substr(config.group_length);
+			groups[counter] = number.substr(0, configuration.group_length);
+			number = number.substr(configuration.group_length);
 			counter++;
 		}
 		
 		// remove the leading zero
-		if (!config.leading_zero && groups.length == 1 && parseInt(groups[0]) == 0 && decimal.length > 0) {
+		if (!configuration.leading_zero && groups.length == 1 && parseInt(groups[0]) == 0 && decimal.length > 0) {
 			groups[0] = "";
 		}
 		
 		// join the groups and the decimals
-		number = groups.join(config.group_delimiter) + decimal;
+		number = groups.join(configuration.group_delimiter) + decimal;
 		
 		// apply the affixes
-		if (config.negatives_first) {
+		if (configuration.negatives_first) {
 			if (negative) {
-				number = config.negative_prefix + number + config.negative_suffix;
+				number = configuration.negative_prefix + number + configuration.negative_suffix;
 			}
-			number = config.prefix + number + config.suffix;
+			number = configuration.prefix + number + configuration.suffix;
 		} else {
-			number = config.prefix + number + config.suffix;
+			number = configuration.prefix + number + configuration.suffix;
 			if (negative) {
-				number = config.negative_prefix + number + config.negative_suffix;
+				number = configuration.negative_prefix + number + configuration.negative_suffix;
 			}
 		}
 		

@@ -29,7 +29,7 @@ BlazeGears.Classes.ClassInterface = function() {
 	Searches the class' superclasses for
 	
 	Arguments:
-		This method takes a variable amount of arguments. The first argument has to be the name of the sought method, the rest will be passed to this method.
+		This method takes a variable amount of arguments. The first argument has to be the name of the sought method, the rest will be passed to the method, if it exists.
 	
 	Exceptions:
 		An Error will be thrown, if the sought method can't be found.
