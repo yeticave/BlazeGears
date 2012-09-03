@@ -24,14 +24,11 @@ Email: info@yeticave.com
 Homepage: http://www.yeticave.com
 */
 
-/*
-Class: BlazeGears.XMLRequest
-
-A class that can be used for making AJAX requests.
-
-Superclasses:
-	<BlazeGears.BaseClass>
-*/
+// Class: BlazeGears.XMLRequest
+// A class that can be used for making AJAX requests.
+// 
+// Superclasses:
+//   <BlazeGears.BaseClass>
 BlazeGears.XMLRequest = BlazeGears.Classes.declareClass(BlazeGears.BaseClass, {
 	// Group: Variables
 	
@@ -48,7 +45,7 @@ BlazeGears.XMLRequest = BlazeGears.Classes.declareClass(BlazeGears.BaseClass, {
 	headers: {"content-type": "application/x-www-form-urlencoded;charset=utf-8;"},
 	
 	// Field: query
-	// A dictionary that holds the query part of the URL. Each key will be a query field. Upon sending the query its content will be escaped.
+	// A dictionary that holds the query part of the URL. Each key will be a query field. Upon sending the query, its values will be escaped.
 	query: {},
 	
 	// Field: url
@@ -59,52 +56,37 @@ BlazeGears.XMLRequest = BlazeGears.Classes.declareClass(BlazeGears.BaseClass, {
 	_request: null,
 	_status: null,
 	
-	// Group: Event Listeners
+	// Group: Events
 	
-	/*
-	Method: onAbort
-	
-	Called upon aborting the request.
-	
-	See Also:
-		<abort>
-	*/
+	// Method: onAbort
+	// Will be fired when the request gets aborted.
+	// 
+	// See Also:
+	//   <abort>
 	onAbort: function(self) {},
 	
-	/*
-	Method: onError
-	
-	Called when an error comes up during sending or receiving the request.
-	*/
+	// Method: onError
+	// Will be fired when an error occurs during the request.
 	onError: function(self) {},
 	
-	/*
-	Method: onSend
-	
-	Called upon sending the request.
-	
-	See Also:
-		<send>
-	*/
+	// Method: onSend
+	// Will be fired when at the beginning of sending the request.
+	// 
+	// See Also:
+	//   <send>
 	onSend: function(self) {},
 	
-	/*
-	Method: onSuccess
-	
-	Called when the request was successfully completed.
-	*/
+	// Method: onSuccess
+	// Will be fired when the request successfully finishes.
 	onSuccess: function(self) {},
 	
 	// Group: Functions
 	
-	/*
-	Method: abort
-	
-	Aborts the request.
-	
-	See Also:
-		<onAbort>
-	*/
+	// Method: abort
+	// Aborts the request.
+	// 
+	// See Also:
+	//   <onAbort>
 	abort: function(self) {
 		self._aborted = true;
 		self._request.abort();
@@ -115,27 +97,20 @@ BlazeGears.XMLRequest = BlazeGears.Classes.declareClass(BlazeGears.BaseClass, {
 		}
 	},
 	
-	/*
-	Method: getStatus
-	
-	Return Value:
-		Returns the HTTP status code of the request or null if it wasn't recoded yet.
-	*/
+	// Method: getStatus
+	// Returns the HTTP status code of the request, or null, if it wasn't recoded yet.
 	getStatus: function(self) {
 		return self._status;
 	},
 	
-	/*
-	Method: getResponse
-	
-	Returns the response of the request.
-	
-	Arguments:
-		[xml = true] - If it's true, the returned response will be an XML document object, else plain text.
-	
-	Return Value:
-		Returns the response of the request either as an XML document object or plain text, depending on the provided argument. If the request wasn't completed successfully, it will return null.
-	*/
+	// Method: getResponse
+	// Returns the response of the request.
+	// 
+	// Arguments:
+	//   [xml = true] - If it's true, the returned response will be an XML document object, else plain text.
+	// 
+	// Return Value:
+	//   Returns the response of the request either as an XML document object or plain text, depending on the provided argument. If the request wasn't completed successfully, it will return null.
 	getResponse: function(self, xml) {
 		if (!self.is(xml)) xml = true;
 		
@@ -150,14 +125,11 @@ BlazeGears.XMLRequest = BlazeGears.Classes.declareClass(BlazeGears.BaseClass, {
 		}
 	},
 	
-	/*
-	Method: send
-	
-	Sends the request.
-	
-	See Also:
-		<onSend>
-	*/
+	// Method: send
+	// Sends the request.
+	// 
+	// See Also:
+	//   <onSend>
 	send: function(self) {
 		var headers = self.headers;
 		var query = self.query;

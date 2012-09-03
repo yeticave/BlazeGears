@@ -24,32 +24,26 @@ Email: info@yeticave.com
 Homepage: http://www.yeticave.com
 */
 
-/*
-Class: BlazeGears.Styles
-
-A singleton class that performs some common CSS and other visual tasks.
-
-Superclasses:
-	<BlazeGears.BaseClass>
-*/
+// Class: BlazeGears.Styles
+// A singleton class that performs some common CSS and other visual tasks.
+// 
+// Superclasses:
+//   <BlazeGears.BaseClass>
 BlazeGears.Styles = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
-	/*
-	Method: alignElements
-	
-	Aligns an absolutely positioned element to another element.
-	
-	Arguments:
-		element - The absolutely positioned element. It can be either an ID or a reference to an actual element.
-		vertical_element_pivot - The vertical pivot point of the element. The usable values are "top", "bottom", "middle", and null. When it's null, the X coordinate won't be modified.
-		horizontal_element_pivot - The horizontal pivot point of the element. The usable values are "left", "right", "center", and null. When it's null, the Y coordinate won't be modified.
-		target - The target element. It can be either an ID or a reference to an actual element.
-		[vertical_target_pivot = "top"] - The vertical pivot point of the target. The usable values are "top", "bottom", and "middle".
-		[horizontal_target_pivot = "left"] - The horizontal pivot point of the target. The usable values are "left", "right", and "center"
-	
-	See Also:
-		- <getPosition>
-		- <setPosition>
-	*/
+	// Method: alignElements
+	// Aligns an absolutely positioned element to another element.
+	// 
+	// Arguments:
+	//   element - The absolutely positioned element. It can be either an ID or a reference to an actual element.
+	//   vertical_element_pivot - The vertical pivot point of the element. The usable values are "top", "bottom", "middle", and null. When it's null, the X coordinate won't be modified.
+	//   horizontal_element_pivot - The horizontal pivot point of the element. The usable values are "left", "right", "center", and null. When it's null, the Y coordinate won't be modified.
+	//   target - The target element. It can be either an ID or a reference to an actual element.
+	//   [vertical_target_pivot = "top"] - The vertical pivot point of the target. The usable values are "top", "bottom", and "middle".
+	//   [horizontal_target_pivot = "left"] - The horizontal pivot point of the target. The usable values are "left", "right", and "center"
+	// 
+	// See Also:
+	//   - <getPosition>
+	//   - <setPosition>
 	alignElements: function(self, element, vertical_element_pivot, horizontal_element_pivot, target, vertical_target_pivot, horizontal_target_pivot) {
 		if (!self.is(horizontal_target_pivot)) horizontal_target_pivot = "left";
 		if (!self.is(vertical_target_pivot)) vertical_target_pivot = "top";
@@ -59,32 +53,26 @@ BlazeGears.Styles = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 		self.setPosition(element, vertical_element_pivot, horizontal_element_pivot, position[0], position[1]);
 	},
 	
-	/*
-	Method: display
-	
-	Changes the display style of an element.
-	
-	Arguments:
-		element - The element. It can be either an ID or a reference to an actual element.
-		[method = null] - If it's true, the new style value will be "block", else "none". If it's null the current value will be flipped, if possible.
-	*/
+	// Method: display
+	// Changes the display style of an element.
+	// 
+	// Arguments:
+	//   element - The element. It can be either an ID or a reference to an actual element.
+	//   [method = null] - If it's true, the new style value will be "block", else "none". If it's null the current value will be flipped, if possible.
 	display: function(self, element, method) {
 		self._flipStyle(element, method, "display", ["block", "none"]);
 	},
 	
-	/*
-	Method: getPosition
-	
-	Calculates the absolute position of an element.
-	
-	Arguments:
-		element - The element. It can be either an ID or a reference to an actual element.
-		[vertical_pivot = "left"] - The vertical pivot point of the element. The usable values are "top", "bottom", and "middle".
-		[horizontal_pivot = "top"] - The horizontal pivot point of the element. The usable values are "left", "right", and "center".
-	
-	Return Value:
-		Retuns an array, which will have the X coordinate as its first index, and the Y coordinate as its second index. If the element doesn't exist, it will return null.
-	*/
+	// Method: getPosition
+	// Calculates the absolute position of an element.
+	// 
+	// Arguments:
+	//   element - The element. It can be either an ID or a reference to an actual element.
+	//   [vertical_pivot = "left"] - The vertical pivot point of the element. The usable values are "top", "bottom", and "middle".
+	//   [horizontal_pivot = "top"] - The horizontal pivot point of the element. The usable values are "left", "right", and "center".
+	// 
+	// Return Value:
+	//   Returns an array, which will have the X coordinate as its first index, and the Y coordinate as its second index. If the element doesn't exist, it will return null.
 	getPosition: function(self, element, vertical_pivot, horizontal_pivot) {
 		if (!self.is(horizontal_pivot)) horizontal_pivot = "left";
 		if (!self.is(vertical_pivot)) vertical_pivot = "top";
@@ -130,18 +118,15 @@ BlazeGears.Styles = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 		return result;
 	},
 	
-	/*
-	Method: setPosition
-	
-	Sets the position of an absolutely positioned element.
-	
-	Arguments:
-		element - The absolutely positioned element. It can be either an ID or a reference to an actual element.
-		[vertical_pivot = null] - The vertical pivot point of the target. The usable values are "left", "right", "center", and null. When it's null, the X coordinate won't be modified.
-		[horizontal_pivot = null] - The horizontal pivot point of the target. The usable values are "left", "right", "center", and null. When it's null, the Y coordinate won't be modified.
-		[x = 0] - The X coordinate.
-		[y = 0] - The X coordinate.
-	*/
+	// Method: setPosition
+	// Sets the position of an absolutely positioned element.
+	// 
+	// Arguments:
+	//   element - The absolutely positioned element. It can be either an ID or a reference to an actual element.
+	//   [vertical_pivot = null] - The vertical pivot point of the target. The usable values are "left", "right", "center", and null. When it's null, the X coordinate won't be modified.
+	//   [horizontal_pivot = null] - The horizontal pivot point of the target. The usable values are "left", "right", "center", and null. When it's null, the Y coordinate won't be modified.
+	//   [x = 0] - The X coordinate.
+	//   [y = 0] - The X coordinate.
 	setPosition: function(self, element, vertical_pivot, horizontal_pivot, x, y) {
 		if (!self.is(horizontal_pivot)) horizontal_pivot = null;
 		if (!self.is(vertical_pivot)) vertical_pivot = null;
@@ -183,15 +168,12 @@ BlazeGears.Styles = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 		}
 	},
 	
-	/*
-	Method: visibility
-	
-	Changes the visibility style of an element.
-	
-	Arguments:
-		element - The element. It can be either an ID or a reference to an actual element.
-		[method = null] - If it's true, the new style value will be "visible", else "hidden". If it's null the current value will be flipped, if possible.
-	*/
+	// Method: visibility
+	// Changes the visibility style of an element.
+	// 
+	// Arguments:
+	//   element - The element. It can be either an ID or a reference to an actual element.
+	//   [method = null] - If it's true, the new style value will be "visible", else "hidden". If it's null the current value will be flipped, if possible.
 	visibility: function(self, element, method) {
 		self._flipStyle(element, method, "display", ["visible", "hidden"]);
 	},

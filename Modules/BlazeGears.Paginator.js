@@ -24,37 +24,31 @@ Email: info@yeticave.com
 Homepage: http://www.yeticave.com
 */
 
-/*
-Class: BlazeGears.Paginator
-
-A class that manages some aspects of pagination.
-
-Superclasses:
-	<BlazeGears.BaseClass>
-
-Dependencies:
-	- <BlazeGears.BGTL>
-	- <BlazeGears.FragVars>
-*/
+// Class: BlazeGears.Paginator
+// A pagination control widget.
+// 
+// Superclasses:
+//   <BlazeGears.BaseClass>
+// 
+// Dependencies:
+//   - <BlazeGears.BGTL>
+//   - <BlazeGears.FragVars>
 BlazeGears.Paginator = BlazeGears.Classes.declareClass(BlazeGears.BaseClass, {
 	// Group: Variables
 	
 	// Field: element
-	// The element which will contain the paginator. It can be either an ID or a reference to an actual element. An array of IDs/elements can also be provided.
+	// The element which the widget will be injected into. It can be either an ID or a reference to an actual element.
 	element: null,
 	
-	/*
-	Field: template
-	
-	The BGTL template used for generation.
-	
-	See Also:
-		<BlazeGears.BGTL>
-	*/
+	// Field: template
+	// The BGTL template used for rendering.
+	// 
+	// See Also:
+	//   <BlazeGears.BGTL>
 	template: "<div class='BlazeGears-Paginator'> %if (getPages() > 1) {% %if (getPage() > 1) {% <div class='PreviousPage'><a href='javascript:;' onclick='BlazeGears.getEntity(&#39;{{getId()}}&#39;).previousPage();'>{{texts[0]}}</a></div> %} else {% <div class='PreviousPage' style='visibility: hidden;'>{{texts[0]}}</div> %}% <div class='CurrentPage'> {{texts[1]}} <select onchange='BlazeGears.getEntity(&#39;{{getId()}}&#39;).goToPage(this.value);'> %for (var i = 1; i <= getPages(); i++) {% %if (i == getPage()) {% <option selected='selected' value='{{i}}'>{{i}}</option> %} else {% <option value='{{i}}'>{{i}}</option> %}% %}% </select> / {{getPages()}} </div> %if (getPage() < getPages()) {% <div class='NextPage'><a href='javascript:;' onclick='BlazeGears.getEntity(&#39;{{getId()}}&#39;).nextPage();'>{{texts[2]}}</a></div> %} else {% <div class='NextPage' style='visibility: hidden;'>{{texts[2]}}</div> %}% <div class='Clear'></div> %}% </div>",
 	
 	// Field: texts
-	// The text-pack used for generation.
+	// The text collection of the widget. It will be passed to the template for rendering.
 	texts: ["Previous Page", "Page", "Next Page"],
 	
 	_bgtl: null,
@@ -62,26 +56,21 @@ BlazeGears.Paginator = BlazeGears.Classes.declareClass(BlazeGears.BaseClass, {
 	_page: 1,
 	_pages: 1,
 	
-	// Group: Event Listeners
+	// Group: Events
 	
-	/*
-	Method: onChange
-	
-	Will be called upon changing the page number.
-	*/
+	// Method: onChange
+	// Will be fired when the page number changes.
 	onChange: function(self) {},
 	
 	// Group: Functions
 	
-	/*
-	Constructor: __init__
-	
-	Arguments:
-		fragvar - The ID of the FragVar that will hold the page number.
-	
-	See Also:
-		<BlazeGears.FragVars.createFragVar>
-	*/
+	// Constructor: __init__
+	// 
+	// Arguments:
+	//   fragvar - The ID of the FragVar that will store the page number.
+	// 
+	// See Also:
+	//   <BlazeGears.FragVars.createFragVar>
 	__init__: function(self, fragvar) {
 		var fragvars = new BlazeGears.FragVars();
 		
@@ -91,88 +80,61 @@ BlazeGears.Paginator = BlazeGears.Classes.declareClass(BlazeGears.BaseClass, {
 		self._id = self.createEntity(self);
 	},
 	
-	/*
-	Method: generate
-	
-	A depreciated alias for <render>.
-	*/
+	// Method: generate
+	// A deprecated alias for <render>.
 	generate: function(self) {
 		return self.render();
 	},
 	
-	/*
-	Method: getId
-	
-	Return Value:
-		Returns the entity ID of the paginator.
-	*/
+	// Method: getId
+	// Returns the entity ID of the paginator.
 	getId: function(self) {
 		return self._id;
 	},
 	
-	/*
-	Method: getPage
-	
-	Return Value:
-		Returns the current page number.
-	*/
+	// Method: getPage
+	// Returns the current page number.
 	getPage: function(self) {
 		return self._page;
 	},
 	
-	/*
-	Method: getPages
-	
-	Return Value:
-		Returns the total number of pages.
-	
-	See Also:
-		<setPages>
-	*/
+	// Method: getPages
+	// Returns the total number of pages.
+	// 
+	// See Also:
+	//   <setPages>
 	getPages: function(self) {
 		return self._pages;
 	},
 	
-	/*
-	Method: goToPage
-	
-	Sets the current page number.
-	
-	Arguments:
-		page - The page number to go to.
-	*/
+	// Method: goToPage
+	// Sets the current page number.
+	// 
+	// Arguments:
+	//   page - The page number to go to.
 	goToPage: function(self, page) {
 		if (page >= 1 && page <= self._pages) {
 			self._fragvar.setValue(page);
 		}
 	},
 	
-	/*
-	Method: nextPage
-	
-	Increases the current page number by one.
-	*/
+	// Method: nextPage
+	// Increases the current page number by one.
 	nextPage: function(self) {
 		self._fragvar.add(1, 1);
 	},
 	
-	/*
-	Method: previousPage
-	
-	Decreases the current page number by one.
-	*/
+	// Method: previousPage
+	// Decreases the current page number by one.
 	previousPage: function(self) {
 		self._fragvar.add(-1, self._pages);
 	},
 	
-	/*
-	Method: render
-	
-	Renders the paginator and places it into the target <element>, if there's one.
-	
-	Return Value:
-		Returns the markup for the paginator.
-	*/
+	// Method: render
+	// Renders the paginator and injects it into the target <element>, if there's one.
+	// 
+	// Return Value:
+	//   Returns the markup for the paginator.
 	render: function(self) {
 		var element;
 		var page;
@@ -225,27 +187,25 @@ BlazeGears.Paginator = BlazeGears.Classes.declareClass(BlazeGears.BaseClass, {
 		return result;
 	},
 	
-	/*
-	Method: setPages
-	
-	Sets the number of pages and re-renders the paginator.
-	
-	Arguments:
-		pages - The new number of pages.
-	
-	Return Value:
-		Returns the markup for the paginator.
-	
-	See Also:
-		- <getPages>
-		- <render>
-	*/
+	// Method: setPages
+	// Sets the number of pages and re-renders the paginator.
+	// 
+	// Arguments:
+	//   pages - The new number of pages.
+	// 
+	// Return Value:
+	//   Returns the markup for the paginator.
+	// 
+	// See Also:
+	//   - <getPages>
+	//   - <render>
 	setPages: function(self, pages) {
 		self._pages = pages;
 		
 		return self.render();
 	},
 	
+	// re-renders the paginator and fires the change event
 	_update: function(self) {
 		self.render();
 		self.onChange.call(self, self);

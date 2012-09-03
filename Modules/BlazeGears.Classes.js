@@ -1,33 +1,28 @@
-/*
-Class: BlazeGears.Classes
-
-This namespace contains the functions and interfaces that can be used declare classes that has advantages over regular JavaScript classes.
-The declaration of a class is being done by passing an object to one of the class declaring functions. 
-
-Declaration Object Notes:
- - Each key of the object will be a member of the class.
- - Every key must be unique, not even keys of different types (public or static) are allowed to match. This doesn't effect magical keys, as they are special to begin with.
- - Every method must have "self" as their first argument. This argument will be pushed to the front of the argument list, and it's guaranteed, that it will point either to the instance for instance methods or to the class for static methods.
- - Keys starting with the dollar sign (e.g. "$static") will created as static members of the class.
- - Keys starting with an underscore (e.g. "_protected") are considered protected/private by convention. Members like these in BlazeGears are not documented, meant to be used only internally, and might change without warning or notice.
- - Keys starting and ending with double underscores (e.g. the constructor) will be considered magical. Using keys like these for declaring your own functionality is not advised.
- - Objects should never be initialized in the declaration of the class, as the constructor will try to create a copy of every object member.
-*/
+// Class: BlazeGears.Classes
+// This namespace contains the functions and interfaces that can be used declare classes that has some advantages (and some drawbacks) over regular JavaScript classes.
+// 
+// The declaration of a class is being done by passing an object to one of the class declaring functions. 
+// 
+// Declaration Object Notes:
+//   - Each key of the object will be a member of the class.
+//   - Every key must be unique, not even keys of different types (public or static) are allowed to match. This doesn't effect magical keys, as they are special to begin with.
+//   - Every method must have "self" as their first argument. This argument will be pushed to the front of the argument list, and it's guaranteed, that it will point either to the instance for instance methods or to the class for static methods.
+//   - Keys starting with the dollar sign (e.g. "$static") are created as static members of the class.
+//   - Keys starting with an underscore (e.g. "_protected") are considered protected by convention. Members like these in BlazeGears are not documented, meant to be used only internally, and might change without warning or notice.
+//   - Keys starting and ending with double underscores (e.g. the constructor) are considered magical. Using keys like these for declaring your own functionality is not advised.
+//   - Objects should never be initialized in the declaration of the class, as the constructor will try to create a copy of every object member.
 BlazeGears.Classes = new function() {
 	var self = this;
 	var bg = BlazeGears;
 	
-	/*
-	Function: declareClass
-	
-	Declares a class.
-	
-	Arguments:
-		This method takes a variable amount of arguments. The last argument must the declaration object and all the prior ones will be the superclasses of the class.
-	
-	Return Value:
-		Returns the declared class, which implements the <BlazeGears.Classes.ClassInterface>.
-	*/
+	// Function: declareClass
+	// Declares a class.
+	// 
+	// Arguments:
+	//   This method takes a variable amount of arguments. The last argument must be the declaration object and all the prior ones will be the superclasses of the class.
+	//
+	//Return Value:
+	//   Returns the declared class, which implements the <BlazeGears.Classes.ClassInterface>.
 	self.declareClass = function() {
 		if (arguments.length > 0) {
 			arguments[arguments.length - 1].__singleton__ = false;
@@ -36,17 +31,14 @@ BlazeGears.Classes = new function() {
 		return declareClass.apply(self, arguments);
 	}
 	
-	/*
-	Function: declareSingleton
-	
-	Declares a singleton.
-	
-	Arguments:
-		This method takes a variable amount of arguments. The last argument must the declaration object and all the prior ones will be the superclasses of the class.
-	
-	Return Value:
-		Returns the declared class, which implements the <BlazeGears.Classes.SingletonInterface>.
-	*/
+	// Function: declareSingleton
+	// Declares a singleton.
+	// 
+	// Arguments:
+	//   This method takes a variable amount of arguments. The last argument must be the declaration object and all the prior ones will be the superclasses of the class.
+	// 
+	// Return Value:
+	//   Returns the declared class, which implements the <BlazeGears.Classes.SingletonInterface>.
 	self.declareSingleton = function() {
 		if (arguments.length > 0) {
 			arguments[arguments.length - 1].__singleton__ = true;
@@ -55,6 +47,7 @@ BlazeGears.Classes = new function() {
 		return declareClass.apply(self, arguments);
 	}
 	
+	// does all the class declaring work
 	var declareClass = function() {
 		var blazegears_class;
 		var declaration = {"magic": {}, "public": {}, "static": {}};

@@ -84,7 +84,7 @@
   
   Appreciation and many thanks go to the following people:
   
-    - Marcel Hellkamp, the creator of the BottlePy Framework and its' Simple
+    - Marcel Hellkamp, the creator of the BottlePy Framework and its Simple
       Template (http://bottlepy.org), which was the main inspiration for the
       BlazeGears Templating Language.
     

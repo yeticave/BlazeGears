@@ -24,47 +24,38 @@ Email: info@yeticave.com
 Homepage: http://www.yeticave.com
 */
 
-/*
-Class: BlazeGears.Formats
-
-A singleton class that handles various string formatting tasks.
-
-Superclasses:
-	<BlazeGears.BaseClass>
-*/
+// Class: BlazeGears.Formats
+// A singleton class that handles various string formatting tasks.
+// 
+// Superclasses:
+//   <BlazeGears.BaseClass>
 BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
-	/*
-	Field: date_format
-	
-	The default date format dictionary used by <formatDate>.
-	
-	Keys:
-		syntax - The syntax string to be used.
-		parser - Decides which syntax the "syntax" key uses. It can be either "unix" for the <date at http://unixhelp.ed.ac.uk/CGI/man-cgi?date> command of the Unix-like systems, or "php" for the <date at http://php.net/manual/en/function.date.php> function of PHP.
-	*/
+	// Field: date_format
+	// The default date format dictionary used by <formatDate>.
+	// 
+	// Keys:
+	//   syntax - The syntax string to be used.
+	//   parser - Decides which syntax the "syntax" key uses. It can be either "unix" for the <date at http://unixhelp.ed.ac.uk/CGI/man-cgi?date> command of the Unix-like systems, or "php" for the <date at http://php.net/manual/en/function.date.php> function of PHP.
 	date_format: {
 		parser: "unix",
 		syntax: "%B %-d%o, %Y %-I:%M%P"
 	},
 	
-	/*
-	Field: number_format
-	
-	The default number format dictionary used by <formatNumber> and <formatFilesize>.
-	
-	Keys:
-		decimal_delimiter - The string used to separate the integer part from the decimal part.
-		decimal_length - The number of digits to be displayed after the decimal.
-		force_decimals - If it's true, the digits after the decimal will be displayed all the time, even if the those digits are all zeros.
-		group_delimiter - The string used to separate the digit groups.
-		group_length - The maximum number of digits in a digit group.
-		leading_zero - If it's true, the leading zero will be displayed for numbers that are less than 1 and greater than -1.
-		negative_prefix - The prefix applied to numbers less than zero.
-		negative_suffix - The suffix applied to numbers less than zero.
-		negatives_first - If it's true, the negative affixes will be applied before the general affixes.
-		prefix - The prefix applied to all numbers.
-		suffix - The suffix applied to all numbers.
-	*/
+	// Field: number_format
+	// The default number format dictionary used by <formatNumber> and <formatFilesize>.
+	// 
+	// Keys:
+	//   decimal_delimiter - The decimal delimiter character.
+	//   decimal_length - The number of digits to be displayed after the decimal delimiter.
+	//   force_decimals - If it's true, the amount of digits specified by decimal_length will be always displayed, even if the those digits are all zeros.
+	//   group_delimiter - The string used to separate the digit groups.
+	//   group_length - The maximum number of digits in a digit group.
+	//   leading_zero - If it's true, the leading zero will be displayed for numbers that are less than 1 and greater than -1.
+	//   negative_prefix - The prefix applied to numbers less than zero.
+	//   negative_suffix - The suffix applied to numbers less than zero.
+	//   negatives_first - If it's true, the negative affixes will be applied before the general affixes.
+	//   prefix - The prefix applied to all numbers.
+	//   suffix - The suffix applied to all numbers.
 	number_format: {
 		decimal_delimiter: ".",
 		decimal_length: 0,
@@ -79,21 +70,18 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 		suffix: ""
 	},
 	
-	/*
-	Field: texts
-	
-	This dictionary contains the default text-packs used by <formatDate> and <formatFilesize>.
-	
-	Keys:
-		filesizes - The names of the file size units used by <formatFilesize>.
-		full_days - The full names of days used by <formatDate>.
-		full_months - The full names of months used by <formatDate>.
-		short_lower_meridiems - The abbreviated lower-case variants of ante meridiem and post meridiem used by <formatDate>.
-		short_upper_meridiems - The abbreviated upper-case variants of ante meridiem and post meridiem used by <formatDate>.
-		ordinal_suffixes - The ordinal suffixes for the days of the month used by <formatDate>.
-		short_days - The abbreviated name of days used by <formatDate>.
-		short_months - The abbreviated names of months used by <formatDate>.
-	*/
+	// Field: texts
+	// This dictionary contains the default text collections used by <formatDate> and <formatFilesize>.
+	// 
+	// Keys:
+	//   filesizes - The names of the file size units used by <formatFilesize>.
+	//   full_days - The full names of days used by <formatDate>.
+	//   full_months - The full names of months used by <formatDate>.
+	//   short_lower_meridiems - The abbreviated lower-case variants of ante meridiem and post meridiem used by <formatDate>.
+	//   short_upper_meridiems - The abbreviated upper-case variants of ante meridiem and post meridiem used by <formatDate>.
+	//   ordinal_suffixes - The ordinal suffixes for the days of the month used by <formatDate>.
+	//   short_days - The abbreviated names of days used by <formatDate>.
+	//   short_months - The abbreviated names of months used by <formatDate>.
 	texts: {
 		filesizes: ["b", "Kb", "Mb", "Gb", "Tb"],
 		full_days: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
@@ -105,38 +93,35 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 		short_months: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 	},
 	
-	/*
-	Function: formatDate
-	
-	Formats a date using either Unix or PHP syntax.
-	
-	Arguments:
-		[date = new Date()] - The date to be formatted.
-		[configuration = {}] - A dictionary that defines how the date should be formatted. The missing keys will be copied from <date_format>.
-	
-	Return Value:
-		Returns the formatted date.
-	
-	Broken Unix Specifiers:
-		E - Use the locale's alternate representation for date and time. Doesn't do anything.
-		N - Nanoseconds. Always returns "000000000".
-		O - Use the locale's alternate numeric symbols for numbers. Doesn't do anything.
-		Z - Abbreviated time zone name. Always returns an empty string.
-		z - Time zone offset. Always returns an empty string.
-	
-	Broken PHP Specifiers:
-		I - Daylight saving time. Always returns 0.
-		O - Timezone offset in hours and minutes. Always returns an empty string.
-		P - Timezone offset in hours and minutes. Always returns an empty string.
-		T - Abbreviated time zone name. Always returns an empty string.
-		Z - Timezone offset in seconds. Always returns an empty string.
-		e - Time zone name. Always returns an empty string.
-		u - Microseconds. Always returns "000000".
-	
-	See Also:
-		- <date_format>
-		- <texts>
-	*/
+	// Function: formatDate
+	// Formats a date using either Unix or PHP syntax.
+	// 
+	// Arguments:
+	//   [date = new Date()] - The date to be formatted.
+	//   [configuration = {}] - A dictionary that defines how the date should be formatted. The missing keys will be copied from <date_format>.
+	// 
+	// Return Value:
+	// 	Returns the formatted date.
+	// 
+	// Broken Unix Specifiers:
+	//   E - Use the locale's alternate representation for date and time. Doesn't do anything.
+	//   N - Nanoseconds. Always returns "000000000".
+	//   O - Use the locale's alternate numeric symbols for numbers. Doesn't do anything.
+	//   Z - Abbreviated time zone name. Always returns an empty string.
+	//   z - Time zone offset. Always returns an empty string.
+	// 
+	// Broken PHP Specifiers:
+	//   I - Daylight saving time. Always returns 0.
+	//   O - Timezone offset in hours and minutes. Always returns an empty string.
+	//   P - Timezone offset in hours and minutes. Always returns an empty string.
+	//   T - Abbreviated time zone name. Always returns an empty string.
+	//   Z - Timezone offset in seconds. Always returns an empty string.
+	//   e - Time zone name. Always returns an empty string.
+	//   u - Microseconds. Always returns "000000".
+	// 
+	// See Also:
+	//   - <date_format>
+	//   - <texts>
 	formatDate: function(self, date, configuration) {
 		if (!self.is(date)) date = new Date();
 		if (!self.is(configuration)) configuration = {};
@@ -184,27 +169,24 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 		return result;
 	},
 	
-	/*
-	Function: formatFilesize
-	
-	Formats a number into a file size by rounding down to the nearest significant value.
-	
-	Arguments:
-		filesize - The file size to be formatted in bytes.
-		[configuration = {}] - A dictionary that defines how the number should be formatted. The missing keys will be copied from <number_format>.
-	
-	Return Value:
-		Returns the formatted filesize.
-	
-	See Also:
-		- <formatNumber>
-		- <number_format>
-		- <texts>
-	*/
+	// Function: formatFilesize
+	// Formats a number into a file size by rounding down to the nearest significant value.
+	// 
+	// Arguments:
+	//   filesize - The file size to be formatted in bytes.
+	//   [configuration = {}] - A dictionary that defines how the number should be formatted. The missing keys will be copied from <number_format>.
+	// 
+	// Return Value:
+	//   Returns the formatted file size.
+	// 
+	// See Also:
+	//   - <formatNumber>
+	//   - <number_format>
+	//   - <texts>
 	formatFilesize: function(self, filesize, configuration) {
 		var unit = 0;
 		
-		// check the filesize
+		// check the file size
 		filesize = parseInt(filesize);
 		if (isNaN(filesize)) {
 			filesize = 0;
@@ -220,21 +202,18 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 		return filesize + self.texts.filesizes[unit];
 	},
 	
-	/*
-	Function: formatNumber
-	
-	Formats a number.
-	
-	Arguments:
-		number - The number to be formatted.
-		[configuration = {}] - A dictionary that defines how the number should be formatted. The missing keys will be copied from <number_format>.
-	
-	Return Value:
-		Returns the formatted number.
-	
-	See Also:
-		<number_format>
-	*/
+	// Function: formatNumber
+	// Formats a number.
+	// 
+	// Arguments:
+	//   number - The number to be formatted.
+	//   [configuration = {}] - A dictionary that defines how the number should be formatted. The missing keys will be copied from <number_format>.
+	// 
+	// Return Value:
+	//   Returns the formatted number.
+	// 
+	// See Also:
+	//   <number_format>
 	formatNumber: function(self, number, configuration) {
 		if (!self.is(configuration)) configuration = {};
 		
@@ -303,7 +282,7 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 			counter++;
 		}
 		
-		// assing the digits to their groups
+		// assign the digits to their groups
 		while (number.length > 0) {
 			groups[counter] = number.substr(0, configuration.group_length);
 			number = number.substr(configuration.group_length);
@@ -334,6 +313,7 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 		return number;
 	},
 	
+	// formats a date using php's date function's syntax
 	_formatPhpDate: function(self, date, syntax) {
 		var character;
 		var chunk;
@@ -527,6 +507,7 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 		return result;
 	},
 	
+	// formats a date using unix syntax
 	_formatUnixDate: function(self, date, syntax) {
 		var character;
 		var chunk;

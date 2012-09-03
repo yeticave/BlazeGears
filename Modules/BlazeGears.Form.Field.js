@@ -1,22 +1,19 @@
-/*
-Class: BlazeGears.Form.Field
-
-A class that represents a field of a form object.
-
-Superclasses:
-	<BlazeGears.BaseClass>
-*/
+// Class: BlazeGears.Form.Field
+// A class that represents a field of a form object.
+// 
+// Superclasses:
+//   <BlazeGears.BaseClass>
 BlazeGears.Form.Field = BlazeGears.Classes.declareClass(BlazeGears.BaseClass, {
 	// Field: attribs
-	// Each key of this dictionary will be an attribute of the field.
+	// A dictionary where the keys will be HTML attributes of the field.
 	attribs: {},
 	
 	// Field: columns
-	// The horizontal dimension of a textbox. This is only applicable to fields that use a textarea as their input.
+	// The horizontal dimension of the field's textbox. This is only applicable to fields that use a textarea as their input.
 	columns: 25,
 	
 	// Field: events
-	// Each key of this dictionary will be an event of the field. The "on" prefix will be applied to the keys automatically.
+	// A dictionary where the keys will be events of the field. The "on" prefix will be applied to the keys automatically.
 	events: {},
 	
 	// Field: label
@@ -24,32 +21,29 @@ BlazeGears.Form.Field = BlazeGears.Classes.declareClass(BlazeGears.BaseClass, {
 	label: null,
 	
 	// Field: rows
-	// The vertical dimension of a textbox. This is only applicable to fields that use a textarea as their input.
+	// The vertical dimension of the field's textbox. This is only applicable to fields that use a textarea as their input.
 	rows: 5,
 	
-	/*
-	Field: template
-	
-	If it isn't null, the field will use this BGTL template upon generating itself, instead of the ones provided by the form object.
-	
-	See Also:
-		<BlazeGears.BGTL>
-	*/
+	// Field: template
+	// The BGTL template of the field. If it's null, the field will use the template provided by the form object.
+	// 
+	// Notes:
+	//   The field's attributes, events, and text collection will be passed to the template during rendering.
+	// 
+	// See Also:
+	//   <BlazeGears.BGTL>
 	template: null,
 	
 	// Field: texts
-	// If it isn't null, the field will use this text-pack upon generating itself, instead of the ones provided by the form object.
+	// The text collection of the field. If it's null, the field will use the text collection provided by the form object.
 	texts: null,
 	
-	/*
-	Field: value
-	
-	The default value of the field. Will be updated upon the validation of the form or calling <getValue>.
-	
-	See Also:
-		- <BlazeGears.Form.validate>
-		- <getValue>
-	*/
+	// Field: value
+	// The default value of the field. Will be updated upon the validation of the form or calling <getValue>.
+	// 
+	// See Also:
+	//   - <BlazeGears.Form.validate>
+	//   - <getValue>
 	value: null,
 	
 	_id: null,
@@ -58,21 +52,18 @@ BlazeGears.Form.Field = BlazeGears.Classes.declareClass(BlazeGears.BaseClass, {
 	_rules: [],
 	_type: null,
 	
-	/*
-	Method: createOption
-	
-	Adds an option to the field. This is only applicable to fields that use some kind of option selection method, like select lists, radio buttons, or checkboxes.
-	
-	Arguments:
-		[id = null] - The ID of the option. If not provided, a random one will be generated. This is important for checkboxes, since their IDs will be their names.
-	
-	Return Value:
-		Returns a referece to the newly created option object.
-	
-	See Also:
-		- <BlazeGears.Form.Option>
-		- <getOptions>
-	*/
+	// Method: createOption
+	// Adds an option to the field. This is only applicable to fields that use some kind of option selection method, like select lists, radio buttons, or checkboxes.
+	// 
+	// Arguments:
+	//   [id = null] - The ID of the option. If not provided, a random one will be generated. This is important for checkboxes, since their IDs will be their names.
+	// 
+	// Return Value:
+	//   Returns option object.
+	// 
+	// See Also:
+	//   - <BlazeGears.Form.Option>
+	//   - <getOptions>
 	createOption: function(self, id) {
 		var option = new BlazeGears.Form.Option(self, id);
 		
@@ -81,19 +72,16 @@ BlazeGears.Form.Field = BlazeGears.Classes.declareClass(BlazeGears.BaseClass, {
 		return option;
 	},
 	
-	/*
-	Method: createRule
-	
-	Attaches a rule to the field. Upon validation the field must meet the criteria dictated by these rules or the validation of the form will fail.
-	
-	Arguments:
-		rule - The rule can be either a regular expression or a callback function. If it's a regular expression, it will be tested against the value of the field. If it's a callback function, it will be called with a reference to the field as its first argument. If the callback function returns true, the field will pass this rule.
-		[invalid = null] - This message will be displayed if the field fails this rule.
-		[valid = null] - This message will be displayed if the field passes this rule.
-	
-	See Also:
-		<BlazeGears.Form.validate>
-	*/
+	// Method: createRule
+	// Attaches a rule to the field. Upon validation the field must meet the criteria dictated by these rules or the validation of the field will fail.
+	// 
+	// Arguments:
+	//   rule - The rule can be either a regular expression or a callback function. If it's a regular expression, it will be tested against the value of the field. If it's a callback function, it will be called with a reference to the field as its first argument. If the callback function returns true, the field will pass this rule.
+	//   [invalid = null] - This message will be displayed if the field fails this rule.
+	//   [valid = null] - This message will be displayed if the field passes this rule.
+	// 
+	// See Also:
+	//   <BlazeGears.Form.validate>
 	createRule: function(self, rule, invalid, valid) {
 		if (!self.is(invalid)) invalid = null;
 		if (!self.is(valid)) valid = null;
@@ -112,50 +100,35 @@ BlazeGears.Form.Field = BlazeGears.Classes.declareClass(BlazeGears.BaseClass, {
 		}
 	},
 	
-	/*
-	Method: getElementId
-	
-	Return Value:
-		Returns the ID of the field's input element.
-		
-		This element won't exist for fields that use radio buttons or checkboxes.
-	*/
+	// Method: getElementId
+	// Returns the ID of the field's input element or null if the field doesn't have an input field.
 	getElementId: function(self) {
 		return self._parent._id + "_" + self._id;
 	},
 	
-	/*
-	Method: getId
-	
-	Return Value:
-		Returns the ID of the field.
-	*/
+	// Method: getId
+	// Returns the ID of the field.
 	getId: function(self) {
 		return self._id;
 	},
 	
-	/*
-	Method: getOptions
-	
-	Return Value:
-		Returns an array of the field's option objects.
-	
-	See Also:
-		<BlazeGears.Form.Option>
-	*/
+	// Method: getOptions
+	// Returns an array of the field's option objects.
+	// 
+	// See Also:
+	//   <BlazeGears.Form.Option>
 	getOptions: function(self) {
 		return self._options;
 	},
 	
-	/*
-	Method: getValue
-	
-	Return Value:
-		Returns the value of the field's input element.
-	
-	See Also:
-		<value>
-	*/
+	// Method: getValue
+	// Updates the field's <value>.
+	//
+	// Return Value:
+	//   Returns the updated value.
+	// 
+	// See Also:
+	//   <value>
 	getValue: function(self) {
 		var element = document.getElementById(self.getElementId());
 		var result = null;
@@ -168,12 +141,14 @@ BlazeGears.Form.Field = BlazeGears.Classes.declareClass(BlazeGears.BaseClass, {
 		return result;
 	},
 	
+	// protected constructor
 	__init__: function(self, parent, id, type) {
 		self._id = id;
 		self._parent = parent;
 		self._type = type;
 	},
 	
+	// renders the field's template
 	_render: function(self) {
 		var result = null;
 		var template;
@@ -191,6 +166,7 @@ BlazeGears.Form.Field = BlazeGears.Classes.declareClass(BlazeGears.BaseClass, {
 		return result;
 	},
 	
+	// validates the field against its' rules
 	_validate: function(self) {
 		var element = document.getElementById(self.getElementId());
 		var invalid_content = "";

@@ -24,28 +24,22 @@ Email: info@yeticave.com
 Homepage: http://www.yeticave.com
 */
 
-/*
-Class: BlazeGears
-
-The main namespace that contains all the general BlazeGears functions.
-*/
+// Class: BlazeGears
+// The main namespace that contains all the fundamental functionality.
 BlazeGears = new function() {
 	var self = this;
-	var entities = {};
-	var included_css = [];
-	var included_js = [];
+	var entities = {}; // stores the declared entities
+	var included_css = []; // stores the list of included css files
+	var included_js = []; // stores the list of included javascript files
 	
-	/*
-	Variable: config
-	
-	The main configurational dictionary.
-	
-	Keys:
-		display_errors - If it's true, <error> will display the messages on-screen. Defaults to false.
-		entity_id_length - The length of the IDs used for entities. Defaults to 10.
-		entity_id_prefix - This prefix will be applied to every entity ID to avoid clashes. It doesn't count towards the length of the ID. Defaults to "blazegears_entity_".
-		escape_encoding - The default encoding used by <escapeString>. Defaults to "html".
-	*/
+	// Variable: config
+	// The dictionary that's used for configuration.
+	// 
+	// Keys:
+	//   display_errors - If it's true, <error> will display an alert window whenever it's called. Defaults to false.
+	//   entity_id_length - The length of the random IDs used for entities. Defaults to 10.
+	//   entity_id_prefix - This prefix will be applied to every random entity ID to avoid clashes with other IDs. It doesn't count towards the length of the ID. Defaults to "blazegears_entity_".
+	//   escape_encoding - The default escaping method used by <escapeString>. Defaults to "html".
 	self.config = {
 		display_errors: false,
 		entity_id_length: 10,
@@ -53,34 +47,25 @@ BlazeGears = new function() {
 		escape_encoding: "html"
 	};
 	
-	/*
-	Function: Class
-	
-	A depreciated alias for <BlazeGears.Classes.declareClass>.
-	*/
+	// Function: Class
+	// A deprecated alias for <BlazeGears.Classes.declareClass>.
 	self.Class = function() {
 		return BlazeGears.Classes.declareClass.apply(self, arguments);
 	}
 	
-	/*
-	Function: Singleton
-	
-	A depreciated alias for <BlazeGears.Classes.declareSingleton>.
-	*/
+	// Function: Singleton
+	// A deprecated alias for <BlazeGears.Classes.declareSingleton>.
 	self.Singleton = function() {
 		return BlazeGears.Classes.declareSingleton.apply(self, arguments);
 	}
 	
-	/*
-	Function: StyleSheet
-	
-	Generates and outputs a style sheet.
-	
-	Arguments:
-		selector - The selector of the style sheet. An array of selectors can also be provided.
-		properties - A dictionary of properties.
-		[media = "all"] - The media property of the style sheet.
-	*/
+	// Function: StyleSheet
+	// Generates and outputs the markup for a style sheet.
+	// 
+	// Arguments:
+	//   selector - The selector of the style sheet. Also accepts an array of selectors.
+	//   properties - A dictionary where the keys are the CSS properties' names.
+	//   [media = "all"] - The media attribute of the style sheet.
 	self.StyleSheet = function(selector, properties, media) {
 		if (!self.is(media)) media = "all";
 		
@@ -105,26 +90,23 @@ BlazeGears = new function() {
 		document.write(result);
 	}
 	
-	/*
-	Function: cloneArray
-	
-	A depreciated alias for <cloneObject>.
-	*/
-	self.cloneArray = function(source) {
-		return self.cloneObject(source);
+	// Function: cloneArray
+	// A deprecated alias for <cloneObject>.
+	self.cloneArray = function(template) {
+		return self.cloneObject(template);
 	}
 	
-	/*
-	Function: cloneObject
-	
-	Creates an exact copy of an object.
-	
-	Arguments:
-		source - The object to be cloned.
-	
-	Return Value:
-		Returns a reference to the newly created object.
-	*/
+	// Function: cloneObject
+	// Creates a deep copy of an object.
+	// 
+	// Arguments:
+	//   source - The object to be cloned.
+	// 
+	// Return Value:
+	//   Returns the cloned object.
+	// 
+	// Notes:
+	//   This method uses object literals for cloning, so all constructor, type, and prototype data/metadata will be lost.
 	self.cloneObject = function(source) {
 		var clone = self.isArray(source) ? [] : {};
 		
@@ -139,25 +121,22 @@ BlazeGears = new function() {
 		return clone;
 	}
 	
-	/*
-	Function: createEntity
-	
-	Creates a variable and stores it internally.
-	
-	Arguments:
-		[value = null] - The value that initially will be associated with the entity.
-		[id = null] - The suggested ID for the entity.
-	
-	Return Value:
-		Returns the ID of the entity or null if the suggested ID is already in use.
-	
-	See Also:
-		- <destroyEntity>
-		- <getEntity>
-		- <updateEntity>
-		- <config>.entity_id_length
-		- <config>.entity_id_prefix
-	*/
+	// Function: createEntity
+	// Creates an internally stored variable.
+	// 
+	// Arguments:
+	//   [value = null] - The value of the entity.
+	//   [id = null] - The suggested ID for the entity.
+	// 
+	// Return Value:
+	//   Returns the ID of the entity, or null, if the suggested ID is already in use.
+	// 
+	// See Also:
+	//   - <destroyEntity>
+	//   - <getEntity>
+	//   - <updateEntity>
+	//   - <config>.entity_id_length
+	//   - <config>.entity_id_prefix
 	self.createEntity = function(value, id) {
 		if (!self.is(id)) id = null;
 		if (!self.is(value)) value = null;
@@ -189,19 +168,16 @@ BlazeGears = new function() {
 		return result;
 	}
 	
-	/*
-	Function: createListener
-	
-	Creates a cross-browser event listener.
-	
-	Arguments:
-		caller - The listener will be attached to this element.
-		event - The name of the event without the "on" prefix.
-		command - The command to be executed upon the event.
-	
-	See Also:
-		<destroyListener>
-	*/
+	// Function: createListener
+	// Creates a cross-browser event listener.
+	// 
+	// Arguments:
+	//   caller - The listener will be attached to this element.
+	//   event - The name of the event, without the "on" prefix.
+	//   command - The callback to be called when the event fires.
+	// 
+	// See Also:
+	//   <destroyListener>
 	self.createListener = function(caller, event, command) {
 		if (caller.addEventListener) {
 			caller.addEventListener(event, command, false);
@@ -212,22 +188,19 @@ BlazeGears = new function() {
 		}
 	}
 	
-	/*
-	Function: destroyEntity
-	
-	Destroys a previously created entity.
-	
-	Arguments:
-		id - The ID of the entity.
-	
-	Return Value:
-		Returns true if the entity with this ID was found and destroyed, else false.
-	
-	See Also:
-		- <createEntity>
-		- <getEntity>
-		- <updateEntity>
-	*/
+	// Function: destroyEntity
+	// Destroys an entity created by <createEntity>.
+	// 
+	// Arguments:
+	//   id - The ID of the entity.
+	// 
+	// Return Value:
+	//   Returns true if the entity with this ID was found, else false.
+	// 
+	// See Also:
+	//   - <createEntity>
+	//   - <getEntity>
+	//   - <updateEntity>
 	self.destroyEntity = function(id) {
 		var result = false;
 		
@@ -241,17 +214,16 @@ BlazeGears = new function() {
 		return result;
 	}
 	
-	/*
-	Function: destroyListener
-	
-	Destroys an event listener.
-	
-	Arguments:
-		All parameters must match the ones used to create the event listener.
-	
-	See Also:
-		<createListener>
-	*/
+	// Function: destroyListener
+	// Destroys a cross-browser event listener.
+	// 
+	// Arguments:
+	//   caller - The listener will be attached to this element.
+	//   event - The name of the event, without the "on" prefix.
+	//   callback - The callback to be called when the event fires.
+	// 
+	// See Also:
+	//   <createListener>
 	self.destroyListener = function(caller, event, command) {
 		if (caller.removeEventListener) {
 			caller.removeEventListener(event, command, false);
@@ -262,19 +234,19 @@ BlazeGears = new function() {
 		}
 	}
 	
-	/*
-	Function: error
-	
-	Logs and/or displays an error message.
-	
-	Arguments:
-		module - The name of the module that issues the error message.
-		[message = null] - The message itself.
-		[details = null] - Additional details.
-	
-	See Also:
-		<config>.display_errors
-	*/
+	// Function: error
+	// Logs and/or displays an error message.
+	// 
+	// Arguments:
+	//   module - The name of the module that issues the error message.
+	//   [message = null] - The message itself.
+	//   [details = null] - Additional details.
+	//
+	// Notes:
+	//   Currently no logging is being done by this method.
+	//
+	// See Also:
+	//   <config>.display_errors
 	self.error = function(module, message, details) {
 		if (!self.is(message)) message = null;
 		if (!self.is(details)) details = null;
@@ -290,32 +262,26 @@ BlazeGears = new function() {
 		}
 	}
 	
-	/*
-	Function: escape
-	
-	A depreciated alias for <escapeString>.
-	*/
+	// Function: escape
+	// A deprecated alias for <escapeString>.
 	self.escape = function(text, encoding) {
 		return self.escapeString(text, encoding);
 	}
 	
-	/*
-	Function: escapeString
-	
-	Escapes a string based on the selected encoding.
-	
-	Arguments:
-		text - The string to be escaped.
-		[encoding] - The encoding to be used. If not provided, <config>.escape_encoding will be used.
-	
-	Return Value:
-		Returns the escaped string.
-	
-	Encodings:
-		html - Only escapes HTML control characters.
-		newlines - Only escapes the carriage return and new line characters.
-		utf-8 - All non-ASCII and HTML control characters will be escaped.
-	*/
+	// Function: escapeString
+	// Escapes a string based on the selected escaping method.
+	// 
+	// Arguments:
+	//   text - The string to be escaped.
+	//   [method] - The escaping method to be used. If not provided, <config>.escape_encoding will be used.
+	// 
+	// Return Value:
+	//   Returns the escaped string.
+	// 
+	// Escaping Methods:
+	//   html - Only escapes HTML control characters.
+	//   newlines - Only escapes the carriage return and new line characters.
+	//   utf-8 - All non-ASCII and HTML control characters will be escaped.
 	self.escapeString = function(text, encoding) {
 		if (!self.is(encoding)) encoding = self.config.escape_encoding;
 		
@@ -343,7 +309,7 @@ BlazeGears = new function() {
 				}
 			}
 		} else {
-			// select the encoding characters
+			// select the characters to be escaped
 			switch (encoding) {
 				case "html":
 					entities = {34: "&quot;", 38: "&amp;", 39: "&#39;", 60: "&lt;", 62: "&gt;"};
@@ -357,7 +323,7 @@ BlazeGears = new function() {
 					entities = encoding;
 			}
 			
-			// check all the characters for match with the encoding array
+			// check all the characters against the escaping dictionary
 			for (var i = 0; i < text.length; i++) {
 				character = text.charAt(i);
 				code = text.charCodeAt(i);
@@ -373,31 +339,25 @@ BlazeGears = new function() {
 		return result;
 	}
 	
-	/*
-	Function: generateFlash
-	
-	A depreciated alias for <renderFlash>.
-	*/
+	// Function: generateFlash
+	// A deprecated alias for <renderFlash>.
 	self.generateFlash = function(id, filename, width, height, parameters) {
 		return self.renderFlash(id, filename, width, height, parameters);
 	}
 	
-	/*
-	Function: getEntity
-	
-	Returns the value associated with an entity.
-	
-	Arguments:
-		id - The ID of the entity.
-	
-	Return Value:
-		Returns the value of the entity, or null if the entity doesn't exist.
-	
-	See Also:
-		- <createEntity>
-		- <destroyEntity>
-		- <updateEntity>
-	*/
+	// Function: getEntity
+	// Returns the value of an entity created by <createEntity>.
+	// 
+	// Arguments:
+	//   id - The ID of the entity.
+	// 
+	// Return Value:
+	//   Returns the value of the entity, or null, if the entity doesn't exist.
+	// 
+	// See Also:
+	//   - <createEntity>
+	//   - <destroyEntity>
+	//   - <updateEntity>
 	self.getEntity = function(id) {
 		if (self.is(entities[id])) {
 			return entities[id];
@@ -406,16 +366,13 @@ BlazeGears = new function() {
 		}
 	}
 	
-	/*
-	Function: includeCss
-	
-	Generates an element in the heading of the document for a CSS link.
-	
-	Arguments:
-		filename - The filename of the CSS file. An array of filenames can also be provided.
-		[media = "all"] - The media property of the CSS link.
-		[once = true] - If it's true, the same filename won't be imported more than once.
-	*/
+	// Function: includeCss
+	// Generates a link element in the head of the document for including a CSS file.
+	// 
+	// Arguments:
+	//   filename - The filename of the CSS file. Also accepts an array of filenames.
+	//   [media = "all"] - The media attribute of the CSS link.
+	//   [once = true] - If it's true, the same file won't be included more than once.
 	self.includeCss = function(filename, media, once) {
 		if (!self.is(media)) media = "all";
 		if (!self.is(once)) once = true;
@@ -454,15 +411,12 @@ BlazeGears = new function() {
 		}
 	}
 	
-	/*
-	Function: includeJs
-	
-	Generates the HTML code for including a JavaScript file and outputs it.
-	
-	Arguments:
-		filename - The filename of the JavaScript file. An array of filenames can also be provided.
-		[once = true] - If it's true, the same filename won't be imported more than once.
-	*/
+	// Function: includeJs
+	// Generates the markup for including a JavaScript file and outputs it.
+	// 
+	// Arguments:
+	//   filename - The filename of the JavaScript file. Also accepts an array of filenames.
+	//   [once = true] - If it's true, the same file won't be included more than once.
 	self.includeJs = function(filename, once) {
 		if (!self.is(once)) once = true;
 		
@@ -492,79 +446,64 @@ BlazeGears = new function() {
 		}
 	}
 	
-	/*
-	Function: is
-	
-	Checks if a variable is undefined.
-	
-	Arguments:
-		variable - The variable to be checked.
-	
-	Return Value:
-		Returns true if the variable is not undefined, else false.
-	*/
+	// Function: is
+	// Determines if a variable is undefined.
+	// 
+	// Arguments:
+	//   variable - The variable to be checked.
+	// 
+	// Return Value:
+	//   Returns true if the variable is not undefined, else false.
 	self.is = function(variable) {
 		return typeof variable != "undefined";
 	}
 	
-	/*
-	Function: isArray
-	
-	Checks if a variable is an array.
-	
-	Arguments:
-		variable - The variable to be checked.
-	
-	Return Value:
-		Returns true if the the variable is an array, else false.
-	*/
+	// Function: isArray
+	// Determines if a variable is an array.
+	// 
+	// Arguments:
+	//   variable - The variable to be checked.
+	// 
+	// Return Value:
+	//   Returns true if the the variable is an array, else false.
 	self.isArray = function(variable) {
 		return isConstructOf(variable, "Array");
 	}
 	
-	/*
-	Function: isDate
-	
-	Checks if a variable is a date object.
-	
-	Arguments:
-		variable - The variable to be checked.
-	
-	Return Value:
-		Returns true if the the variable is a date object, else false.
-	*/
+	// Function: isDate
+	// Determines if a variable is a date object.
+	// 
+	// Arguments:
+	//   variable - The variable to be checked.
+	// 
+	// Return Value:
+	//   Returns true if the the variable is a date object, else false.
 	self.isDate = function(variable) {
 		return isConstructOf(variable, "Date");
 	}
 	
-	/*
-	Function: isFunction
-	
-	Checks if a variable is a function.
-	
-	Arguments:
-		variable - The variable to be checked.
-	
-	Return Value:
-		Returns true if the the variable is a function, else false.
-	*/
+	// Function: isFunction
+	// Determines if a variable is a function.
+	// 
+	// Arguments:
+	//   variable - The variable to be checked.
+	// 
+	// Return Value:
+	//   Returns true if the the variable is a function, else false.
 	self.isFunction = function(variable) {
 		return isConstructOf(variable, "Function");
 	}
 	
-	/*
-	Function: isInArray
-	
-	Recursively checks if a value exists in an array.
-	
-	Arguments:
-		value - The value to look for.
-		array - The array to search in.
-		[recursion = true] - If it's true, the sub-arrays of the original one will also be searched.
-	
-	Return Value:
-		Returns true if the value is the array or one of its' sub-arrays (if recursion is enabled), else false.
-	*/
+	// Function: isInArray
+	// Determines if a value can be found in an array using linear search.
+	// 
+	// Arguments:
+	//   value - The value to look for.
+	//   array - The array to search in.
+	//   [recursion = true] - If it's true, the sub-arrays of the original one will also be searched.
+	// 
+	// Return Value:
+	//   Returns true if the value can be found in the array or one of its sub-arrays (if recursion is enabled), else false.
 	self.isInArray = function(value, array, recursion) {
 		if (!self.is(recursion)) recursion = true;
 		
@@ -589,81 +528,66 @@ BlazeGears = new function() {
 		return result;
 	}
 	
-	/*
-	Function: isNumber
-	
-	Checks if a variable is a number.
-	
-	Arguments:
-		variable - The variable to be checked.
-	
-	Return Value:
-		Returns true if the the variable is a number, else false.
-	*/
+	// Function: isNumber
+	// Determines if a variable is a number.
+	// 
+	// Arguments:
+	//   variable - The variable to be checked.
+	// 
+	// Return Value:
+	//   Returns true if the the variable is a number, else false.
 	self.isNumber = function(variable) {
 		return isConstructOf(variable, "Number");
 	}
 	
-	/*
-	Function: isObject
-	
-	Checks if a variable is an object.
-	
-	Arguments:
-		variable - The variable to be checked.
-	
-	Return Value:
-		Returns true if the the variable is an object, else false.
-	*/
+	// Function: isObject
+	// Determines if a variable is an object.
+	// 
+	// Arguments:
+	//   variable - The variable to be checked.
+	// 
+	// Return Value:
+	//   Returns true if the the variable is an object, else false.
 	self.isObject = function(variable) {
 		return variable != null && isConstructOf(variable, "Object");
 	}
 	
-	/*
-	Function: isRegExp
-	
-	Checks if a variable is a regular expression.
-	
-	Arguments:
-		variable - The variable to be checked.
-	
-	Return Value:
-		Returns true if the the variable is a regular expression, else false.
-	*/
+	// Function: isRegExp
+	// Determines if a variable is a regular expression.
+	// 
+	// Arguments:
+	//   variable - The variable to be checked.
+	// 
+	// Return Value:
+	//   Returns true if the the variable is a regular expression, else false.
 	self.isRegExp = function(variable) {
 		return isConstructOf(variable, "RegExp");
 	}
 	
-	/*
-	Function: isString
-	
-	Checks if a variable is a string.
-	
-	Arguments:
-		variable - The variable to be checked.
-	
-	Return Value:
-		Returns true if the the variable is a string, else false.
-	*/
+	// Function: isString
+	// Determines if a variable is a string.
+	// 
+	// Arguments:
+	//   variable - The variable to be checked.
+	// 
+	// Return Value:
+	//   Returns true if the the variable is a string, else false.
 	self.isString = function(variable) {
 		return isConstructOf(variable, "String");
 	}
 	
-	/*
-	Function: renderFlash
-	
-	Generates the cross-browser HTML code for a Flash application.
-	
-	Arguments:
-		id - The ID value for the OBJECT tag of the application.
-		filename - The filename of the application.
-		width - The width of the application.
-		height - The height of the application.
-		[parameters = {}] - A dictionary that defines the parameters for the application. The keys will be used as the names of the parameters.
-	
-	Return Value:
-		Returns the generated HTML code.
-	*/
+	// Function: renderFlash
+	// Generates the cross-browser markup for a Flash application.
+	// 
+	// Arguments:
+	//   id - The ID attribute for the object tag of the application.
+	//   filename - The filename of the application.
+	//   width - The width of the application.
+	//   height - The height of the application.
+	//   [parameters = {}] - A dictionary that defines the parameters for the application.
+	// 
+	// Return Value:
+	//   Returns the generated markup.
 	self.renderFlash = function(id, filename, width, height, parameters) {
 		if (!self.is(parameters)) parameters = {};
 		
@@ -679,22 +603,19 @@ BlazeGears = new function() {
 		return result;
 	}
 	
-	/*
-	Function: updateEntity
-	
-	Changes the value of an entity.
-	
-	Arguments:
-		id - The ID of the entity.
-	
-	Return Value:
-		Returns true if the entity with this ID was found and modified, else false.
-	
-	See Also:
-		- <createEntity>
-		- <destroyEntity>
-		- <getEntity>
-	*/
+	// Function: updateEntity
+	// Changes the value of an entity created by <createEntity>.
+	// 
+	// Arguments:
+	//   id - The ID of the entity.
+	// 
+	// Return Value:
+	//   Returns true if the entity with this ID was found, else false.
+	// 
+	// See Also:
+	//   - <createEntity>
+	//   - <destroyEntity>
+	//   - <getEntity>
 	self.updateEntity = function(id, value) {
 		var result = false;
 		
@@ -708,6 +629,7 @@ BlazeGears = new function() {
 		return result;
 	}
 	
+	// determines if the variable's constructor contains the provided string
 	var isConstructOf = function(variable, constructor) {
 		var result = false;
 		

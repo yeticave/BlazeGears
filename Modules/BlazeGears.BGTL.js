@@ -24,60 +24,48 @@ Email: info@yeticave.com
 Homepage: http://www.yeticave.com
 */
 
-/*
-Class: BlazeGears.BGTL
-
-A singleton class that parses and renders HTML templates written in the BlazeGears Templating Language.
-
-The language's syntax is based on a mix of JavaScript and <BottlePy's Simple Template at http://bottlepy.org/docs/dev/stpl.html>.
-
-Superclasses:
-	<BlazeGears.BaseClass>
-
-Control Tags:
-	There are three different control tags available:
-		- Statments are surround with percentage marks. (e.g. "%alert('This is a statment!');%")
-		- Escaped output is using the "{{" opening tag and the "}}" closing tag. (e.g. "{{escaped_output}}")
-		- Unescaped output is the same as escaped one, but must be an exclamation mark in front of the input. (e.g. "{{!unescaped_output}}")
-	
-	Apart from the closing tags, tags can be terminated by line breaks, too.
-*/
+// Class: BlazeGears.BGTL
+// A singleton class that compiles HTML templates written in the BlazeGears Templating Language.
+// 
+// The language's syntax is based on a mix of JavaScript and <BottlePy's Simple Template at http://bottlepy.org/docs/dev/stpl.html>.
+// 
+// Superclasses:
+//   <BlazeGears.BaseClass>
+// 
+// Control Tags:
+//   There are three different control tags available:
+//     - Statements are surround with percentage marks. (e.g. "%alert('This is a statement!');%")
+//     - Escaped output is using the "{{" opening tag and the "}}" closing tag. (e.g. "{{escaped_output}}")
+//     - Unescaped output is the same as the escaped one, but must have an exclamation mark in front of the input. (e.g. "{{!unescaped_output}}")
+// 	
+//   Apart from the closing tags, tags can be terminated by line breaks, too.
 BlazeGears.BGTL = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 	_parameters_var: "bgtl_parameters",
 	_result_variable: "bgtl_result",
 	
-	/*
-	Method: execute
-	
-	A depreciated alias for <renderTemplate>.
-	*/
+	// Method: execute
+	// A deprecated alias for <renderTemplate>.
 	execute: function(self, template, parameters) {
 		return self.renderTemplate(template, parameters);
 	},
 	
-	/*
-	Method: parse
-	
-	A depreciated alias for <parseTemplate>.
-	*/
+	// Method: parse
+	// A deprecated alias for <parseTemplate>.
 	parse: function(self, template) {
 		return self.parseTemplate(template);
 	},
 	
-	/*
-	Method: parseTemplate
-	
-	Parses a string into a template object.
-	
-	Paremeters:
-		template - The string to be parsed.
-	
-	Return Value:
-		Returns a template object, which implements the <BlazeGears.BGTL.TemplateInterface>.
-	
-	See Alsp:
-		<BlazeGears.BGTL.TemplateInterface>
-	*/
+	// Method: parseTemplate
+	// Parses a string into a template object.
+	// 
+	// Parameters:
+	//   template - The string to be parsed.
+	// 
+	// Return Value:
+	//   Returns a template object, which implements the <BlazeGears.BGTL.TemplateInterface>.
+	// 
+	// See Also:
+	//   <BlazeGears.BGTL.TemplateInterface>
 	parseTemplate: function(self, template) {
 		var breaker;
 		var breakers;
@@ -195,18 +183,19 @@ BlazeGears.BGTL = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 		return result;
 	},
 	
-	/*
-	Method: renderTemplate
-	
-	Parses, renders, and finally discards a template.
-	
-	Paremeters:
-		template - The string to be parsed.
-		[parameters = {}] - A dictionary of arguments used for the execution.
-	
-	Return Value:
-		Returns the rendered template.
-	*/
+	// Method: renderTemplate
+	// Compiles, renders, and finally discards a template.
+	// 
+	// Arguments:
+	//   template - The string to be compiled.
+	//   [parameters = {}] - A dictionary of arguments used for the execution where the keys are variables' names.
+	// 
+	// Return Value:
+	//   Returns the markup rendered by the template.
+	// 
+	// See Also:
+	//   - <parseTemplate>
+	//   - <BlazeGears.BGTL.TemplateInterface.execute>
 	renderTemplate: function(self, template, parameters) {
 		if (!self.is(parameters)) parameters = {};
 		
@@ -216,10 +205,12 @@ BlazeGears.BGTL = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 		return result;
 	},
 	
+	// escapes some characters that could cause some javascript syntax issues during compilation
 	_escape: function(self, text) {
 		return BlazeGears.escapeString(text, {9: "\\t", 10: "\\n", 13: "\\r", 34: "\\\"", 92: "\\"});
 	},
 	
+	// finds the first occurrence of an array of strings (whichever is first)
 	_findNearest: function(self, text, array) {
 		var index;
 		var result = null;

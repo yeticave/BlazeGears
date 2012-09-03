@@ -24,17 +24,14 @@ Email: info@yeticave.com
 Homepage: http://www.yeticave.com
 */
 
-/*
-Class: BlazeGears.FragVars
-
-A singleton class that handles variables stored in the fragment section of the current URL.
-
-Superclasses:
-	<BlazeGears.Styles>
-*/
+// Class: BlazeGears.FragVars
+// A singleton class that handles variables stored in the fragment section of the current URL.
+// 
+// Superclasses:
+//   <BlazeGears.Styles>
 BlazeGears.FragVars = BlazeGears.Classes.declareSingleton(BlazeGears.Styles, {
 	// Field: ie_history
-	// If it's true, upon updating the URL the changes will be saved, so the the forward and back buttons will properly work under Internet Explorer.
+	// If it's true, upon updating the URL the changes will be saved to an iframe, so the the forward and back buttons will properly work under Internet Explorer.
 	ie_history: true,
 	
 	// Field: redundant_events
@@ -50,20 +47,17 @@ BlazeGears.FragVars = BlazeGears.Classes.declareSingleton(BlazeGears.Styles, {
 	_hash: "",
 	_timer: null,
 	
-	/*
-	Method: createFragVar
-	
-	Creates a FragVar object.
-	
-	Arguments:
-		id - The ID of the FragVar. Using characters other than letters, digits, and underscores isn't advised.
-	
-	Return Value:
-		Returns a new FragVar object, if this ID wasn't taken before, else the original instance.
-	
-	See Also:
-		<BlazeGears.FragVars.FragVar>
-	*/
+	// Method: createFragVar
+	// Creates a FragVar object.
+	// 
+	// Arguments:
+	//   id - The ID of the FragVar. Using characters other than letters, digits, and underscores isn't advised.
+	// 
+	// Return Value:
+	//   Returns a new FragVar object, if this ID wasn't taken before, else the original instance.
+	// 
+	// See Also:
+	//   <BlazeGears.FragVars.FragVar>
 	createFragVar: function(self, id) {
 		var result = self.getFragVar(id);
 		
@@ -75,17 +69,14 @@ BlazeGears.FragVars = BlazeGears.Classes.declareSingleton(BlazeGears.Styles, {
 		return result;
 	},
 	
-	/*
-	Method: getFragVar
-	
-	Finds a FragVar.
-	
-	Arguments:
-		id - The ID of the sought FragVar.
-	
-	Return Value:
-		Returns the FragVar object, if it exists, else null.
-	*/
+	// Method: getFragVar
+	// Finds a FragVar.
+	// 
+	// Arguments:
+	//   id - The ID of the sought FragVar.
+	// 
+	// Return Value:
+	//   Returns the FragVar object, if it exists, else null.
 	getFragVar: function(self, id) {
 		var result = null;
 		
@@ -99,27 +90,20 @@ BlazeGears.FragVars = BlazeGears.Classes.declareSingleton(BlazeGears.Styles, {
 		return result;
 	},
 	
-	/*
-	Method: getFragVars
-	
-	Return Value:
-		Returns a dictionary which contians the values of all the declared FragVars.
-	*/
+	// Method: getFragVars
+	// Returns a dictionary where the keys are the FragVars' IDs and the values are the FragVars' values.
 	getFragVars: function(self) {
 		return self._parseHash().fragvars;
 	},
 	
-	/*
-	Method: goToAnchor
-	
-	Scrolls the page to an anchor without clashing with the FragVars in the URL.
-	
-	Arguments:
-		anchor - This must be either a string that matches the ID or name of the target anchor or a reference to an A element which refers to the anchor through its href attribute.
-	
-	Return Value:
-		Always returns false.
-	*/
+	// Method: goToAnchor
+	// Scrolls the page to an anchor without clashing with the FragVars in the URL.
+	// 
+	// Arguments:
+	//   anchor - This must be either a string that matches the ID or name of the target anchor or a reference to an A element which refers to the anchor through its' href attribute.
+	// 
+	// Return Value:
+	//   Always returns false.
 	goToAnchor: function(self, anchor) {
 		var id = "";
 		var index;
@@ -138,14 +122,11 @@ BlazeGears.FragVars = BlazeGears.Classes.declareSingleton(BlazeGears.Styles, {
 		return false;
 	},
 	
-	/*
-	Method: setFragVars
-	
-	Sets the value of some FragVars.
-	
-	Arguments:
-		fragvars - This must be a dictionary and its keys will be the IDs of the set FragVars.
-	*/
+	// Method: setFragVars
+	// Sets the value of some FragVars.
+	// 
+	// Arguments:
+	//   fragvars - A dictionary where the keys are the FragVars' IDs and the values are the new values.
 	setFragVars: function(self, new_fragvars) {
 		var fragvars;
 		var hash = self._parseHash();
@@ -161,6 +142,7 @@ BlazeGears.FragVars = BlazeGears.Classes.declareSingleton(BlazeGears.Styles, {
 		self._updateHash(hash.anchor, fragvars);
 	},
 	
+	// determines if it's necessary use an iframe for IE history
 	__init__: function(self) {
 		var anchor = self._parseHash().anchor;
 		
@@ -178,6 +160,7 @@ BlazeGears.FragVars = BlazeGears.Classes.declareSingleton(BlazeGears.Styles, {
 		self._refresh();
 	},
 	
+	// parses the url fragment
 	_parseHash: function(self, hash) {
 		if (!self.is(hash)) hash = window.location.hash;
 		
@@ -202,6 +185,7 @@ BlazeGears.FragVars = BlazeGears.Classes.declareSingleton(BlazeGears.Styles, {
 		return result;
 	},
 	
+	// determines if the url fragment has changed since the last check and call the changed fragvars
 	_refresh: function(self) {
 		var callbacks = [];
 		var callers = [];
@@ -266,6 +250,7 @@ BlazeGears.FragVars = BlazeGears.Classes.declareSingleton(BlazeGears.Styles, {
 		self._timer = setTimeout(self._refresh, 100);
 	},
 	
+	// updates the url fragment and writes the change to the iframe, if necessary
 	_updateHash: function(self, anchor, fragvars) {
 		if (!self.is(anchor)) anchor = "";
 		if (!self.is(fragvars)) fragvars = {};

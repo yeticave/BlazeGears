@@ -24,11 +24,8 @@ Email: info@yeticave.com
 Homepage: http://www.yeticave.com
 */
 
-/*
-Class: BlazeGears.BaseClass
-
-A class that puts all the functions from the <BlazeGears> namespace into an object-oriented context.
-*/
+// Class: BlazeGears.BaseClass
+// A class that wraps all the functions from the <BlazeGears> namespace into a class context.
 BlazeGears.BaseClass = BlazeGears.Classes.declareClass({
 	// Method: cloneArray
 	cloneArray: function(self, source) {
