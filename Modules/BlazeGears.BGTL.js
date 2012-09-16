@@ -43,20 +43,8 @@ BlazeGears.BGTL = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 	_parameters_var: "bgtl_parameters",
 	_result_variable: "bgtl_result",
 	
-	// Method: execute
-	// A deprecated alias for <renderTemplate>.
-	execute: function(self, template, parameters) {
-		return self.renderTemplate(template, parameters);
-	},
-	
-	// Method: parse
-	// A deprecated alias for <parseTemplate>.
-	parse: function(self, template) {
-		return self.parseTemplate(template);
-	},
-	
-	// Method: parseTemplate
-	// Parses a string into a template object.
+	// Method: compileTemplate
+	// Compiles a string into a template object.
 	// 
 	// Parameters:
 	//   template - The string to be parsed.
@@ -66,7 +54,7 @@ BlazeGears.BGTL = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 	// 
 	// See Also:
 	//   <BlazeGears.BGTL.TemplateInterface>
-	parseTemplate: function(self, template) {
+	compileTemplate: function(self, template) {
 		var breaker;
 		var breakers;
 		var config;
@@ -149,7 +137,7 @@ BlazeGears.BGTL = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 								break;
 							
 							case "variable":
-								result += self._result_variable + " += BlazeGears.escapeString(" + script + ");";
+								result += self._result_variable + " += BlazeGears.escapeHtml(" + script + ");";
 								break;
 						}
 					}
@@ -176,38 +164,39 @@ BlazeGears.BGTL = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 		// try to compile the object
 		try {
 			result = eval(result)
-		} catch (exc) {
-			self.error("BlazeGears.BGTL", exc, result);
+		} catch (exception) {
+			self.error("BlazeGears.BGTL", exception, result);
 		}
 		
 		return result;
 	},
 	
-	// Method: renderTemplate
+	// Method: execute
 	// Compiles, renders, and finally discards a template.
 	// 
 	// Arguments:
 	//   template - The string to be compiled.
-	//   [parameters = {}] - A dictionary of arguments used for the execution where the keys are variables' names.
+	//   [parameters = {}] - A dictionary where keys are the variables' names used for rendering.
 	// 
 	// Return Value:
 	//   Returns the markup rendered by the template.
 	// 
 	// See Also:
-	//   - <parseTemplate>
+	//   - <compileTemplate>
 	//   - <BlazeGears.BGTL.TemplateInterface.execute>
-	renderTemplate: function(self, template, parameters) {
-		if (!self.is(parameters)) parameters = {};
-		
-		var bgtl = self.parseTemplate(template);
-		var result = bgtl.render(parameters);
-		
-		return result;
+	execute: function(self, template, parameters) {
+		return self.renderTemplate(template, parameters);
+	},
+	
+	// Method: parse
+	// A deprecated alias for <compileTemplate>.
+	parse: function(self, template) {
+		return self.compileTemplate(template);
 	},
 	
 	// escapes some characters that could cause some javascript syntax issues during compilation
 	_escape: function(self, text) {
-		return BlazeGears.escapeString(text, {9: "\\t", 10: "\\n", 13: "\\r", 34: "\\\"", 92: "\\"});
+		return BlazeGears.escapeHtml(text, {9: "\\t", 10: "\\n", 13: "\\r", 34: "\\\"", 92: "\\"});
 	},
 	
 	// finds the first occurrence of an array of strings (whichever is first)

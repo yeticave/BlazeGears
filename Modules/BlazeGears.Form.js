@@ -184,10 +184,10 @@ BlazeGears.Form = BlazeGears.Classes.declareClass(BlazeGears.BaseClass, {
 		}
 		result = "<form action='" + self.action + "' id='" + self._id + "'";
 		for (var i in self.attribs) {
-			result += " " + i + "='" + self.escapeString(self.attribs[i]) + "'";
+			result += " " + i + "='" + self.escapeHtml(self.attribs[i]) + "'";
 		}
 		for (var i in self.events) {
-			result += " on" + i + "='" + self.escapeString(self.events[i]);
+			result += " on" + i + "='" + self.escapeHtml(self.events[i]);
 			if (i == "submit") {
 				result += "; return BlazeGears.getEntity(\"" + self._id + "\")._submit();";
 			}
@@ -197,7 +197,7 @@ BlazeGears.Form = BlazeGears.Classes.declareClass(BlazeGears.BaseClass, {
 		
 		// compile the templates
 		for (var i in self.templates) {
-			self._templates[i] = self._bgtl.parseTemplate(self.templates[i]);
+			self._templates[i] = self._bgtl.compileTemplate(self.templates[i]);
 		}
 		
 		// render the fields and add the html chunks

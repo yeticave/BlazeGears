@@ -39,7 +39,7 @@ BlazeGears = new function() {
 	//   display_errors - If it's true, <error> will display an alert window whenever it's called. Defaults to false.
 	//   entity_id_length - The length of the random IDs used for entities. Defaults to 10.
 	//   entity_id_prefix - This prefix will be applied to every random entity ID to avoid clashes with other IDs. It doesn't count towards the length of the ID. Defaults to "blazegears_entity_".
-	//   escape_encoding - The default escaping method used by <escapeString>. Defaults to "html".
+	//   escape_encoding - The default escaping method used by <escapeHtml>. Defaults to "html".
 	self.config = {
 		display_errors: false,
 		entity_id_length: 10,
@@ -100,21 +100,21 @@ BlazeGears = new function() {
 	// Creates a deep copy of an object.
 	// 
 	// Arguments:
-	//   source - The object to be cloned.
+	//   template - The object to be cloned.
 	// 
 	// Return Value:
 	//   Returns the cloned object.
 	// 
 	// Notes:
 	//   This method uses object literals for cloning, so all constructor, type, and prototype data/metadata will be lost.
-	self.cloneObject = function(source) {
-		var clone = self.isArray(source) ? [] : {};
+	self.cloneObject = function(template) {
+		var clone = self.isArray(template) ? [] : {};
 		
-		for (i in source) {
-			if (source[i] && self.isObject(source[i]) && source[i] != null) {
-				clone[i] = self.cloneObject(source[i]);
+		for (i in template) {
+			if (template[i] && self.isObject(template[i]) && template[i] != null) {
+				clone[i] = self.cloneObject(template[i]);
 			} else {
-				clone[i] = source[i];
+				clone[i] = template[i];
 			}
 		}
 		
@@ -174,17 +174,17 @@ BlazeGears = new function() {
 	// Arguments:
 	//   caller - The listener will be attached to this element.
 	//   event - The name of the event, without the "on" prefix.
-	//   command - The callback to be called when the event fires.
+	//   callback - The callback to be called when the event fires.
 	// 
 	// See Also:
 	//   <destroyListener>
-	self.createListener = function(caller, event, command) {
+	self.createListener = function(caller, event, callback) {
 		if (caller.addEventListener) {
-			caller.addEventListener(event, command, false);
+			caller.addEventListener(event, callback, false);
 		} else if (caller.attachEvent) {
-			caller.attachEvent("on" + event, command);
+			caller.attachEvent("on" + event, callback);
 		} else {
-			eval("caller.on" + event + " = command;");
+			eval("caller.on" + event + " = callback;");
 		}
 	}
 	
@@ -224,11 +224,11 @@ BlazeGears = new function() {
 	// 
 	// See Also:
 	//   <createListener>
-	self.destroyListener = function(caller, event, command) {
+	self.destroyListener = function(caller, event, callback) {
 		if (caller.removeEventListener) {
-			caller.removeEventListener(event, command, false);
+			caller.removeEventListener(event, callback, false);
 		} else if (caller.detachEvent) {
-			caller.detachEvent("on" + event, command);
+			caller.detachEvent("on" + event, callback);
 		} else {
 			eval("delete caller.on" + event + ";");
 		}
@@ -263,12 +263,12 @@ BlazeGears = new function() {
 	}
 	
 	// Function: escape
-	// A deprecated alias for <escapeString>.
+	// A deprecated alias for <escapeHtml>.
 	self.escape = function(text, encoding) {
-		return self.escapeString(text, encoding);
+		return self.escapeHtml(text, encoding);
 	}
 	
-	// Function: escapeString
+	// Function: escapeHtml
 	// Escapes a string based on the selected escaping method.
 	// 
 	// Arguments:
@@ -282,7 +282,7 @@ BlazeGears = new function() {
 	//   html - Only escapes HTML control characters.
 	//   newlines - Only escapes the carriage return and new line characters.
 	//   utf-8 - All non-ASCII and HTML control characters will be escaped.
-	self.escapeString = function(text, encoding) {
+	self.escapeHtml = function(text, encoding) {
 		if (!self.is(encoding)) encoding = self.config.escape_encoding;
 		
 		var code;
@@ -441,7 +441,7 @@ BlazeGears = new function() {
 				if (once) {
 					included_js.push(filename);
 				}
-				document.write("<script src='" + self.escapeString(filename) + "' type='text/javascript'></script>");
+				document.write("<script src='" + self.escapeHtml(filename) + "' type='text/javascript'></script>");
 			}
 		}
 	}
@@ -498,27 +498,27 @@ BlazeGears = new function() {
 	// Determines if a value can be found in an array using linear search.
 	// 
 	// Arguments:
-	//   value - The value to look for.
-	//   array - The array to search in.
+	//   needle - The value to look for.
+	//   haystack - The array to search in.
 	//   [recursion = true] - If it's true, the sub-arrays of the original one will also be searched.
 	// 
 	// Return Value:
 	//   Returns true if the value can be found in the array or one of its sub-arrays (if recursion is enabled), else false.
-	self.isInArray = function(value, array, recursion) {
+	self.isInArray = function(needle, haystack, recursion) {
 		if (!self.is(recursion)) recursion = true;
 		
 		var result = false;
 		
-		if (self.isArray(value) && recursion) {
-			for (var i in value) {
-				if (self.isInArray(value[i], array)) {
+		if (self.isArray(needle) && recursion) {
+			for (var i in needle) {
+				if (self.isInArray(needle[i], haystack)) {
 					result = true;
 					break;
 				}
 			}
 		} else {
-			for (var i in array) {
-				if (array[i] == value) {
+			for (var i in haystack) {
+				if (haystack[i] == needle) {
 					result = true;
 					break;
 				}

@@ -157,7 +157,7 @@ BlazeGears.Form.Field = BlazeGears.Classes.declareClass(BlazeGears.BaseClass, {
 			self.texts = self._parent.texts[self._type];
 		}
 		if (self.template != null) {
-			template = self._parent._bgtl.parseTemplate(self.template);
+			template = self._parent._bgtl.compileTemplate(self.template);
 			result = template.render(self);
 		} else if (self.is(self._parent._templates[self._type])) {
 			result = self._parent._templates[self._type].render(self);
@@ -194,11 +194,11 @@ BlazeGears.Form.Field = BlazeGears.Classes.declareClass(BlazeGears.BaseClass, {
 			}
 			if (!rule_result) {
 				if (self._rules[i][2] != null) {
-					invalid_content += "<div>" + self.escapeString(self._rules[i][2]) +  "</div>";
+					invalid_content += "<div>" + self.escapeHtml(self._rules[i][2]) +  "</div>";
 				}
 				result = false;
 			} else if (self._rules[i][3] != null) {
-				valid_content += "<div>" + self.escapeString(self._rules[i][3]) +  "</div>";
+				valid_content += "<div>" + self.escapeHtml(self._rules[i][3]) +  "</div>";
 			}
 			if (invalid_element != null) {
 				if (invalid_content.length > 0) {

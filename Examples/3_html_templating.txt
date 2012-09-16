@@ -19,7 +19,7 @@ The example below uses both the opening and closing tags for all three control t
 		{title: "Entry #2", content: "This is some content with a <a href='http://www.blazegears.com'>link</a>."}
 	];
 	
-	parsed_template = bgtl.parseTemplate(template);
+	parsed_template = bgtl.compileTemplate(template);
 	alert(parsed_template.render(entries));
 (end)
 
