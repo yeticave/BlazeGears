@@ -467,7 +467,19 @@ BlazeGears = new function() {
 	// Return Value:
 	//   Returns true if the the variable is an array, else false.
 	self.isArray = function(variable) {
-		return isConstructOf(variable, "Array");
+		return variable instanceof Array;
+	}
+	
+	// Function: isBoolean
+	// Determines if a variable is a boolean object.
+	// 
+	// Arguments:
+	//   variable - The variable to be checked.
+	// 
+	// Return Value:
+	//   Returns true if the the variable is a boolean object, else false.
+	self.isBoolean = function(variable) {
+		return variable instanceof Boolean || typeof variable == "boolean";
 	}
 	
 	// Function: isDate
@@ -479,7 +491,7 @@ BlazeGears = new function() {
 	// Return Value:
 	//   Returns true if the the variable is a date object, else false.
 	self.isDate = function(variable) {
-		return isConstructOf(variable, "Date");
+		return variable instanceof Date
 	}
 	
 	// Function: isFunction
@@ -491,7 +503,7 @@ BlazeGears = new function() {
 	// Return Value:
 	//   Returns true if the the variable is a function, else false.
 	self.isFunction = function(variable) {
-		return isConstructOf(variable, "Function");
+		return variable instanceof Function || typeof variable == "function";
 	}
 	
 	// Function: isInArray
@@ -537,7 +549,7 @@ BlazeGears = new function() {
 	// Return Value:
 	//   Returns true if the the variable is a number, else false.
 	self.isNumber = function(variable) {
-		return isConstructOf(variable, "Number");
+		return variable instanceof Number || typeof variable == "number";
 	}
 	
 	// Function: isObject
@@ -549,6 +561,16 @@ BlazeGears = new function() {
 	// Return Value:
 	//   Returns true if the the variable is an object, else false.
 	self.isObject = function(variable) {
+		var constructor = "Object";
+		
+		if (variable != null) {
+			if (variable.constructor) {
+				result = variable.constructor.toString().indexOf(constructor) != -1;
+			} else if (typeof variable == constructor.toString().toLowerCase()) {
+				result = true;
+			}
+		}
+		
 		return variable != null && isConstructOf(variable, "Object");
 	}
 	
@@ -561,7 +583,7 @@ BlazeGears = new function() {
 	// Return Value:
 	//   Returns true if the the variable is a regular expression, else false.
 	self.isRegExp = function(variable) {
-		return isConstructOf(variable, "RegExp");
+		return variable instanceof RegExp;
 	}
 	
 	// Function: isString
@@ -573,7 +595,7 @@ BlazeGears = new function() {
 	// Return Value:
 	//   Returns true if the the variable is a string, else false.
 	self.isString = function(variable) {
-		return isConstructOf(variable, "String");
+		return variable instanceof String || typeof variable == "string";
 	}
 	
 	// Function: renderFlash
@@ -624,21 +646,6 @@ BlazeGears = new function() {
 			result = true;
 		} else {
 			self.error("BlazeGears", "Entity doesn't exist!", id);
-		}
-		
-		return result;
-	}
-	
-	// determines if the variable's constructor contains the provided string
-	var isConstructOf = function(variable, constructor) {
-		var result = false;
-		
-		if (variable != null) {
-			if (variable.constructor) {
-				result = variable.constructor.toString().indexOf(constructor) != -1;
-			} else if (typeof variable == constructor.toString().toLowerCase()) {
-				result = true;
-			}
 		}
 		
 		return result;
