@@ -562,6 +562,7 @@ BlazeGears = new function() {
 	//   Returns true if the the variable is an object, else false.
 	self.isObject = function(variable) {
 		var constructor = "Object";
+		var result = false;
 		
 		if (variable != null) {
 			if (variable.constructor) {
@@ -571,7 +572,7 @@ BlazeGears = new function() {
 			}
 		}
 		
-		return variable != null && isConstructOf(variable, "Object");
+		return result;
 	}
 	
 	// Function: isRegExp
