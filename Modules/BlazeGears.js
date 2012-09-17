@@ -521,19 +521,10 @@ BlazeGears = new function() {
 		
 		var result = false;
 		
-		if (self.isArray(needle) && recursion) {
-			for (var i in needle) {
-				if (self.isInArray(needle[i], haystack)) {
-					result = true;
-					break;
-				}
-			}
-		} else {
-			for (var i in haystack) {
-				if (haystack[i] == needle) {
-					result = true;
-					break;
-				}
+		for (var i in haystack) {
+			if ((self.isArray(haystack[i]) && self.isInArray(needle, haystack[i]) && recursion) || haystack[i] == needle) {
+				result = true;
+				break;
 			}
 		}
 		
