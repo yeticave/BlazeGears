@@ -90,10 +90,16 @@ BlazeGears.FragVars = BlazeGears.Classes.declareSingleton(BlazeGears.Styles, {
 		return result;
 	},
 	
-	// Method: getFragVars
+	// Method: getFragVarValues
 	// Returns a dictionary where the keys are the FragVars' IDs and the values are the FragVars' values.
-	getFragVars: function(self) {
+	getFragVarValues: function(self) {
 		return self._parseHash().fragvars;
+	},
+	
+	// Method: getFragVars
+	// A deprecated alias for <BlazeGears.FragVars.getFragVarValues>.
+	getFragVars: function(self) {
+		return self.getFragVarValues();
 	},
 	
 	// Method: goToAnchor
@@ -116,18 +122,18 @@ BlazeGears.FragVars = BlazeGears.Classes.declareSingleton(BlazeGears.Styles, {
 				id = anchor.href.substr(index + 1);
 			}
 		}
-		self._updateHash(id, self.getFragVars());
+		self._updateHash(id, self.getFragVarValues());
 		self._go_to_anchor = true;
 		
 		return false;
 	},
 	
-	// Method: setFragVars
-	// Sets the value of some FragVars.
+	// Method: setFragVarValues
+	// Sets the values of some FragVars.
 	// 
 	// Arguments:
 	//   fragvars - A dictionary where the keys are the FragVars' IDs and the values are the new values.
-	setFragVars: function(self, new_fragvars) {
+	setFragVarValues: function(self, new_fragvars) {
 		var fragvars;
 		var hash = self._parseHash();
 		
@@ -140,6 +146,12 @@ BlazeGears.FragVars = BlazeGears.Classes.declareSingleton(BlazeGears.Styles, {
 			}
 		}
 		self._updateHash(hash.anchor, fragvars);
+	},
+	
+	// Method: setFragVars
+	// A deprecated alias for <BlazeGears.FragVars.setFragVarValues>.
+	setFragVars: function(self, new_fragvars) {
+		self.setFragVarValues(new_fragvars);
 	},
 	
 	// determines if it's necessary use an iframe for IE history

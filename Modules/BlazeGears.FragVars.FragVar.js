@@ -61,7 +61,7 @@ BlazeGears.FragVars.FragVar = BlazeGears.Classes.declareClass(BlazeGears.BaseCla
 		var fragvars = {};
 		
 		fragvars[self._id] = value;
-		self._parent.setFragVars(fragvars);
+		self._parent.setFragVarValues(fragvars);
 	},
 	
 	// protected constructor

@@ -93,6 +93,12 @@ BlazeGears.BaseClass = BlazeGears.Classes.declareClass({
 		return BlazeGears.getEntity(id);
 	},
 	
+	// Method: getEntityValue
+	// See Also: <BlazeGears.getEntityValue>
+	getEntityValue: function(self, id) {
+		return BlazeGears.getEntityValue(id);
+	},
+	
 	// Method: includeCss
 	// See Also: <BlazeGears.includeCss>
 	includeCss: function(self, filename, media, once) {
@@ -109,6 +115,12 @@ BlazeGears.BaseClass = BlazeGears.Classes.declareClass({
 	// See Also: <BlazeGears.is>
 	is: function(self, variable) {
 		return BlazeGears.is(variable);
+	},
+	
+	// Method: isAnonymousObject
+	// See Also: <BlazeGears.isAnonymousObject>
+	isAnonymousObject: function(self, variable) {
+		return BlazeGears.isAnonymousObject(variable);
 	},
 	
 	// Method: isArray
@@ -163,6 +175,12 @@ BlazeGears.BaseClass = BlazeGears.Classes.declareClass({
 	// See Also: <BlazeGears.renderFlash>
 	renderFlash: function(self, id, filename, width, height, parameters) {
 		return BlazeGears.renderFlash(id, filename, width, height, parameters);
+	},
+	
+	// Method: setEntityValue
+	// See Also: <BlazeGears.setEntityValue>
+	setEntityValue: function(self, id, value) {
+		BlazeGears.setEntityValue(id, value);
 	},
 	
 	// Method: updateEntity

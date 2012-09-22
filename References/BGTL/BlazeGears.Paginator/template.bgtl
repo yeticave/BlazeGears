@@ -1,13 +1,13 @@
 <div class='BlazeGears-Paginator'>
 	%if (getPages() > 1) {%
 		%if (getPage() > 1) {%
-			<div class='PreviousPage'><a href='javascript:;' onclick='BlazeGears.getEntity(&#39;{{getId()}}&#39;).previousPage();'>{{texts[0]}}</a></div>
+			<div class='PreviousPage'><a href='javascript:;' onclick='BlazeGears.getEntityValue(&#39;{{getId()}}&#39;).previousPage();'>{{texts[0]}}</a></div>
 		%} else {%
 			<div class='PreviousPage' style='visibility: hidden;'>{{texts[0]}}</div>
 		%}%
 		<div class='CurrentPage'>
 			{{texts[1]}}
-			<select onchange='BlazeGears.getEntity(&#39;{{getId()}}&#39;).goToPage(this.value);'>
+			<select onchange='BlazeGears.getEntityValue(&#39;{{getId()}}&#39;).goToPage(this.value);'>
 				%for (var i = 1; i <= getPages(); i++) {%
 					%if (i == getPage()) {%
 						<option selected='selected' value='{{i}}'>{{i}}</option>
@@ -20,7 +20,7 @@
 			{{getPages()}}
 		</div>
 		%if (getPage() < getPages()) {%
-			<div class='NextPage'><a href='javascript:;' onclick='BlazeGears.getEntity(&#39;{{getId()}}&#39;).nextPage();'>{{texts[2]}}</a></div>
+			<div class='NextPage'><a href='javascript:;' onclick='BlazeGears.getEntityValue(&#39;{{getId()}}&#39;).nextPage();'>{{texts[2]}}</a></div>
 		%} else {%
 			<div class='NextPage' style='visibility: hidden;'>{{texts[2]}}</div>
 		%}%

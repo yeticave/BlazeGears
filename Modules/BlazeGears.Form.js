@@ -189,7 +189,7 @@ BlazeGears.Form = BlazeGears.Classes.declareClass(BlazeGears.BaseClass, {
 		for (var i in self.events) {
 			result += " on" + i + "='" + self.escapeHtml(self.events[i]);
 			if (i == "submit") {
-				result += "; return BlazeGears.getEntity(\"" + self._id + "\")._submit();";
+				result += "; return BlazeGears.getEntityValue(\"" + self._id + "\")._submit();";
 			}
 			result += "'";
 		}

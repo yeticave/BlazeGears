@@ -133,8 +133,8 @@ BlazeGears = new function() {
 	// 
 	// See Also:
 	//   - <destroyEntity>
-	//   - <getEntity>
-	//   - <updateEntity>
+	//   - <getEntityValue>
+	//   - <setEntityValue>
 	//   - <config>.entity_id_length
 	//   - <config>.entity_id_prefix
 	self.createEntity = function(value, id) {
@@ -199,8 +199,8 @@ BlazeGears = new function() {
 	// 
 	// See Also:
 	//   - <createEntity>
-	//   - <getEntity>
-	//   - <updateEntity>
+	//   - <getEntityValue>
+	//   - <setEntityValue>
 	self.destroyEntity = function(id) {
 		var result = false;
 		
@@ -346,6 +346,12 @@ BlazeGears = new function() {
 	}
 	
 	// Function: getEntity
+	// A deprecated alias for <getEntityValue>.
+	self.getEntity = function(id) {
+		return self.getEntityValue(id);
+	}
+	
+	// Function: getEntityValue
 	// Returns the value of an entity created by <createEntity>.
 	// 
 	// Arguments:
@@ -357,8 +363,8 @@ BlazeGears = new function() {
 	// See Also:
 	//   - <createEntity>
 	//   - <destroyEntity>
-	//   - <updateEntity>
-	self.getEntity = function(id) {
+	//   - <setEntityValue>
+	self.getEntityValue = function(id) {
 		if (self.is(entities[id])) {
 			return entities[id];
 		} else {
@@ -458,6 +464,29 @@ BlazeGears = new function() {
 		return typeof variable != "undefined";
 	}
 	
+	// Function: isAnonymousObject
+	// Determines if a variable is an object.
+	// 
+	// Arguments:
+	//   variable - The variable to be checked.
+	// 
+	// Return Value:
+	//   Returns true if the the variable is an object, else false.
+	self.isAnonymousObject = function(variable) {
+		var constructor = "Object";
+		var result = false;
+		
+		if (variable != null) {
+			if (variable.constructor) {
+				result = variable.constructor.toString().indexOf(constructor) != -1;
+			} else if (typeof variable == constructor.toString().toLowerCase()) {
+				result = true;
+			}
+		}
+		
+		return result;
+	}
+	
 	// Function: isArray
 	// Determines if a variable is an array.
 	// 
@@ -544,26 +573,8 @@ BlazeGears = new function() {
 	}
 	
 	// Function: isObject
-	// Determines if a variable is an object.
-	// 
-	// Arguments:
-	//   variable - The variable to be checked.
-	// 
-	// Return Value:
-	//   Returns true if the the variable is an object, else false.
 	self.isObject = function(variable) {
-		var constructor = "Object";
-		var result = false;
-		
-		if (variable != null) {
-			if (variable.constructor) {
-				result = variable.constructor.toString().indexOf(constructor) != -1;
-			} else if (typeof variable == constructor.toString().toLowerCase()) {
-				result = true;
-			}
-		}
-		
-		return result;
+		return self.isAnonymousObject(variable);
 	}
 	
 	// Function: isRegExp
@@ -617,8 +628,8 @@ BlazeGears = new function() {
 		return result;
 	}
 	
-	// Function: updateEntity
-	// Changes the value of an entity created by <createEntity>.
+	// Function: setEntityValue
+	// Sets the value of an entity created by <createEntity>.
 	// 
 	// Arguments:
 	//   id - The ID of the entity.
@@ -629,8 +640,8 @@ BlazeGears = new function() {
 	// See Also:
 	//   - <createEntity>
 	//   - <destroyEntity>
-	//   - <getEntity>
-	self.updateEntity = function(id, value) {
+	//   - <getEntityValue>
+	self.setEntityValue = function(id, value) {
 		var result = false;
 		
 		if (self.is(entities[id])) {
@@ -641,6 +652,12 @@ BlazeGears = new function() {
 		}
 		
 		return result;
+	}
+	
+	// Function: updateEntity
+	// A deprecated alias for <setEntityValue>.
+	self.updateEntity = function(id, value) {
+		return self.setEntityValue(id, value);
 	}
 }
 
