@@ -184,7 +184,7 @@ BlazeGears = new function() {
 		} else if (caller.attachEvent) {
 			caller.attachEvent("on" + event, callback);
 		} else {
-			eval("caller.on" + event + " = callback;");
+			caller["on" + event] = callback;
 		}
 	}
 	
@@ -230,7 +230,7 @@ BlazeGears = new function() {
 		} else if (caller.detachEvent) {
 			caller.detachEvent("on" + event, callback);
 		} else {
-			eval("delete caller.on" + event + ";");
+			delete caller["on" + event]
 		}
 	}
 	
@@ -465,7 +465,7 @@ BlazeGears = new function() {
 	}
 	
 	// Function: isAnonymousObject
-	// Determines if a variable is an object.
+	// Determines if a variable is an anonymous object.
 	// 
 	// Arguments:
 	//   variable - The variable to be checked.
@@ -473,17 +473,8 @@ BlazeGears = new function() {
 	// Return Value:
 	//   Returns true if the the variable is an object, else false.
 	self.isAnonymousObject = function(variable) {
-		var constructor = "Object";
-		var result = false;
-		
-		if (variable != null) {
-			if (variable.constructor) {
-				result = variable.constructor.toString().indexOf(constructor) != -1;
-			} else if (typeof variable == constructor.toString().toLowerCase()) {
-				result = true;
-			}
-		}
-		
+		var constructorPattern = /^(\s*)function(\s*)Object\(\)(\s*)\{/;
+		var result = constructorPattern.test(variable.constructor);
 		return result;
 	}
 	

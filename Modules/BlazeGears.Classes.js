@@ -163,7 +163,11 @@ BlazeGears.Classes = new function() {
 			// public members
 			for (var i in blazegears_class.__declaration__.public) {
 				if (bg.isFunction(blazegears_class.__declaration__.public[i])) {
-					eval("instance[i] = function() { return instance.__method__('" + i + "', arguments); }");
+					with ({memberName: i}) {
+						instance[memberName] = function() {
+							return instance.__method__(memberName, arguments);
+						}
+					}
 				} else if (bg.isArray(blazegears_class.__declaration__.public[i]) || bg.isObject(blazegears_class.__declaration__.public[i])) {
 					instance[i] = bg.cloneObject(blazegears_class.__declaration__.public[i]);
 				} else {
@@ -171,10 +175,14 @@ BlazeGears.Classes = new function() {
 				}
 			}
 			
-			// static methods
+			// static methods for instances
 			for (var i in blazegears_class.__declaration__.static) {
 				if (bg.isFunction(blazegears_class.__declaration__.static[i])) {
-					eval("instance[i] = function() { return blazegears_class.__method__('" + i + "', arguments); }");
+					with ({memberName: i}) {
+						instance[memberName] = function() {
+							return blazegears_class.__method__(memberName, arguments);
+						}
+					}
 				}
 			}
 			
@@ -228,7 +236,11 @@ BlazeGears.Classes = new function() {
 		// static members
 		for (var i in declaration.static) {
 			if (bg.isFunction(declaration.static[i])) {
-				eval("blazegears_class[i] = function() { return blazegears_class.__method__('" + i + "', arguments); }");
+				with ({memberName: i}) {
+					blazegears_class[memberName] = function() {
+						return blazegears_class.__method__(memberName, arguments);
+					}
+				}
 			} else if (bg.isArray(declaration.static[i]) || bg.isObject(declaration.static[i])) {
 				blazegears_class[i] = bg.cloneObject(declaration.static[i]);
 			} else {
