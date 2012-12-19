@@ -158,9 +158,7 @@ BlazeGears.FragVars = BlazeGears.Classes.declareSingleton(BlazeGears.Styles, {
 	__init__: function(self) {
 		var anchor = self._parseHash().anchor;
 		
-		// create the ie iframe
-		document.write("<!--[if lte IE 7]><iframe id='blazegears_fragvars_iframe' title='IE 7' style='display: none;'></iframe><![endif]-->");
-		document.write("<!--[if gte IE 8]><iframe id='blazegears_fragvars_iframe' title='IE 8+' style='display: none;'></iframe><![endif]-->");
+		// find the history manipulating iframe
 		self._iframe = document.getElementById("blazegears_fragvars_iframe");
 		
 		// enable the initial anchoring
@@ -300,3 +298,7 @@ BlazeGears.FragVars = BlazeGears.Classes.declareSingleton(BlazeGears.Styles, {
 		}
 	}
 });
+
+// create the ie iframe
+document.write("<!--[if lte IE 7]><iframe id='blazegears_fragvars_iframe' title='IE 7' style='display: none;'></iframe><![endif]-->");
+document.write("<!--[if gte IE 8]><iframe id='blazegears_fragvars_iframe' title='IE 8+' style='display: none;'></iframe><![endif]-->");
