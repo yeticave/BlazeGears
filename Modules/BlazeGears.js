@@ -474,7 +474,7 @@ BlazeGears = new function() {
 	//   Returns true if the the variable is an object, else false.
 	self.isAnonymousObject = function(variable) {
 		var constructorPattern = /^(\s*)function(\s*)Object\(\)(\s*)\{/;
-		var result = constructorPattern.test(variable.constructor);
+		var result = variable != null ? constructorPattern.test(variable.constructor) : false;
 		return result;
 	}
 	
