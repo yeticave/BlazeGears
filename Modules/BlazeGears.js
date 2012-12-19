@@ -110,7 +110,7 @@ BlazeGears = new function() {
 	self.cloneObject = function(template) {
 		var clone = self.isArray(template) ? [] : {};
 		
-		for (i in template) {
+		for (var i in template) {
 			if (template[i] && self.isObject(template[i]) && template[i] != null) {
 				clone[i] = self.cloneObject(template[i]);
 			} else {

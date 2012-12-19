@@ -265,6 +265,7 @@ BlazeGears.FragVars = BlazeGears.Classes.declareSingleton(BlazeGears.Styles, {
 		if (!self.is(anchor)) anchor = "";
 		if (!self.is(fragvars)) fragvars = {};
 		
+		var hash;
 		var element;
 		var new_fragvars = [];
 		
