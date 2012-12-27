@@ -87,8 +87,8 @@ BlazeGears.Classes = new function() {
 				}
 				declaration.static[key] = raw_declaration[i];
 			} else {
-				if (bg.is(declaration.static[key])) {
-					delete declaration.static[key];
+				if (bg.is(declaration.static[i])) {
+					delete declaration.static[i];
 				}
 				declaration.public[i] = raw_declaration[i];
 			}
