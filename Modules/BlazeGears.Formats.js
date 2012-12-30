@@ -684,7 +684,7 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 						break;
 					
 					case "c": // same as "%a %b %d %H:%M:%S %Y"
-						chunk = self._formatUnixDate(date, "%a %b %d %H:%M:%S %Y");
+						chunk = self._formatUnixDate(date, "%a %b %_d %H:%M:%S %Y");
 						if (upper) {
 							chunk = chunk.toUpperCase();
 						}
