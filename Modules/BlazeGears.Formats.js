@@ -505,6 +505,9 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 	_formatUnixDate: function(self, date, syntax) {
 		var character;
 		var chunk;
+		var has_padding_modifier = false;
+		var local_date = false;
+		var local_numbers = false;
 		var opposite;
 		var padding;
 		var precision;
@@ -531,14 +534,17 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 						specifier += character;
 						switch (character) {
 							case "-": // disable padding
+								has_padding_modifier = true;
 								padding = "";
 								break;
 							
 							case "_": // pad with spaces
+								has_padding_modifier = true;
 								padding = " ";
 								break;
 							
 							case "0": // pad with zeros
+								has_padding_modifier = true;
 								padding = "0";
 								break;
 							
@@ -577,10 +583,16 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 					
 					case "A": // weekday names (Sunday - Saturday)
 						chunk = self._getDayName(date);
+						if (upper || opposite) {
+							chunk = chunk.toUpperCase();
+						}
 						break;
 					
 					case "B": // month names (January - December)
 						chunk = self._getMonthName(date);
+						if (upper || opposite) {
+							chunk = chunk.toUpperCase();
+						}
 						break;
 					
 					case "C": // centuries (20 - 21)
@@ -658,15 +670,24 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 					
 					case "a": // abbreviated weekday names (Sun - Sat)
 						chunk = self._getAbbreviatedDayName(date);
+						if (upper || opposite) {
+							chunk = chunk.toUpperCase();
+						}
 						break;
 					
 					case "b": // abbreviated month names (Jan - Dec)
 					case "h":
 						chunk = self._getAbbreviatedMonthName(date);
+						if (upper || opposite) {
+							chunk = chunk.toUpperCase();
+						}
 						break;
 					
 					case "c": // same as "%a %b %d %H:%M:%S %Y"
 						chunk = self._formatUnixDate(date, "%a %b %d %H:%M:%S %Y");
+						if (upper) {
+							chunk = chunk.toUpperCase();
+						}
 						break;
 					
 					case "d": // days (01 - 31)
@@ -674,27 +695,32 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 						break;
 					
 					case "e": // same as "%_d"
-						chunk = self._formatUnixDate(date, "%_d");
+						if (!has_padding_modifier) {
+							padding = " ";
+						}
+						chunk = self._padStringLeft(self._getDate(date), padding, 2);
 						break;
 					
 					case "g": // abbreviated iso-8601 years (00 - 99)
-						chunk = self._getIso8601Year(date).toString();
-						chunk = chunk.substr(chunk.length - 2);
+						chunk = self._padStringLeft(self._getIso8601Year(date) % 100, padding, 2);
 						break;
 					
 					case "j": // days of the year (001 - 366)
-						chunk = self._getDayOfYear(date).toString();
-						while (padding.length > 0 && chunk.length < 3) {
-							chunk = chunk + padding;
-						}
+						chunk = self._padStringLeft(self._getDayOfYear(date), padding, 3);
 						break;
 					
 					case "k": // same as "%_H"
-						chunk = self._formatUnixDate(date, "%_H");
+						if (!has_padding_modifier) {
+							padding = " ";
+						}
+						chunk = self._padStringLeft(self._getHours(date), padding, 2);
 						break;
 					
 					case "l": // same as "%_I"
-						chunk = self._formatUnixDate(date, "%_I");
+						if (!has_padding_modifier) {
+							padding = " ";
+						}
+						chunk = self._padStringLeft(self._getTwelveHourHours(date), padding, 2);
 						break;
 					
 					case "m": // months (01 - 12)
@@ -711,6 +737,9 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 					
 					case "p": // abbreviated upper-case meridiems (AM - PM)
 						chunk = self._getUpperCaseMeridiem(date);
+						if (opposite) {
+							chunk = chunk.toLowerCase();
+						}
 						break;
 					
 					case "r": // same as "%I:%M:%S %p"
@@ -738,7 +767,7 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 						break;
 					
 					case "y": // abbreviated years (00 - 99)
-						chunk = self._getAbbreviatedYear(date);
+						chunk = self._padStringLeft(self._getFullYear(date) % 100, padding, 2);
 						break;
 					
 					case "z": // time zone offset (-1200 - +1300)
@@ -753,11 +782,6 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 					
 					default:
 						continue;
-				}
-				
-				if (upper) {
-					chunk = String(chunk);
-					chunk = chunk.toUpperCase();
 				}
 				
 				result += chunk;
