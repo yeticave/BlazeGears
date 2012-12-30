@@ -111,7 +111,7 @@ BlazeGears = new function() {
 		var clone = self.isArray(template) ? [] : {};
 		
 		for (var i in template) {
-			if (template[i] && self.isObject(template[i]) && template[i] != null) {
+			if (template[i] && self.isAnonymousObject(template[i]) && template[i] != null) {
 				clone[i] = self.cloneObject(template[i]);
 			} else {
 				clone[i] = template[i];
@@ -465,7 +465,7 @@ BlazeGears = new function() {
 	}
 	
 	// Function: isAnonymousObject
-	// Determines if a variable is an anonymous object.
+	// Determines if a variable is an anonymous object or object literal.
 	// 
 	// Arguments:
 	//   variable - The variable to be checked.
@@ -564,6 +564,7 @@ BlazeGears = new function() {
 	}
 	
 	// Function: isObject
+	// A deprecated alias for <isAnonymousObject>.
 	self.isObject = function(variable) {
 		return self.isAnonymousObject(variable);
 	}
