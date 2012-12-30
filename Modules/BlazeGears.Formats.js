@@ -596,7 +596,7 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 						break;
 					
 					case "C": // centuries (20 - 21)
-						chunk = self._getCentury(date);
+						chunk = self._getCentury(date) - 1;
 						break;
 					
 					case "D": // same as "%m/%d/%y"
@@ -810,7 +810,7 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 	},
 	
 	_getCentury: function(self, date) {
-		return Math.ceil(self._getFullYear(date) / 100);
+		return Math.ceil((self._getFullYear(date) + 1) / 100);
 	},
 	
 	_getDate: function(self, date) {
