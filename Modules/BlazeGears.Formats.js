@@ -93,6 +93,18 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 		short_months: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 	},
 	
+	// Function: enableUtcTime
+	// Enables or disable the usage of the UTC time for date formatting.
+	// 
+	// Arguments:
+	//   enable - If it's true, the date functions will be using UTC time, otherwise they will be using the local time zone.
+	//
+	// See Also:
+	//   <formatDate>
+	enableUtcTime: function(self, enable) {
+		self._isUtcTimeEnabled = enable;
+	},
+	
 	// Function: formatDate
 	// Formats a date using either Unix or PHP syntax.
 	// 
@@ -313,6 +325,9 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 		return number;
 	},
 	
+	// determines if utc time or the local time should be used
+	_isUtcTimeEnabled: false,
+	
 	// formats a date using php's date function's syntax
 	_formatPhpDate: function(self, date, syntax) {
 		var character;
@@ -331,39 +346,27 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 					break;
 				
 				case "A": // abbreviated upper-case meridiems (AM - PM)
-					result += self._formatUnixDate(date, "%p");
+					result += self._getUpperCaseMeridiem(date);
 					break;
 				
 				case "B": // swatch internet time (000 - 999)
-					chunk = date.getUTCHours() + 1;
-					if (chunk > 23) {
-						chunk = 0;
-					}
-					chunk *= 3600;
-					chunk += date.getUTCMinutes() * 60;
-					chunk += date.getUTCSeconds();
-					chunk /= 86.4;
-					chunk = String(Math.floor(chunk));
-					while (chunk.length < 3) {
-						chunk = "0" + chunk;
-					}
-					result += chunk;
+					result += self._getSwatchInternetTime(date);
 					break;
 				
 				case "D": // abbreviated weekday names (Sun - Sat)
-					result += self._formatUnixDate(date, "%a");
+					result += self._getAbbreviatedDayName(date);
 					break;
 				
 				case "F": // month names (January - December)
-					result += self._formatUnixDate(date, "%B");
+					result += self._getMonthName(date);
 					break;
 				
 				case "G": // international hours (0 - 23)
-					result += self._formatUnixDate(date, "%-H");
+					result += self._getHours(date);
 					break;
 				
 				case "H": // international hours (00 - 23)
-					result += self._formatUnixDate(date, "%H");
+					result += self._padStringLeft(self._getHours(date), "0", 2);
 					break;
 				
 				case "I": // daylight saving time (0 - 1)
@@ -371,51 +374,51 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 					break;
 				
 				case "L": // leap years (0 - 1)
-					result += self._formatUnixDate(date, "%L");
+					result += self._isLeapYear(date) ? "1" : "0";
 					break;
 				
 				case "M": // abbreviated month names (Jan - Dec)
-					result += self._formatUnixDate(date, "%b");
+					result += self._getAbbreviatedMonthName(date);
 					break;
 				
 				case "N": // weekdays, starting on monday (1 - 7)
-					result += self._formatUnixDate(date, "%u");
+					result += self._getDayOfWeek(date);
 					break;
 				
 				case "O": // time zone offset in hours and minutes (-1200 - +1300)
-					result += self._formatUnixDate(date, "%z");
+					//result += self._formatUnixDate(date, "%z");
 					break;
 				
 				case "P": // time zone offset in hours and minutes (-12:00 - +13:00)
-					result += self._formatUnixDate(date, "%:z");
+					//result += self._formatUnixDate(date, "%:z");
 					break;
 				
 				case "S": // ordinals for the days of the month (st, nd, rd, or th)
-					result += self._formatUnixDate(date, "%o");
+					result += self._getOrdinalSuffix(date);
 					break;
 				
 				case "T": // abbreviated time zone names (e.g. UTC)
-					result += "";
+					//result += "";
 					break;
 				
 				case "U": // unix timestamp
-					result += self._formatUnixDate(date, "%s");
+					result += self._getTimestamp(date);
 					break;
 				
 				case "W": // iso-8601 weeks (01 - 53)
-					result += self._formatUnixDate(date, "%V");
+					result += self._padStringLeft(self._getIso8601Week(date), "0", 2);
 					break;
 				
 				case "Y": // years (1970 - 2038)
-					result += self._formatUnixDate(date, "%Y");
+					result += self._getFullYear(date);
 					break;
 				
 				case "Z": // time zone offset in seconds (-43200 - 50400)
-					result += "";
+					//result += "";
 					break;
 				
 				case "a": // abbreviated lower-case meridiems (am - pm)
-					result += self._formatUnixDate(date, "%P");
+					result += self._getLowerCaseMeridiem(date);
 					break;
 				
 				case "c": // same as "Y-m-d\\TH:i:sP"
@@ -423,43 +426,43 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 					break;
 				
 				case "d": // days (01 - 31)
-					result += self._formatUnixDate(date, "%d");
+					result += self._padStringLeft(self._getDate(date), "0", 2);
 					break;
 				
 				case "e": // time zone names (e.g. Nuku'alofa)
-					result += "";
+					//result += "";
 					break;
 				
 				case "g": // hours (1 - 12)
-					result += self._formatUnixDate(date, "%-I");
+					result += self._getTwelveHourHours(date);
 					break;
 				
 				case "h": // hours (01 - 12)
-					result += self._formatUnixDate(date, "%I");
+					result += self._padStringLeft(self._getTwelveHourHours(date), "0", 2);
 					break;
 				
 				case "i": // minutes (00 - 59)
-					result += self._formatUnixDate(date, "%M");
+					result += self._padStringLeft(self._getMinutes(date), "0", 2);
 					break;
 				
 				case "j": // days (1 - 31)
-					result += self._formatUnixDate(date, "%-d");
+					result += self._getDate(date);
 					break;
 				
 				case "l": // weekday names (Sunday - Saturday)
-					result += self._formatUnixDate(date, "%A");
+					result += self._getDayName(date);
 					break;
 				
 				case "m": // months (01 - 12)
-					result += self._formatUnixDate(date, "%m");
+					result += self._padStringLeft(self._getMonth(date) + 1, "0", 2);
 					break;
 				
 				case "n": // months (1 - 12)
-					result += self._formatUnixDate(date, "%-m");
+					result += self._getMonth(date) + 1;
 					break;
 				
 				case "o": // iso-8601 years (1970 - 2038)
-					result += self._formatUnixDate(date, "%G");
+					result += self._getIso8601Year(date);
 					break;
 				
 				case "r": // same as "D, d M Y H:i:s O"
@@ -467,20 +470,11 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 					break;
 				
 				case "s": // seconds (00 - 59)
-					result += self._formatUnixDate(date, "%S");
+					result += self._padStringLeft(self._getSeconds(date), "0", 2);
 					break;
 				
 				case "t": // number of days in the month (28 - 31)
-					chunk = date.getMonth() + 1;
-					if (chunk == 1 || chunk == 3 || chunk == 5 || chunk == 7 || chunk == 8 || chunk == 10 || chunk == 12) {
-						result += 31;
-					} else if (chunk == 4 || chunk == 6 || chunk == 9 || chunk == 11) {
-						result += 30;
-					} else if (self._formatPhpDate(date, "L") == "0") {
-						result += 29;
-					} else {
-						result += 28;
-					}
+					result += self._getNumberOfDaysInMonth(date);
 					break;
 				
 				case "u": // microseconds (000000 - 999999)
@@ -488,15 +482,15 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 					break;
 				
 				case "w": // weekdays, starting on sunday (0 - 6)
-					result += self._formatUnixDate(date, "%w");
+					result += self._getDay(date);
 					break;
 				
 				case "y": // abbreviated years (00 - 99)
-					result += self._formatUnixDate(date, "%y");
+					result += self._getAbbreviatedYear(date);
 					break;
 				
 				case "z": // days of the year (0 - 365)
-					result += parseInt(self._formatUnixDate(date, "%-j")) - 1;
+					result += self._getDayOfYear(date) - 1;
 					break;
 				
 				default:
@@ -582,15 +576,15 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 						break;
 					
 					case "A": // weekday names (Sunday - Saturday)
-						chunk = self.texts.full_days[date.getDay()];
+						chunk = self._getDayName(date);
 						break;
 					
 					case "B": // month names (January - December)
-						chunk = self.texts.full_months[date.getMonth()];
+						chunk = self._getMonthName(date);
 						break;
 					
 					case "C": // centuries (20 - 21)
-						chunk = Math.ceil(date.getFullYear() / 100);
+						chunk = self._getCentury(date);
 						break;
 					
 					case "D": // same as "%m/%d/%y"
@@ -602,43 +596,23 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 						break;
 					
 					case "G": // iso-8601 years (1970 - 2038)
-						if (date.getMonth() == 0 && parseInt(self._formatUnixDate(date, "%-V")) > 50) {
-							chunk = date.getFullYear() - 1;
-						} else {
-							chunk = date.getFullYear();
-						}
+						chunk = self._getIso8601Year(date);
 						break;
 					
 					case "H": // international hours (00 - 23)
-						chunk = date.getHours();
-						if (padding.length > 0 && chunk < 10) {
-							chunk = padding + chunk;
-						}
+						chunk = self._padStringLeft(self._getHours(date), padding, 2);
 						break;
 					
 					case "I": // hours (01 - 12)
-						chunk = date.getHours();
-						if (chunk > 12) {
-							chunk -= 12;
-						}
-						if (chunk == 0) {
-							chunk = 12;
-						}
-						if (chunk < 10) {
-							chunk = padding + chunk;
-						}
+						chunk = self._padStringLeft(self._getTwelveHourHours(date), padding, 2);
 						break;
 					
 					case "L": // leap years (0 - 1)
-						chunk = date.getFullYear();
-						chunk = ((chunk % 4 == 0) && (chunk % 100 != 0)) || (chunk % 400 == 0) ? 1 : 0;
+						chunk = self._isLeapYear(date) ? "1" : "0";
 						break;
 					
 					case "M": // minutes (00 - 59)
-						chunk = date.getMinutes();
-						if (chunk < 10) {
-							chunk = padding + chunk;
-						}
+						chunk = self._padStringLeft(self._getMinutes(date), padding, 2);
 						break;
 					
 					case "N": // nanoseconds (000000000 - 999999999)
@@ -646,7 +620,7 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 						break;
 					
 					case "P": // abbreviated lower-case meridiems (am - pm)
-						chunk = self.texts.short_lower_meridiems[date.getHours() < 12 ? 0 : 1];
+						chunk = self._getLowerCaseMeridiem(date);
 						break;
 					
 					case "R": // same as "%H:%M"
@@ -654,10 +628,7 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 						break;
 					
 					case "S": // seconds (00 - 59)
-						chunk = date.getSeconds();
-						if (chunk < 10) {
-							chunk = padding + chunk;
-						}
+						chunk = self._padStringLeft(self._getSeconds(date), padding, 2);
 						break;
 					
 					case "T": // same as "%H:%M:%S".
@@ -666,69 +637,19 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 						break;
 					
 					case "U": // weeks, staring on sunday (00 - 53)
-						temporary = new Date(date.getFullYear(), 0, 1, 0, 0, 0, 0).getDay();
-						temporary++;
-						chunk = parseInt(self._formatUnixDate(date, "%-j"));
-						if (temporary > 1) {
-							chunk -= 8 - temporary;
-						}
-						if (chunk <= 0) {
-							chunk = 0;
-						} else {
-							chunk = Math.ceil(chunk / 7);
-						}
-						if (chunk < 10) {
-							chunk = padding + chunk;
-						}
+						chunk = self._padStringLeft(self._getSundayWeek(date), padding, 2);
 						break;
 					
 					case "V": // iso-8601 weeks (01 - 53)
-						temporary = [
-							new Date(date.getFullYear(), 0, 1, 0, 0, 0, 0).getDay(),
-							new Date(date.getFullYear(), 11, 31, 0, 0, 0, 0).getDay(),
-							self._formatUnixDate(date, "%L") == "1" ? 366 : 365
-						];
-						for (var i = 0; i < 2; i++) {
-							if (temporary[i] == 0) {
-								temporary[i] = 7;
-							}
-						}
-						temporary[0] = temporary[0] > 4 ? -8 + temporary[0] : temporary[0] - 1;
-						temporary[1] = temporary[1] < 4 ? temporary[1] : 0;
-						chunk = parseInt(self._formatUnixDate(date, "%-j"));
-						if (chunk <= -temporary[0]) {
-							chunk = self._formatUnixDate(new Date(date.getFullYear() - 1, 11, 31, 0, 0, 0, 0), specifier);
-						} else  if (chunk > temporary[2] - temporary[1]) {
-							chunk = padding + 1;
-						} else {
-							chunk = Math.ceil((chunk + temporary[0]) / 7);
-							if (chunk < 10) {
-								chunk = padding + chunk;
-							}
-						}
+						chunk = self._padStringLeft(self._getIso8601Week(date), padding, 2);
 						break;
 					
 					case "W": // weeks, staring on monday (00 - 53)
-						temporary = new Date(date.getFullYear(), 0, 1, 0, 0, 0, 0).getDay();
-						if (temporary == 0) {
-							temporary = 7;
-						}
-						chunk = parseInt(self._formatUnixDate(date, "%-j"));
-						if (temporary > 1) {
-							chunk -= 8 - temporary;
-						}
-						if (chunk <= 0) {
-							chunk = 0;
-						} else {
-							chunk = Math.ceil(chunk / 7);
-						}
-						if (chunk < 10) {
-							chunk = padding + chunk;
-						}
+						chunk = self._padStringLeft(self._getMondayWeek(date), padding, 2);
 						break;
 					
 					case "Y": // years (1970 - 2038)
-						chunk = date.getFullYear();
+						chunk = self._getFullYear(date);
 						break;
 					
 					case "Z": // abbreviated time zone names (e.g. UTC)
@@ -736,12 +657,12 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 						break;
 					
 					case "a": // abbreviated weekday names (Sun - Sat)
-						chunk = self.texts.short_days[date.getDay()];
+						chunk = self._getAbbreviatedDayName(date);
 						break;
 					
 					case "b": // abbreviated month names (Jan - Dec)
 					case "h":
-						chunk = self.texts.short_months[date.getMonth()];
+						chunk = self._getAbbreviatedMonthName(date);
 						break;
 					
 					case "c": // same as "%a %b %d %H:%M:%S %Y"
@@ -749,10 +670,7 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 						break;
 					
 					case "d": // days (01 - 31)
-						chunk = date.getDate();
-						if (chunk < 10) {
-							chunk = padding + chunk;
-						}
+						chunk = self._padStringLeft(self._getDate(date), padding, 2);
 						break;
 					
 					case "e": // same as "%_d"
@@ -760,25 +678,14 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 						break;
 					
 					case "g": // abbreviated iso-8601 years (00 - 99)
-						chunk = self._formatUnixDate(date, "%G");
+						chunk = self._getIso8601Year(date).toString();
 						chunk = chunk.substr(chunk.length - 2);
 						break;
 					
 					case "j": // days of the year (001 - 366)
-						chunk = date.getFullYear();
-						temporary = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-						if (self._formatUnixDate(date, "%L") == "1") {
-							temporary[1] = 29;
-						}
-						chunk = 0;
-						for (var j = date.getMonth() - 1; j >= 0; j--) {
-							chunk += temporary[j];
-						}
-						chunk += date.getDate();
-						if (padding.length > 0) {
-							while (chunk.length < 3) {
-								chunk = padding + chunk;
-							}
+						chunk = self._getDayOfYear(date).toString();
+						while (padding.length > 0 && chunk.length < 3) {
+							chunk = chunk + padding;
 						}
 						break;
 					
@@ -791,10 +698,7 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 						break;
 					
 					case "m": // months (01 - 12)
-						chunk = date.getMonth() + 1;
-						if (chunk < 10) {
-							chunk = padding + chunk;
-						}
+						chunk = self._padStringLeft(self._getMonth(date) + 1, padding, 2);
 						break;
 					
 					case "n": // newline
@@ -802,11 +706,11 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 						break;
 					
 					case "o": // ordinals for the days of the month (st, nd, rd, or th)
-						chunk = self.texts.ordinal_suffixes[date.getDate() - 1];
+						chunk = self._getOrdinalSuffix(date);
 						break;
 					
 					case "p": // abbreviated upper-case meridiems (AM - PM)
-						chunk = self.texts.short_upper_meridiems[date.getHours() < 12 ? 0 : 1];
+						chunk = self._getUpperCaseMeridiem(date);
 						break;
 					
 					case "r": // same as "%I:%M:%S %p"
@@ -814,7 +718,7 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 						break;
 					
 					case "s": // unix timestamp
-						chunk = Math.round(date.getTime() / 1000);
+						chunk = self._getTimestamp(date);
 						break;
 					
 					case "t": // tab
@@ -822,14 +726,11 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 						break;
 					
 					case "u": // weekdays, starting on monday (1 - 7)
-						chunk = date.getDay();
-						if (chunk == 0) {
-							chunk = 7;
-						}
+						chunk = self._getDayOfWeek(date);
 						break;
 					
 					case "w": // weekdays, starting on sunday (0 - 6)
-						chunk = date.getDay();
+						chunk = self._getDay(date);
 						break;
 					
 					case "x": // same as "%m/%d/%y"
@@ -837,17 +738,16 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 						break;
 					
 					case "y": // abbreviated years (00 - 99)
-						chunk = String(date.getFullYear());
-						chunk = chunk.substr(chunk.length - 2);
+						chunk = self._getAbbreviatedYear(date);
 						break;
 					
 					case "z": // time zone offset (-1200 - +1300)
-						switch (precision) {
-							case 0: break; // (-1200 - +1300)
-							case 1: break; // (-12:00 - +13:00)
-							case 2: break; // (-12:00:00 - +13:00:00)
-							case 3: break; // minimal required precision
-						}
+						//switch (precision) {
+						//	case 0: break; // (-1200 - +1300)
+						//	case 1: break; // (-12:00 - +13:00)
+						//	case 2: break; // (-12:00:00 - +13:00:00)
+						//	case 3: break; // minimal required precision
+						//}
 						chunk = "";
 						break;
 					
@@ -855,17 +755,255 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 						continue;
 				}
 				
-				if (local_date) {}
-				if (local_numbers) {}
 				if (upper) {
 					chunk = String(chunk);
 					chunk = chunk.toUpperCase();
 				}
-				if (opposite) {} // debug
 				
 				result += chunk;
 			} else {
 				result += character;
+			}
+		}
+		
+		return result;
+	},
+	
+	_getAbbreviatedDayName: function(self, date) {
+		return self.texts.short_days[self._getDay(date)];
+	},
+	
+	_getAbbreviatedMonthName: function(self, date) {
+		return self.texts.short_months[self._getMonth(date)];
+	},
+	
+	_getAbbreviatedYear: function(self, date) {
+		var result = String(self._getFullYear(date));
+		
+		result = result.substr(result.length - 2);
+		
+		return result;
+	},
+	
+	_getCentury: function(self, date) {
+		return Math.ceil(self._getFullYear(date) / 100);
+	},
+	
+	_getDate: function(self, date) {
+		return self._isUtcTimeEnabled ? date.getUTCDate() : date.getDate();
+	},
+	
+	_getDay: function(self, date) {
+		return self._isUtcTimeEnabled ? date.getUTCDay() : date.getDay();
+	},
+	
+	_getDayName: function(self, date) {
+		return self.texts.full_days[self._getDay(date)];
+	},
+	
+	_getDayOfWeek: function(self, date) {
+		var result = self._getDay(date);
+		
+		if (result == 0) {
+			result = 7;
+		}
+		
+		return result;
+	},
+	
+	_getDayOfYear: function(self, date) {
+		var month_lenghts = [31, self._isLeapYear(date) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+		var result = 0;
+		
+		for (var i = self._getMonth(date) - 1; i >= 0; --i) {
+			result += month_lenghts[i];
+		}
+		result += self._getDate(date);
+		
+		return result;
+	},
+	
+	_getFirstDayOfYear: function(self, date) {
+		var first_day = new Date(self._getFullYear(date), 0, 1, 0, 0, 0, 0);
+		
+		return self._getDay(first_day);
+	},
+	
+	_getFullYear: function(self, date) {
+		return self._isUtcTimeEnabled ? date.getUTCFullYear() : date.getFullYear();
+	},
+	
+	_getHours: function(self, date) {
+		return self._isUtcTimeEnabled ? date.getUTCHours() : date.getHours();
+	},
+	
+	_getIso8601Year: function(self, date) {
+		var result;
+		
+		if (self._getMonth(date) == 0 && self._getIso8601Week(date) > 50) {
+			result = self._getFullYear(date) - 1;
+		} else {
+			result = self._getFullYear(date);
+		}
+		
+		return result;
+	},
+	
+	_getIso8601Week: function(self, date) {
+		var day_of_year = parseInt(self._formatUnixDate(date, "%-j"));
+		var first_day = self._getDayOfWeek(new Date(self._getFullYear(date), 0, 1, 0, 0, 0, 0));
+		var last_day = self._getDayOfWeek(new Date(self._getFullYear(date), 11, 31, 0, 0, 0, 0));
+		var year_length = self._isLeapYear(date) ? 366 : 365;
+		var result;
+		
+		first_day = first_day > 4 ? first_day - 8 : first_day - 1;
+		last_day = last_day < 4 ? last_day : 0;
+		if (day_of_year <= -first_day) {
+			result = self._getIso8601Week(new Date(self._getFullYear(date) - 1, 11, 31, 0, 0, 0, 0));
+		} else if (day_of_year > year_length - last_day) {
+			result = 1;
+		} else {
+			result = Math.ceil((day_of_year + first_day) / 7);
+		}
+		
+		return result;
+	},
+	
+	_getLastDayOfYear: function(self, date) {
+		var last_day = new Date(self._getFullYear(date), 11, 31, 0, 0, 0, 0);
+		
+		return self._getDay(last_day);
+	},
+	
+	_getLowerCaseMeridiem: function(self, date) {
+		return self.texts.short_lower_meridiems[self._getHours(date) < 12 ? 0 : 1];
+	},
+	
+	_getMinutes: function(self, date) {
+		return self._isUtcTimeEnabled ? date.getUTCMinutes() : date.getMinutes();
+	},
+	
+	_getMondayWeek: function(self, date) {
+		var day_of_year = self._getDayOfYear(date);
+		var first_day = self._getFirstDayOfYear(date);
+		var result;
+		
+		if (first_day == 0) {
+			first_day = 7;
+		}
+		day_of_year = parseInt(self._formatUnixDate(date, "%-j"));
+		if (first_day > 1) {
+			day_of_year -= 8 - first_day;
+		}
+		if (day_of_year <= 0) {
+			result = 0;
+		} else {
+			result = Math.ceil(day_of_year / 7);
+		}
+		
+		return result;
+	},
+	
+	_getMonth: function(self, date) {
+		return self._isUtcTimeEnabled ? date.getUTCMonth() : date.getMonth();
+	},
+	
+	_getMonthName: function(self, date) {
+		return self.texts.full_months[self._getMonth(date)];
+	},
+	
+	_getNumberOfDaysInMonth: function(self, date) {
+		var month = self._getMonth(date);
+		var result;
+		
+		if (self.isInArray(month, [0, 2, 4, 6, 7, 9, 11])) {
+			result = 31;
+		} else if (self.isInArray(month, [3, 5, 8, 10])) {
+			result = 30;
+		} else if (self._isLeapYear(date)) {
+			result = 29;
+		} else {
+			result = 28;
+		}
+		
+		return result;
+	},
+	
+	_getOrdinalSuffix: function(self, date) {
+		return self.texts.ordinal_suffixes[self._getDate(date) - 1];
+	},
+	
+	_getSeconds: function(self, date) {
+		return self._isUtcTimeEnabled ? date.getUTCSeconds() : date.getSeconds();
+	},
+	
+	_getSundayWeek: function(self, date) {
+		var day_of_year = self._getDayOfYear(date);
+		var first_day = self._getFirstDayOfYear(date);
+		var result;
+		
+		first_day++;
+		if (first_day > 1) {
+			day_of_year -= 8 - first_day;
+		}
+		if (day_of_year <= 0) {
+			result = 0;
+		} else {
+			result = Math.ceil(day_of_year / 7);
+		}
+		
+		return result;
+	},
+	
+	_getSwatchInternetTime: function(self, date) {
+		var result = date.getUTCHours() + 1;
+		
+		if (result > 23) {
+			result = 0;
+		}
+		result *= 3600;
+		result += date.getUTCMinutes() * 60;
+		result += date.getUTCSeconds();
+		result /= 86.4;
+		result = Math.floor(result);
+		result = self._padStringLeft(result, "0", 3);
+		
+		return result;
+	},
+	
+	_getTimestamp: function(self, date) {
+		return Math.round(date.getTime() / 1000);
+	},
+	
+	_getTwelveHourHours: function(self, date) {
+		var result = self._getHours(date);
+		
+		if (result > 12) {
+			result -= 12;
+		}
+		if (result == 0) {
+			result = 12;
+		}
+		
+		return result;
+	},
+	
+	_getUpperCaseMeridiem: function(self, date) {
+		return self.texts.short_upper_meridiems[self._getHours(date) < 12 ? 0 : 1];
+	},
+	
+	_isLeapYear: function(self, date) {
+		var year = self._getFullYear(date);
+		
+		return ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0);
+	},
+	
+	_padStringLeft: function(self, string, padding, expected_width) {
+		var result = string.toString();
+		
+		if (padding.length > 0) {
+			while (result.length < expected_width) {
+				result = padding + result;
 			}
 		}
 		
