@@ -7,7 +7,7 @@
      \/___/ \/____/\/__/\/_/ \/____/\/____/ \/___/ \/____/\/__/\/_/ \/_/\/___/ 
 
                                JavaScript Toolkit
-                        Version 1.0.3-s, July 21st, 2012
+                      Version 1.1.0-s, December 31st, 2012
                                www.blazegears.com
 
 
@@ -101,6 +101,64 @@
   V. Version History
 --------------------------------------------------------------------------------
 
+  - Version 1.1.0-s, December 31st, 2012
+    - Superseded the BlazeGears.cloneArray function with the
+      BlazeGears.cloneObject alias.
+    - Superseded the BlazeGears.escape function with the BlazeGears.escapeHtml
+      alias.
+    - Superseded the BlazeGears.generateFlash function with the
+      BlazeGears.renderFlash alias.
+    - Superseded the BlazeGears.getEntity function with the
+      BlazeGears.getEntityValue alias.
+    - Superseded the BlazeGears.isObject function with the
+      BlazeGears.isAnonymousObject alias.
+    - Superseded the BlazeGears.updateEntity function with the
+      BlazeGears.setEntityValue alias.
+    - Superseded the BlazeGears.BGTL.parse method with the
+      BlazeGears.BGTL.parseTemplate alias.
+    - Superseded the BlazeGears.Form.generate method with the
+      BlazeGears.Form.render alias.
+    - Superseded the BlazeGears.FragVars.getFragVars method with the
+      BlazeGears.FragVars.getFragVarValues alias.
+    - Superseded the BlazeGears.FragVars.setFragVars method with the
+      BlazeGears.FragVars.setFragVarValues alias.
+    - Superseded the BlazeGears.Paginator.generate method with the
+      BlazeGears.Paginator.render alias.
+    - Deprecated the BlazeGears.Class function.
+    - Deprecated the BlazeGears.Singleton function.
+    - Added the BlazeGears.isBoolean method, which determines if a variable is
+      a boolean.
+    - Added the BlazeGears.BGTL.TemplateInterface class, which is used for
+      documenting the members of the parsed templates.
+    - Added the BlazeGears.Classes namespace, which supersedes the class
+      declaring functionality of the BlazeGears namespace.
+    - Added the BlazeGears.Classes.ClassInterface and
+      BlazeGears.Classes.SingletonInterface classes, which are used for
+      documenting the default members available for declared classes.
+    - Added the BlazeGears.Formats.enableUTCTime method, which can be used to
+      switch between the UTC and local time zone.
+    - Fixed the bug where the BlazeGears.isInArray method would incorrectly
+      handle the recursive searches.
+    - Fixed the bug where the variable type determining functions would return
+      an incorrect result if the variable's constructor included the sought
+      object's name.
+    - Fixed the bug where constructing the first FragVars object anytime other
+      than during page loading would break the page.
+    - Fixed the bug where mixing the order of regular and static members
+      during class declaration would delete some members.
+    - Fixed the bug where the padding and casing modifiers wouldn't work on
+      some Unix date format specifiers.
+    - Fixed the bug where the Unix century specifiers would generate a
+      different value than the date command.
+    - Fixed the bug where the %c Unix date format specifier would use the
+      incorrect padding character.
+    - Moved the BlazeGears.Form.Field, BlazeGears.Form.Option, and
+      BlazeGears.FragVars.FragVar classes to their own separate files.
+    - Removed some variables accidentally introduced into the global scope.
+    - Removed most of the eval'd functionality, so the code can be minified
+      using some more aggressive compilation methods.
+    - The main features of library are now unit tested.
+  
   - Version 1.0.3-s, July 21st, 2012
     - Reverted the fix made to the BlazeGears.createEntity function in the
       previous release, because the original functionality was correct.
