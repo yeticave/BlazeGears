@@ -9,7 +9,7 @@ if (browserType) {document.write("<div class=" + browserType + ">");if (browserV
 
 
 
-<div id=Content><div class="CFile"><div class=CTopic id=MainTopic><h1 class=CTitle><a name="7.Pagination"></a>7.&nbsp; Pagination</h1><div class=CBody><p>The Paginator class is technically a cooperation between a managed FragVar and a BGTL template.&nbsp; The class will generate an interface from the BGTL template where the current page number can be manipulated, and the FragVar will store the changes.&nbsp; Whenever the page number changes, an event listener will be fired, and the interface will be regenerated using the new page number.</p><blockquote><pre class="prettyprint">&lt;div id=&quot;paginator_container&quot;&gt;&lt;/div&gt;
+<div id=Content><div class="CFile"><div class=CTopic id=MainTopic><h1 class=CTitle><a name="7.Pagination"></a>7.&nbsp; Pagination</h1><div class=CBody><p>The Paginator class is technically a cooperation between a managed FragVar and a BGTL template.&nbsp; The class will render an interface from a BGTL template, where the current page number can be manipulated, and the FragVar will store the changes.&nbsp; Whenever the page number changes, an event listener will be fired, and the interface will be re-rendered using the new page number.</p><blockquote><pre class="prettyprint">&lt;div id=&quot;paginator_container&quot;&gt;&lt;/div&gt;
 &lt;script type=&quot;text/javascript&quot;&gt;
     // &lt;![CDATA[
     paginator = new BlazeGears.Paginator(&quot;page&quot;);
@@ -18,7 +18,7 @@ if (browserType) {document.write("<div class=" + browserType + ">");if (browserV
         alert(&quot;The current page number is: &quot; + self.getPage());
     }
     paginator.setPages(10);
-    paginator.generate();
+    paginator.render();
     // ]]&gt;
 &lt;/script&gt;</pre></blockquote><h4 class=CHeading>See Also</h4><p><a href="../Modules/BlazeGears-Paginator-js.html#BlazeGears.Paginator" class=LClass id=link1 onMouseOver="ShowTip(event, 'tt1', 'link1')" onMouseOut="HideTip('tt1')">BlazeGears.Paginator</a></p></div></div></div>
 
@@ -27,7 +27,7 @@ if (browserType) {document.write("<div class=" + browserType + ">");if (browserV
 
 
 <!--START_ND_TOOLTIPS-->
-<div class=CToolTip id="tt1"><div class=CClass>A class that manages some aspects of pagination.</div></div><!--END_ND_TOOLTIPS-->
+<div class=CToolTip id="tt1"><div class=CClass>A pagination control widget.</div></div><!--END_ND_TOOLTIPS-->
 
 <script language=JavaScript><!--
 if (browserType) {if (browserVer) {document.write("</div>"); }document.write("</div>");}// --></script></body></html>

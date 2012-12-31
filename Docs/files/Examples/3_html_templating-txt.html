@@ -9,7 +9,7 @@ if (browserType) {document.write("<div class=" + browserType + ">");if (browserV
 
 
 
-<div id=Content><div class="CFile"><div class=CTopic id=MainTopic><h1 class=CTitle><a name="3.HTML_Templating"></a>3.&nbsp; HTML Templating</h1><div class=CBody><p>The HTML templating class uses the BlazeGears Templating Language, which is based on a mix of JavaScript and <a href="http://bottlepy.org/docs/dev/stpl.html" class=LURL target=_top>BottlePy&rsquo;s Simple Template</a>.&nbsp; Parsing a BGTL template will return an object, which can be executed with some provided data.</p><p>There are three different control tags available: statements, escaped output, and unescaped output.&nbsp; Each of these has an opening and a closing tag, but the closing tags can be replaced by line breaks.</p><p>The example below uses both the opening and closing tags for all three control tags.</p><blockquote><pre class="prettyprint">bgtl = new BlazeGears.BGTL();
+<div id=Content><div class="CFile"><div class=CTopic id=MainTopic><h1 class=CTitle><a name="3.HTML_Templating"></a>3.&nbsp; HTML Templating</h1><div class=CBody><p>The HTML templating class uses the BlazeGears Templating Language, which is based on a mix of JavaScript and <a href="http://bottlepy.org/docs/dev/stpl.html" class=LURL target=_top>BottlePy&rsquo;s Simple Template</a>.&nbsp; Parsing a BGTL template will return an object, which can be rendered with some provided data.</p><p>There are three different control tags available: statements, escaped output, and unescaped output.&nbsp; Each of these has an opening and a closing tag, but the closing tags can be replaced by line breaks.</p><p>The example below uses both the opening and closing tags for all three control tags.</p><blockquote><pre class="prettyprint">bgtl = new BlazeGears.BGTL();
 
 template = &quot;%for (var i in entries) {%&quot;; // statement
 template += &quot;&lt;h1&gt;{{entries[i].title}}&lt;/h1&gt;&quot;; // escaped output
@@ -21,15 +21,15 @@ entries = [
     {title: &quot;Entry #2&quot;, content: &quot;This is some content with a &lt;a href='http://www.blazegears.com'&gt;link&lt;/a&gt;.&quot;}
 ];
 
-parsed_template = bgtl.parse(template);
-alert(parsed_template.execute(entries));</pre></blockquote><p>Templates can be parsed and executed in a single command, too, but this is only useful for templates that are going to be executed only once.</p><h4 class=CHeading>See Also</h4><p><a href="../Modules/BlazeGears-BGTL-js.html#BlazeGears.BGTL" class=LClass id=link1 onMouseOver="ShowTip(event, 'tt1', 'link1')" onMouseOut="HideTip('tt1')">BlazeGears.BGTL</a></p></div></div></div>
+parsed_template = bgtl.compileTemplate(template);
+alert(parsed_template.render(entries));</pre></blockquote><p>Templates can be parsed and rendered in a single command, too, but this is only useful for templates that are going to be rendered only once.</p><h4 class=CHeading>See Also</h4><p><a href="../Modules/BlazeGears-BGTL-js.html#BlazeGears.BGTL" class=LClass id=link1 onMouseOver="ShowTip(event, 'tt1', 'link1')" onMouseOut="HideTip('tt1')">BlazeGears.BGTL</a></p></div></div></div>
 
 </div><!--Content-->
 
 
 
 <!--START_ND_TOOLTIPS-->
-<div class=CToolTip id="tt1"><div class=CClass>A singleton class that parses and executes HTML templates written in the BlazeGears Templating Language.</div></div><!--END_ND_TOOLTIPS-->
+<div class=CToolTip id="tt1"><div class=CClass>A singleton class that compiles HTML templates written in the BlazeGears Templating Language.</div></div><!--END_ND_TOOLTIPS-->
 
 <script language=JavaScript><!--
 if (browserType) {if (browserVer) {document.write("</div>"); }document.write("</div>");}// --></script></body></html>

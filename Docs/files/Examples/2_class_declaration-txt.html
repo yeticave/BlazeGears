@@ -9,9 +9,9 @@ if (browserType) {document.write("<div class=" + browserType + ">");if (browserV
 
 
 
-<div id=Content><div class="CFile"><div class=CTopic id=MainTopic><h1 class=CTitle><a name="2.Class_Declaration"></a>2.&nbsp; Class Declaration</h1><div class=CBody><p>The BlazeGears class declaration interface is largely based on the concepts used by the Python language.&nbsp; It supports constructors, self-references, singletons, regular and multiple inheritance, superclass searching, and static members.</p><h4 class=CHeading>See Also</h4><ul><li><a href="../Modules/BlazeGears-js.html#BlazeGears.Class" class=LFunction id=link1 onMouseOver="ShowTip(event, 'tt1', 'link1')" onMouseOut="HideTip('tt1')">BlazeGears.Class</a></li><li><a href="../Modules/BlazeGears-js.html#BlazeGears.Singleton" class=LFunction id=link2 onMouseOver="ShowTip(event, 'tt2', 'link2')" onMouseOut="HideTip('tt2')">BlazeGears.Singleton</a></li></ul><!--START_ND_SUMMARY--><div class=Summary><div class=STitle>Summary</div><div class=SBorder><table border=0 cellspacing=0 cellpadding=0 class=STable><tr class="SMain"><td class=SEntry><a href="#2.Class_Declaration" >2.&nbsp; Class Declaration</a></td><td class=SDescription>The BlazeGears class declaration interface is largely based on the concepts used by the Python language. </td></tr><tr class="SGeneric SMarked"><td class=SEntry><a href="#Declaring_a_Class" >Declaring a Class</a></td><td class=SDescription>The class declaring method handles arguments dynamically. </td></tr><tr class="SGeneric"><td class=SEntry><a href="#Singletons" >Singletons</a></td><td class=SDescription>Singletons work almost the same as regular classes do, but upon trying to create a second instance, the reference to the for the first instance will be returned instead.</td></tr><tr class="SGeneric SMarked"><td class=SEntry><a href="#Regular_and_Multiple_Inheritance" >Regular and Multiple Inheritance</a></td><td class=SDescription>Besides regular inheritance, BlazeGears also supports multiple inheritance. </td></tr><tr class="SGeneric"><td class=SEntry><a href="#Static_Members" >Static Members</a></td><td class=SDescription>To make a member static the dollar sign prefix must be used. </td></tr></table></div></div><!--END_ND_SUMMARY--></div></div></div>
+<div id=Content><div class="CFile"><div class=CTopic id=MainTopic><h1 class=CTitle><a name="2.Class_Declaration"></a>2.&nbsp; Class Declaration</h1><div class=CBody><p>The BlazeGears class declaration interface is largely based on the concepts used by the Python language.&nbsp; It supports constructors, self-references, singletons, regular and multiple inheritance, superclass searching, and static members.</p><h4 class=CHeading>See Also</h4><p><a href="../Modules/BlazeGears-Classes-js.html#BlazeGears.Classes" class=LClass id=link1 onMouseOver="ShowTip(event, 'tt1', 'link1')" onMouseOut="HideTip('tt1')">BlazeGears.Classes</a></p><!--START_ND_SUMMARY--><div class=Summary><div class=STitle>Summary</div><div class=SBorder><table border=0 cellspacing=0 cellpadding=0 class=STable><tr class="SMain"><td class=SEntry><a href="#2.Class_Declaration" >2.&nbsp; Class Declaration</a></td><td class=SDescription>The BlazeGears class declaration interface is largely based on the concepts used by the Python language. </td></tr><tr class="SGeneric SMarked"><td class=SEntry><a href="#Declaring_a_Class" >Declaring a Class</a></td><td class=SDescription>The class declaring method handles arguments dynamically. </td></tr><tr class="SGeneric"><td class=SEntry><a href="#Singletons" >Singletons</a></td><td class=SDescription>Singletons work almost the same as regular classes do, but upon trying to create a second instance, the reference to the for the first instance will be returned instead.</td></tr><tr class="SGeneric SMarked"><td class=SEntry><a href="#Regular_and_Multiple_Inheritance" >Regular and Multiple Inheritance</a></td><td class=SDescription>Besides regular inheritance, BlazeGears also supports multiple inheritance. </td></tr><tr class="SGeneric"><td class=SEntry><a href="#Static_Members" >Static Members</a></td><td class=SDescription>To make a member static the dollar sign prefix must be used. </td></tr></table></div></div><!--END_ND_SUMMARY--></div></div></div>
 
-<div class="CGeneric"><div class=CTopic><h3 class=CTitle><a name="Declaring_a_Class"></a>Declaring a Class</h3><div class=CBody><p>The class declaring method handles arguments dynamically.&nbsp; The last argument must a dictionary, this will be the declaration, and all the prior ones will be the superclasses of the class.</p><p>The example below will show the usage of constructors and self-references.</p><blockquote><pre class="prettyprint">MyClass = BlazeGears.Class({
+<div class="CGeneric"><div class=CTopic><h3 class=CTitle><a name="Declaring_a_Class"></a>Declaring a Class</h3><div class=CBody><p>The class declaring method handles arguments dynamically.&nbsp; The last argument must a dictionary, this will be the declaration, and all the prior ones will be the superclasses of the class.</p><p>The example below will show the usage of constructors and self-references.</p><blockquote><pre class="prettyprint">MyClass = BlazeGears.Classes.declareClass({
     my_property: null, // property
 
     // the constructor, sets the value of the property
@@ -26,9 +26,9 @@ if (browserType) {document.write("<div class=" + browserType + ">");if (browserV
 });
 
 my_obj = MyClass(&quot;I'm a class!&quot;);
-my_obj.myMethod(); // I'm a class!</pre></blockquote><p>The constructor method of the class is a magical member and will be called each time an instance of the class is created.&nbsp; Magical members can be recognized from the double underscores surrounding their names.</p><p>Self-references are meant to replace the <b>this</b> keyword, because its&rsquo; value might change depending on the context where the method&rsquo;s called from.&nbsp; When a method is called, the self-reference will be pushed in the front of its&rsquo; argument list by a wrapper.&nbsp; These arguments called &ldquo;self&rdquo; in all the standard BlazeGears methods.</p></div></div></div>
+my_obj.myMethod(); // I'm a class!</pre></blockquote><p>The constructor method of the class is a magical member and will be called each time an instance of the class is created.&nbsp; Magical members can be recognized from the double underscores surrounding their names.</p><p>Self-references are meant to replace the <b>this</b> keyword, because its value might change depending on the context where the method&rsquo;s called from.&nbsp; When a method is called, the self-reference will be pushed in the front of its argument list by a wrapper.&nbsp; These arguments are called &ldquo;self&rdquo; in all the standard BlazeGears methods.</p></div></div></div>
 
-<div class="CGeneric"><div class=CTopic><h3 class=CTitle><a name="Singletons"></a>Singletons</h3><div class=CBody><p>Singletons work almost the same as regular classes do, but upon trying to create a second instance, the reference to the for the first instance will be returned instead.</p><blockquote><pre class="prettyprint">MySingleton = BlazeGears.Singleton({
+<div class="CGeneric"><div class=CTopic><h3 class=CTitle><a name="Singletons"></a>Singletons</h3><div class=CBody><p>Singletons work almost the same as regular classes do, but upon trying to create a second instance, the reference to the for the first instance will be returned instead.</p><blockquote><pre class="prettyprint">MySingleton = BlazeGears.Classes.declareSingleton({
     my_property: &quot;I'm a class!&quot;
 });
 
@@ -37,7 +37,7 @@ my_obj_2 = MySingleton();
 my_obj_1.my_property = &quot;I'm a singleton!&quot;;
 alert(my_obj_2.my_property); // I'm a singleton!</pre></blockquote></div></div></div>
 
-<div class="CGeneric"><div class=CTopic><h3 class=CTitle><a name="Regular_and_Multiple_Inheritance"></a>Regular and Multiple Inheritance</h3><div class=CBody><p>Besides regular inheritance, BlazeGears also supports multiple inheritance.&nbsp; For multiple inheritance the list of superclasses must be provided in an order of descending priority.&nbsp; In case there are multiple members of the same name inherited from different superclasses, the one with the highest priority will be used.</p><p>There&rsquo;s a magical method available to all instances, called &ldquo;super&rdquo;, which will search the superclasses in order of priority for a method, and calls it if it&rsquo;s available.</p><blockquote><pre class="prettyprint">Canine = BlazeGears.Class({
+<div class="CGeneric"><div class=CTopic><h3 class=CTitle><a name="Regular_and_Multiple_Inheritance"></a>Regular and Multiple Inheritance</h3><div class=CBody><p>Besides regular inheritance, BlazeGears also supports multiple inheritance.&nbsp; For multiple inheritance the list of superclasses must be provided in an order of descending priority.&nbsp; In case there are multiple members of the same name inherited from different superclasses, the one with the highest priority will be used.</p><p>There&rsquo;s a magical method available to all instances, called &ldquo;super&rdquo;, which will search the superclasses in order of priority for a method, and calls it if it&rsquo;s available.</p><blockquote><pre class="prettyprint">Canine = BlazeGears.Classes.declareClass({
     __init__: function(self, name) {
         self.name = name;
     },
@@ -51,19 +51,19 @@ alert(my_obj_2.my_property); // I'm a singleton!</pre></blockquote></div></div><
     }
 });
 
-Fox = BlazeGears.Class(Canine, { // regular inheritance
+Fox = BlazeGears.Classes.declareClass(Canine, { // regular inheritance
     greet: function(self) {
         alert(&quot;Hi there! I'm a fox!&quot;);
     }
 });
 
-Dog = BlazeGears.Class({
+Dog = BlazeGears.Classes.declareClass({
     bark: function(self) {
         alert(&quot;Woof!&quot;);
     }
 });
 
-Hellhound = BlazeGears.Class(Dog, Canine, { // multiple inheritance
+Hellhound = BlazeGears.Classes.declareClass(Dog, Canine, { // multiple inheritance
     __init__: function(self, name, type) {
         self.__super__(&quot;__init__&quot;, name); // calling the super's constructor
         self.bark();
@@ -75,7 +75,7 @@ foxy.greet(); // Hi there! I'm a fox!
 cerb = new Hellhound(&quot;Cerberus&quot;); // Woof!
 cerb.greet(); // Hey! My name's Cerberus!</pre></blockquote></div></div></div>
 
-<div class="CGeneric"><div class=CTopic><h3 class=CTitle><a name="Static_Members"></a>Static Members</h3><div class=CBody><p>To make a member static the dollar sign prefix must be used.&nbsp; In the case of static methods the self-references will point to the class itself instead of the instance.&nbsp; The same reference is also available for the regular methods through the use of a magical property, called &ldquo;class&rdquo;.</p><blockquote><pre class="prettyprint">MyClass = BlazeGears.Class({
+<div class="CGeneric"><div class=CTopic><h3 class=CTitle><a name="Static_Members"></a>Static Members</h3><div class=CBody><p>To make a member static the dollar sign prefix must be used.&nbsp; In the case of static methods the self-references will point to the class itself instead of the instance.&nbsp; The same reference is also available for the regular methods through the use of a magical property, called &ldquo;class&rdquo;.</p><blockquote><pre class="prettyprint">MyClass = BlazeGears.Classes.declareClass({
     $my_static_property: 5, // static property
 
     // calls the static method and tells the value of the static property
@@ -102,7 +102,7 @@ my_obj.myMethod(); // 8</pre></blockquote></div></div></div>
 
 
 <!--START_ND_TOOLTIPS-->
-<div class=CToolTip id="tt1"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class="Prototype"><tr><td class="prettyprint">self.Class = function()</td></tr></table></blockquote>Declares a class.</div></div><div class=CToolTip id="tt2"><div class=CFunction><blockquote><table border=0 cellspacing=0 cellpadding=0 class="Prototype"><tr><td class="prettyprint">self.Singleton = function()</td></tr></table></blockquote>Acts the same as Class, but upon trying to create a second instance of the class, it will return the reference for the first instance.</div></div><!--END_ND_TOOLTIPS-->
+<div class=CToolTip id="tt1"><div class=CClass>This namespace contains the functions and interfaces that can be used declare classes that has some advantages (and some drawbacks) over regular JavaScript classes.</div></div><!--END_ND_TOOLTIPS-->
 
 <script language=JavaScript><!--
 if (browserType) {if (browserVer) {document.write("</div>"); }document.write("</div>");}// --></script></body></html>
