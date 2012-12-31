@@ -21,7 +21,10 @@ The example below will show how to include all the standard classes.
 			"BlazeGears/Modules/BlazeGears.Formats.js",
 			"BlazeGears/Modules/BlazeGears.Styles.js",
 			"BlazeGears/Modules/BlazeGears.FragVars.js",
+			"BlazeGears/Modules/BlazeGears.FragVars.FragVar.js",
 			"BlazeGears/Modules/BlazeGears.Form.js",
+			"BlazeGears/Modules/BlazeGears.Form.Field.js",
+			"BlazeGears/Modules/BlazeGears.Form.Option.js",
 			"BlazeGears/Modules/BlazeGears.Paginator.js",
 			"BlazeGears/Modules/BlazeGears.XMLRequest.js"
 		]);
