@@ -331,7 +331,6 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 	// formats a date using php's date function's syntax
 	_formatPhpDate: function(self, date, syntax) {
 		var character;
-		var chunk;
 		var result = "";
 		
 		for (var i = 0; i < syntax.length; i++) {
@@ -513,7 +512,6 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 		var precision;
 		var result = "";
 		var specifier;
-		var temporary;
 		var upper;
 		
 		for (var i = 0; i < syntax.length; i++) {
