@@ -10,7 +10,7 @@ BlazeGears.Formats.UnitTests.unixDateFormattingTest = function() {
 	var specifier;
 	var timestamp
 	
-	formatter.enableUtcTime(true);
+	formatter.enableUTCTime(true);
 	for (specifier in results) {
 		if (BlazeGears.isInArray(specifier, broken_specifiers)) {
 			continue;
@@ -37,7 +37,7 @@ BlazeGears.Formats.UnitTests.phpDateFormattingTest = function() {
 	var specifier;
 	var timestamp
 	
-	formatter.enableUtcTime(true);
+	formatter.enableUTCTime(true);
 	for (specifier in results) {
 		if (BlazeGears.isInArray(specifier, broken_specifiers)) {
 			continue;

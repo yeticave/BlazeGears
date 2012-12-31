@@ -93,7 +93,7 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 		short_months: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 	},
 	
-	// Function: enableUtcTime
+	// Function: enableUTCTime
 	// Enables or disable the usage of the UTC time for date formatting.
 	// 
 	// Arguments:
@@ -101,7 +101,7 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 	//
 	// See Also:
 	//   <formatDate>
-	enableUtcTime: function(self, enable) {
+	enableUTCTime: function(self, enable) {
 		self._is_utc_time_enabled = enable;
 	},
 	
