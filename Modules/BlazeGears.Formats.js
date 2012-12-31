@@ -102,7 +102,7 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 	// See Also:
 	//   <formatDate>
 	enableUtcTime: function(self, enable) {
-		self._isUtcTimeEnabled = enable;
+		self._is_utc_time_enabled = enable;
 	},
 	
 	// Function: formatDate
@@ -326,7 +326,7 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 	},
 	
 	// determines if utc time or the local time should be used
-	_isUtcTimeEnabled: false,
+	_is_utc_time_enabled: false,
 	
 	// formats a date using php's date function's syntax
 	_formatPhpDate: function(self, date, syntax) {
@@ -814,11 +814,11 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 	},
 	
 	_getDate: function(self, date) {
-		return self._isUtcTimeEnabled ? date.getUTCDate() : date.getDate();
+		return self._is_utc_time_enabled ? date.getUTCDate() : date.getDate();
 	},
 	
 	_getDay: function(self, date) {
-		return self._isUtcTimeEnabled ? date.getUTCDay() : date.getDay();
+		return self._is_utc_time_enabled ? date.getUTCDay() : date.getDay();
 	},
 	
 	_getDayName: function(self, date) {
@@ -854,11 +854,11 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 	},
 	
 	_getFullYear: function(self, date) {
-		return self._isUtcTimeEnabled ? date.getUTCFullYear() : date.getFullYear();
+		return self._is_utc_time_enabled ? date.getUTCFullYear() : date.getFullYear();
 	},
 	
 	_getHours: function(self, date) {
-		return self._isUtcTimeEnabled ? date.getUTCHours() : date.getHours();
+		return self._is_utc_time_enabled ? date.getUTCHours() : date.getHours();
 	},
 	
 	_getIso8601Year: function(self, date) {
@@ -904,7 +904,7 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 	},
 	
 	_getMinutes: function(self, date) {
-		return self._isUtcTimeEnabled ? date.getUTCMinutes() : date.getMinutes();
+		return self._is_utc_time_enabled ? date.getUTCMinutes() : date.getMinutes();
 	},
 	
 	_getMondayWeek: function(self, date) {
@@ -929,7 +929,7 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 	},
 	
 	_getMonth: function(self, date) {
-		return self._isUtcTimeEnabled ? date.getUTCMonth() : date.getMonth();
+		return self._is_utc_time_enabled ? date.getUTCMonth() : date.getMonth();
 	},
 	
 	_getMonthName: function(self, date) {
@@ -958,7 +958,7 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 	},
 	
 	_getSeconds: function(self, date) {
-		return self._isUtcTimeEnabled ? date.getUTCSeconds() : date.getSeconds();
+		return self._is_utc_time_enabled ? date.getUTCSeconds() : date.getSeconds();
 	},
 	
 	_getSundayWeek: function(self, date) {
