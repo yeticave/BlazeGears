@@ -7,7 +7,7 @@
      \/___/ \/____/\/__/\/_/ \/____/\/____/ \/___/ \/____/\/__/\/_/ \/_/\/___/ 
 
                                JavaScript Toolkit
-                      Version 1.1.0-s, December 31st, 2012
+                      Version 1.1.0-s.1, January 1st, 2013
                                www.blazegears.com
 
 
@@ -101,6 +101,11 @@
   V. Version History
 --------------------------------------------------------------------------------
 
+  - Version 1.1.0-s.1, January 1st, 2013
+    - Made a mistake in the change log of the previous version, the method
+      that supersedes the BlazeGears.BGTL.parse method is called
+      compileTemplate, not parseTemplate.
+  
   - Version 1.1.0-s, December 31st, 2012
     - Superseded the BlazeGears.cloneArray function with the
       BlazeGears.cloneObject alias.
@@ -115,7 +120,7 @@
     - Superseded the BlazeGears.updateEntity function with the
       BlazeGears.setEntityValue alias.
     - Superseded the BlazeGears.BGTL.parse method with the
-      BlazeGears.BGTL.parseTemplate alias.
+      BlazeGears.BGTL.compileTemplate alias.
     - Superseded the BlazeGears.Form.generate method with the
       BlazeGears.Form.render alias.
     - Superseded the BlazeGears.FragVars.getFragVars method with the
