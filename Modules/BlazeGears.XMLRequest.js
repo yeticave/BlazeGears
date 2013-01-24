@@ -24,11 +24,11 @@ Email: info@yeticave.com
 Homepage: http://www.yeticave.com
 */
 
-// Class: BlazeGears.XMLRequest
-// A class that can be used for making AJAX requests.
+// Class: BlazeGears.XMLRequest [Deprecated]
+// This class is deprecated and its functionality will be completely removed. Can be used for making AJAX requests.
 // 
 // Superclasses:
-//   <BlazeGears.BaseClass>
+//   <BlazeGears.BaseClass [Deprecated]>
 BlazeGears.XMLRequest = BlazeGears.Classes.declareClass(BlazeGears.BaseClass, {
 	// Group: Variables
 	

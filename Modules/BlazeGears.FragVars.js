@@ -24,18 +24,21 @@ Email: info@yeticave.com
 Homepage: http://www.yeticave.com
 */
 
-// Class: BlazeGears.FragVars
+// Namespace: blazegears.fragvars
+blazegears.fragvars = {};
+
+// Class: blazegears.fragvars.Manager
 // A singleton class that handles variables stored in the fragment section of the current URL.
 // 
 // Superclasses:
-//   <BlazeGears.Styles>
-BlazeGears.FragVars = BlazeGears.Classes.declareSingleton(BlazeGears.Styles, {
-	// Field: ie_history
-	// If it's true, upon updating the URL the changes will be saved to an iframe, so the the forward and back buttons will properly work under Internet Explorer.
+//   <BlazeGears.Styles [Deprecated]>
+blazegears.fragvars.Manager = BlazeGears.Classes.declareSingleton(BlazeGears.Styles, {
+	// Field: ie_history [Deprecated]
+	// This field is deprecated and its functionality will be irrelevant in the future. If it's true, upon updating the URL the changes will be saved to an iframe, so the the forward and back buttons will properly work under Internet Explorer.
 	ie_history: true,
 	
-	// Field: redundant_events
-	// If it's true, the same event callback functions can be called multiple times when the same callback is used by multiple FragVars, else they won't be called more than once.
+	// Field: redundant_events [Deprecated]
+	// This field is deprecated and redundant events will be permanently disabled in the future. If it's true, the same event callback functions can be called multiple times when the same callback is used by multiple FragVars, else they won't be called more than once.
 	redundant_events: true,
 	
 	_fragvar_assigner: "=",
@@ -57,7 +60,7 @@ BlazeGears.FragVars = BlazeGears.Classes.declareSingleton(BlazeGears.Styles, {
 	//   Returns a new FragVar object, if this ID wasn't taken before, else the original instance.
 	// 
 	// See Also:
-	//   <BlazeGears.FragVars.FragVar>
+	//   <blazegears.fragvars.FragVar>
 	createFragVar: function(self, id) {
 		var result = self.getFragVar(id);
 		
@@ -96,8 +99,8 @@ BlazeGears.FragVars = BlazeGears.Classes.declareSingleton(BlazeGears.Styles, {
 		return self._parseHash().fragvars;
 	},
 	
-	// Method: getFragVars
-	// A deprecated alias for <BlazeGears.FragVars.getFragVarValues>.
+	// Method: getFragVars [Deprecated]
+	// Alias for <getFragVarValues>.
 	getFragVars: function(self) {
 		return self.getFragVarValues();
 	},
@@ -148,8 +151,8 @@ BlazeGears.FragVars = BlazeGears.Classes.declareSingleton(BlazeGears.Styles, {
 		self._updateHash(hash.anchor, fragvars);
 	},
 	
-	// Method: setFragVars
-	// A deprecated alias for <BlazeGears.FragVars.setFragVarValues>.
+	// Method: setFragVars [Deprecated]
+	// Alias for <setFragVarValues>.
 	setFragVars: function(self, new_fragvars) {
 		self.setFragVarValues(new_fragvars);
 	},
@@ -303,3 +306,84 @@ BlazeGears.FragVars = BlazeGears.Classes.declareSingleton(BlazeGears.Styles, {
 // create the ie iframe
 document.write("<!--[if lte IE 7]><iframe id='blazegears_fragvars_iframe' title='IE 7' style='display: none;'></iframe><![endif]-->");
 document.write("<!--[if gte IE 8]><iframe id='blazegears_fragvars_iframe' title='IE 8+' style='display: none;'></iframe><![endif]-->");
+
+// Class: blazegears.fragvars.FragVar
+// A class that represents a single FragVar.
+// 
+// Superclasses:
+//   <BlazeGears.BaseClass [Deprecated]>
+blazegears.fragvars.FragVar = BlazeGears.Classes.declareClass(BlazeGears.BaseClass, {
+	_id: null,
+	_parent: null,
+	
+	// Group: Events
+	
+	// Method: onChange
+	// Will be fired when the value of the FragVar changes.
+	onChange: function(self) {},
+	
+	// Group: Functions
+	
+	// Method: add
+	// Increases the value of the FragVar.
+	// 
+	// Arguments:
+	//   addend - The FragVar's value will be increased by this value.
+	//   [default_value = 0] - If the value of the FragVar isn't a number, this will be used as the original value.
+	add: function(self, addend, default_value) {
+		if (!self.is(default_value)) default_value = 0;
+		
+		var value = self.getValue();
+		
+		if (value == null) {
+			value = default_value;
+		}
+		value = parseFloat(value);
+		if (isNaN(value)) {
+			value = default_value;
+		}
+		value += addend;
+		self.setValue(value);
+	},
+	
+	// Method: getId
+	// Returns the ID of the FragVar.
+	getId: function(self) {
+		return self._id;
+	},
+	
+	// Method: getValue
+	// Returns the value of the FragVar.
+	getValue: function(self) {
+		var fragvars = self._parent._parseHash().fragvars
+		var result = self.is(fragvars[self._id]) ? fragvars[self._id] : null;
+		
+		return result;
+	},
+	
+	// Method: setValue
+	// Sets the value of the FragVar.
+	// 
+	// Arguments:
+	//   value - The new value. Using characters other than letters, digits, and underscores isn't advised.
+	setValue: function(self, value) {
+		var fragvars = {};
+		
+		fragvars[self._id] = value;
+		self._parent.setFragVarValues(fragvars);
+	},
+	
+	// protected constructor
+	__init__: function(self, parent, id) {
+		self._id = id;
+		self._parent = parent;
+	}
+});
+
+// Class: BlazeGears.FragVars [Deprecated]
+// Alias for <blazegears.fragvars.Manager>.
+BlazeGears.FragVars = blazegears.fragvars.Manager;
+
+// Class: BlazeGears.FragVars.FragVar [Deprecated]
+// Alias for <blazegears.fragvars.FragVar>.
+BlazeGears.FragVars.FragVar = blazegears.fragvars.FragVar;

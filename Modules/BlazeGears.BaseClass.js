@@ -24,167 +24,167 @@ Email: info@yeticave.com
 Homepage: http://www.yeticave.com
 */
 
-// Class: BlazeGears.BaseClass
-// A class that wraps all the functions from the <BlazeGears> namespace into a class context.
+// Class: BlazeGears.BaseClass [Deprecated]
+// This class is deprecated and its functionality will be completely removed. Wraps all the functions from the <blazegears> namespace into a class context.
 BlazeGears.BaseClass = BlazeGears.Classes.declareClass({
 	// Method: cloneArray
-	// See Also: <BlazeGears.cloneArray>
+	// See Also: <blazegears.cloneArray [Deprecated]>
 	cloneArray: function(self, template) {
 		return BlazeGears.cloneArray(template);
 	},
 	
 	// Method: cloneObject
-	// See Also: <BlazeGears.cloneObject>
+	// See Also: <blazegears.cloneObject [Deprecated]>
 	cloneObject: function(self, template) {
 		return BlazeGears.cloneObject(template);
 	},
 	
 	// Method: createEntity
-	// See Also: <BlazeGears.createEntity>
+	// See Also: <blazegears.createEntity [Deprecated]>
 	createEntity: function(self, value, id) {
 		return BlazeGears.createEntity(value, id);
 	},
 	
 	// Method: createListener
-	// See Also: <BlazeGears.createListener>
+	// See Also: <blazegears.createListener [Deprecated]>
 	createListener: function(self, caller, event, callback) {
 		BlazeGears.createListener(caller, event, callback);
 	},
 	
 	// Method: destroyEntity
-	// See Also: <BlazeGears.destroyEntity>
+	// See Also: <blazegears.destroyEntity [Deprecated]>
 	destroyEntity: function(self, id) {
 		return BlazeGears.destroyEntity(id);
 	},
 	
 	// Method: destroyListener
-	// See Also: <BlazeGears.destroyListener>
+	// See Also: <blazegears.destroyListener [Deprecated]>
 	destroyListener: function(self, caller, event, callback) {
 		BlazeGears.destroyListener(caller, event, callback);
 	},
 	
 	// Method: error
-	// See Also: <BlazeGears.error>
+	// See Also: <blazegears.error [Deprecated]>
 	error: function(self, module, message, details) {
 		BlazeGears.error(module, message, details);
 	},
 	
 	// Method: escape
-	// See Also: <BlazeGears.escape>
+	// See Also: <blazegears.escape [Deprecated]>
 	escape: function(self, text, encoding) {
 		return BlazeGears.escape(text, encoding);
 	},
 	
 	// Method: escapeHtml
-	// See Also: <BlazeGears.escapeHtml>
+	// See Also: <blazegears.escapeHtml>
 	escapeHtml: function(self, text, encoding) {
 		return BlazeGears.escapeHtml(text, encoding);
 	},
 	
 	// Method: generateFlash
-	// See Also: <BlazeGears.generateFlash>
+	// See Also: <blazegears.generateFlash [Deprecated]>
 	generateFlash: function(self, id, filename, width, height, parameters) {
 		return BlazeGears.generateFlash(id, filename, width, height, parameters);
 	},
 	
 	// Method: getEntity
-	// See Also: <BlazeGears.getEntity>
+	// See Also: <blazegears.getEntity [Deprecated]>
 	getEntity: function(self, id) {
 		return BlazeGears.getEntity(id);
 	},
 	
 	// Method: getEntityValue
-	// See Also: <BlazeGears.getEntityValue>
+	// See Also: <blazegears.getEntityValue [Deprecated]>
 	getEntityValue: function(self, id) {
 		return BlazeGears.getEntityValue(id);
 	},
 	
 	// Method: includeCss
-	// See Also: <BlazeGears.includeCss>
+	// See Also: <blazegears.includeCss [Deprecated]>
 	includeCss: function(self, filename, media, once) {
 		BlazeGears.includeCss(filename, media, once);
 	},
 	
 	// Method: includeJs
-	// See Also: <BlazeGears.includeJs>
+	// See Also: <blazegears.includeJs [Deprecated]>
 	includeJs: function(self, filename, once) {
 		BlazeGears.includeJs(filename, once);
 	},
 	
 	// Method: is
-	// See Also: <BlazeGears.is>
+	// See Also: <blazegears.is [Deprecated]>
 	is: function(self, variable) {
 		return BlazeGears.is(variable);
 	},
 	
 	// Method: isAnonymousObject
-	// See Also: <BlazeGears.isAnonymousObject>
+	// See Also: <blazegears.isAnonymousObject>
 	isAnonymousObject: function(self, variable) {
 		return BlazeGears.isAnonymousObject(variable);
 	},
 	
 	// Method: isArray
-	// See Also: <BlazeGears.isArray>
+	// See Also: <blazegears.isArray>
 	isArray: function(self, variable) {
 		return BlazeGears.isArray(variable);
 	},
 	
 	// Method: isDate
-	// See Also: <BlazeGears.isDate>
+	// See Also: <blazegears.isDate>
 	isDate: function(self, variable) {
 		return BlazeGears.isDate(variable);
 	},
 	
 	// Method: isFunction
-	// See Also: <BlazeGears.isFunction>
+	// See Also: <blazegears.isFunction>
 	isFunction: function(self, variable) {
 		return BlazeGears.isFunction(variable);
 	},
 	
 	// Method: isInArray
-	// See Also: <BlazeGears.isInArray>
+	// See Also: <blazegears.isInArray [Deprecated]>
 	isInArray: function(self, value, array) {
 		return BlazeGears.isInArray(value, array);
 	},
 	
 	// Method: isNumber
-	// See Also: <BlazeGears.isNumber>
+	// See Also: <blazegears.isNumber>
 	isNumber: function(self, variable) {
 		return BlazeGears.isNumber(variable);
 	},
 	
 	// Method: isObject
-	// See Also: <BlazeGears.isObject>
+	// See Also: <blazegears.isObject [Deprecated]>
 	isObject: function(self, variable) {
 		return BlazeGears.isObject(variable);
 	},
 	
 	// Method: isRegExp
-	// See Also: <BlazeGears.isRegExp>
+	// See Also: <blazegears.isRegExp>
 	isRegExp: function(self, variable) {
 		return BlazeGears.isRegExp(variable);
 	},
 	
 	// Method: isString
-	// See Also: <BlazeGears.isString>
+	// See Also: <blazegears.isString>
 	isString: function(self, variable) {
 		return BlazeGears.isString(variable);
 	},
 	
 	// Method: renderFlash
-	// See Also: <BlazeGears.renderFlash>
+	// See Also: <blazegears.renderFlash [Deprecated]>
 	renderFlash: function(self, id, filename, width, height, parameters) {
 		return BlazeGears.renderFlash(id, filename, width, height, parameters);
 	},
 	
 	// Method: setEntityValue
-	// See Also: <BlazeGears.setEntityValue>
+	// See Also: <blazegears.setEntityValue [Deprecated]>
 	setEntityValue: function(self, id, value) {
 		BlazeGears.setEntityValue(id, value);
 	},
 	
 	// Method: updateEntity
-	// See Also: <BlazeGears.updateEntity>
+	// See Also: <blazegears.updateEntity [Deprecated]>
 	updateEntity: function(self, id, value) {
 		BlazeGears.updateEntity(id, value);
 	}

@@ -24,15 +24,15 @@ Email: info@yeticave.com
 Homepage: http://www.yeticave.com
 */
 
-// Class: BlazeGears.Paginator
-// A pagination control widget.
+// Class: BlazeGears.Paginator [Deprecated]
+// This class is deprecated and its functionality will be completely removed. Represents a pagination control widget.
 // 
 // Superclasses:
-//   <BlazeGears.BaseClass>
+//   <BlazeGears.BaseClass [Deprecated]>
 // 
 // Dependencies:
-//   - <BlazeGears.BGTL>
-//   - <BlazeGears.FragVars>
+//   - <BlazeGears.BGTL [Deprecated]>
+//   - <BlazeGears.FragVars [Deprecated]>
 BlazeGears.Paginator = BlazeGears.Classes.declareClass(BlazeGears.BaseClass, {
 	// Group: Variables
 	
@@ -42,9 +42,6 @@ BlazeGears.Paginator = BlazeGears.Classes.declareClass(BlazeGears.BaseClass, {
 	
 	// Field: template
 	// The BGTL template used for rendering.
-	// 
-	// See Also:
-	//   <BlazeGears.BGTL>
 	template: "<div class='BlazeGears-Paginator'> %if (getPages() > 1) {% %if (getPage() > 1) {% <div class='PreviousPage'><a href='javascript:;' onclick='BlazeGears.getEntityValue(&#39;{{getId()}}&#39;).previousPage();'>{{texts[0]}}</a></div> %} else {% <div class='PreviousPage' style='visibility: hidden;'>{{texts[0]}}</div> %}% <div class='CurrentPage'> {{texts[1]}} <select onchange='BlazeGears.getEntityValue(&#39;{{getId()}}&#39;).goToPage(this.value);'> %for (var i = 1; i <= getPages(); i++) {% %if (i == getPage()) {% <option selected='selected' value='{{i}}'>{{i}}</option> %} else {% <option value='{{i}}'>{{i}}</option> %}% %}% </select> / {{getPages()}} </div> %if (getPage() < getPages()) {% <div class='NextPage'><a href='javascript:;' onclick='BlazeGears.getEntityValue(&#39;{{getId()}}&#39;).nextPage();'>{{texts[2]}}</a></div> %} else {% <div class='NextPage' style='visibility: hidden;'>{{texts[2]}}</div> %}% <div class='Clear'></div> %}% </div>",
 	
 	// Field: texts
@@ -68,9 +65,6 @@ BlazeGears.Paginator = BlazeGears.Classes.declareClass(BlazeGears.BaseClass, {
 	// 
 	// Arguments:
 	//   fragvar - The ID of the FragVar that will store the page number.
-	// 
-	// See Also:
-	//   <BlazeGears.FragVars.createFragVar>
 	__init__: function(self, fragvar) {
 		var fragvars = new BlazeGears.FragVars();
 		
@@ -80,8 +74,8 @@ BlazeGears.Paginator = BlazeGears.Classes.declareClass(BlazeGears.BaseClass, {
 		self._id = self.createEntity(self);
 	},
 	
-	// Method: generate
-	// A deprecated alias for <render>.
+	// Method: generate [Deprecated]
+	// Alias for <render>.
 	generate: function(self) {
 		return self.render();
 	},

@@ -24,19 +24,19 @@ Email: info@yeticave.com
 Homepage: http://www.yeticave.com
 */
 
-// Class: BlazeGears
+// Namespace: blazegears
 // The main namespace that contains all the fundamental functionality.
-BlazeGears = new function() {
+blazegears = new function() {
 	var self = this;
 	var entities = {}; // stores the declared entities
 	var included_css = []; // stores the list of included css files
 	var included_js = []; // stores the list of included javascript files
 	
-	// Variable: config
-	// The dictionary that's used for configuration.
+	// Variable: config [Deprecated]
+	// This variable is deprecated and its functionality will be completely removed. The dictionary that's used for configuration.
 	// 
 	// Keys:
-	//   display_errors - If it's true, <error> will display an alert window whenever it's called. Defaults to false.
+	//   display_errors - If it's true, <error [Deprecated]> will display an alert window whenever it's called. Defaults to false.
 	//   entity_id_length - The length of the random IDs used for entities. Defaults to 10.
 	//   entity_id_prefix - This prefix will be applied to every random entity ID to avoid clashes with other IDs. It doesn't count towards the length of the ID. Defaults to "blazegears_entity_".
 	//   escape_encoding - The default escaping method used by <escapeHtml>. Defaults to "html".
@@ -47,20 +47,20 @@ BlazeGears = new function() {
 		escape_encoding: "html"
 	};
 	
-	// Function: Class
-	// A deprecated alias for <BlazeGears.Classes.declareClass>.
+	// Function: Class [Deprecated]
+	// Alias for <BlazeGears.Classes [Deprecated].declareClass>.
 	self.Class = function() {
 		return BlazeGears.Classes.declareClass.apply(self, arguments);
 	}
 	
-	// Function: Singleton
-	// A deprecated alias for <BlazeGears.Classes.declareSingleton>.
+	// Function: Singleton [Deprecated]
+	// Alias for <BlazeGears.Classes [Deprecated].declareSingleton>.
 	self.Singleton = function() {
 		return BlazeGears.Classes.declareSingleton.apply(self, arguments);
 	}
 	
-	// Function: StyleSheet
-	// Generates and outputs the markup for a style sheet.
+	// Function: StyleSheet [Deprecated]
+	// This function is deprecated and its functionality will be completely removed. Generates and outputs the markup for a style sheet.
 	// 
 	// Arguments:
 	//   selector - The selector of the style sheet. Also accepts an array of selectors.
@@ -90,14 +90,14 @@ BlazeGears = new function() {
 		document.write(result);
 	}
 	
-	// Function: cloneArray
-	// A deprecated alias for <cloneObject>.
+	// Function: cloneArray [Deprecated]
+	// Alias for <cloneObject [Deprecated]>.
 	self.cloneArray = function(template) {
 		return self.cloneObject(template);
 	}
 	
-	// Function: cloneObject
-	// Creates a deep copy of an object.
+	// Function: cloneObject [Deprecated]
+	// This function is deprecated and its functionality will be completely removed. Creates a deep copy of an object.
 	// 
 	// Arguments:
 	//   template - The object to be cloned.
@@ -121,8 +121,8 @@ BlazeGears = new function() {
 		return clone;
 	}
 	
-	// Function: createEntity
-	// Creates an internally stored variable.
+	// Function: createEntity [Deprecated]
+	// This function is deprecated and its functionality will be completely removed. Creates an internally stored variable.
 	// 
 	// Arguments:
 	//   [value = null] - The value of the entity.
@@ -130,13 +130,6 @@ BlazeGears = new function() {
 	// 
 	// Return Value:
 	//   Returns the ID of the entity, or null, if the suggested ID is already in use.
-	// 
-	// See Also:
-	//   - <destroyEntity>
-	//   - <getEntityValue>
-	//   - <setEntityValue>
-	//   - <config>.entity_id_length
-	//   - <config>.entity_id_prefix
 	self.createEntity = function(value, id) {
 		if (!self.is(id)) id = null;
 		if (!self.is(value)) value = null;
@@ -168,16 +161,13 @@ BlazeGears = new function() {
 		return result;
 	}
 	
-	// Function: createListener
-	// Creates a cross-browser event listener.
+	// Function: createListener [Deprecated]
+	// This function is deprecated and its functionality will be completely removed. Creates a cross-browser event listener.
 	// 
 	// Arguments:
 	//   caller - The listener will be attached to this element.
 	//   event - The name of the event, without the "on" prefix.
 	//   callback - The callback to be called when the event fires.
-	// 
-	// See Also:
-	//   <destroyListener>
 	self.createListener = function(caller, event, callback) {
 		if (caller.addEventListener) {
 			caller.addEventListener(event, callback, false);
@@ -188,19 +178,14 @@ BlazeGears = new function() {
 		}
 	}
 	
-	// Function: destroyEntity
-	// Destroys an entity created by <createEntity>.
+	// Function: destroyEntity [Deprecated]
+	// This function is deprecated and its functionality will be completely removed. Destroys an entity created by <createEntity [Deprecated]>.
 	// 
 	// Arguments:
 	//   id - The ID of the entity.
 	// 
 	// Return Value:
 	//   Returns true if the entity with this ID was found, else false.
-	// 
-	// See Also:
-	//   - <createEntity>
-	//   - <getEntityValue>
-	//   - <setEntityValue>
 	self.destroyEntity = function(id) {
 		var result = false;
 		
@@ -214,16 +199,13 @@ BlazeGears = new function() {
 		return result;
 	}
 	
-	// Function: destroyListener
-	// Destroys a cross-browser event listener.
+	// Function: destroyListener [Deprecated]
+	// This function is deprecated and its functionality will be completely removed. Destroys a cross-browser event listener.
 	// 
 	// Arguments:
 	//   caller - The listener will be attached to this element.
 	//   event - The name of the event, without the "on" prefix.
 	//   callback - The callback to be called when the event fires.
-	// 
-	// See Also:
-	//   <createListener>
 	self.destroyListener = function(caller, event, callback) {
 		if (caller.removeEventListener) {
 			caller.removeEventListener(event, callback, false);
@@ -234,8 +216,8 @@ BlazeGears = new function() {
 		}
 	}
 	
-	// Function: error
-	// Logs and/or displays an error message.
+	// Function: error [Deprecated]
+	// This function is deprecated and its functionality will be completely removed. Logs and/or displays an error message.
 	// 
 	// Arguments:
 	//   module - The name of the module that issues the error message.
@@ -244,9 +226,6 @@ BlazeGears = new function() {
 	//
 	// Notes:
 	//   Currently no logging is being done by this method.
-	//
-	// See Also:
-	//   <config>.display_errors
 	self.error = function(module, message, details) {
 		if (!self.is(message)) message = null;
 		if (!self.is(details)) details = null;
@@ -262,8 +241,8 @@ BlazeGears = new function() {
 		}
 	}
 	
-	// Function: escape
-	// A deprecated alias for <escapeHtml>.
+	// Function: escape [Deprecated]
+	// Alias for <escapeHtml>.
 	self.escape = function(text, encoding) {
 		return self.escapeHtml(text, encoding);
 	}
@@ -273,7 +252,7 @@ BlazeGears = new function() {
 	// 
 	// Arguments:
 	//   text - The string to be escaped.
-	//   [method] - The escaping method to be used. If not provided, <config>.escape_encoding will be used.
+	//   [method] [Deprecated] - This argument is deprecated and its functionality will be completely removed. The escaping method to be used. If not provided, <config [Deprecated]>.escape_encoding will be used.
 	// 
 	// Return Value:
 	//   Returns the escaped string.
@@ -339,31 +318,26 @@ BlazeGears = new function() {
 		return result;
 	}
 	
-	// Function: generateFlash
-	// A deprecated alias for <renderFlash>.
+	// Function: generateFlash [Deprecated]
+	// Alias for <renderFlash [Deprecated]>.
 	self.generateFlash = function(id, filename, width, height, parameters) {
 		return self.renderFlash(id, filename, width, height, parameters);
 	}
 	
-	// Function: getEntity
-	// A deprecated alias for <getEntityValue>.
+	// Function: getEntity [Deprecated]
+	// Alias for <getEntityValue [Deprecated]>.
 	self.getEntity = function(id) {
 		return self.getEntityValue(id);
 	}
 	
-	// Function: getEntityValue
-	// Returns the value of an entity created by <createEntity>.
+	// Function: getEntityValue [Deprecated]
+	// This function is deprecated and its functionality will be completely removed. Returns the value of an entity created by <createEntity [Deprecated]>.
 	// 
 	// Arguments:
 	//   id - The ID of the entity.
 	// 
 	// Return Value:
 	//   Returns the value of the entity, or null, if the entity doesn't exist.
-	// 
-	// See Also:
-	//   - <createEntity>
-	//   - <destroyEntity>
-	//   - <setEntityValue>
 	self.getEntityValue = function(id) {
 		if (self.is(entities[id])) {
 			return entities[id];
@@ -372,11 +346,11 @@ BlazeGears = new function() {
 		}
 	}
 	
-	// Function: includeCss
-	// Generates a link element in the head of the document for including a CSS file.
+	// Function: includeCss [Deprecated]
+	// This function is deprecated and its functionality will be completely removed. Generates a link element in the head of the document for including a CSS file.
 	// 
 	// Arguments:
-	//   filename - The filename of the CSS file. Also accepts an array of filenames.
+	//   filename - The file name of the CSS file. Also accepts an array of file names.
 	//   [media = "all"] - The media attribute of the CSS link.
 	//   [once = true] - If it's true, the same file won't be included more than once.
 	self.includeCss = function(filename, media, once) {
@@ -417,8 +391,8 @@ BlazeGears = new function() {
 		}
 	}
 	
-	// Function: includeJs
-	// Generates the markup for including a JavaScript file and outputs it.
+	// Function: includeJs [Deprecated]
+	// This function is deprecated and its functionality will be completely removed. Generates the markup for including a JavaScript file and outputs it.
 	// 
 	// Arguments:
 	//   filename - The filename of the JavaScript file. Also accepts an array of filenames.
@@ -452,14 +426,8 @@ BlazeGears = new function() {
 		}
 	}
 	
-	// Function: is
-	// Determines if a variable is undefined.
-	// 
-	// Arguments:
-	//   variable - The variable to be checked.
-	// 
-	// Return Value:
-	//   Returns true if the variable is not undefined, else false.
+	// Function: is [Deprecated]
+	// Alias for <isDefined>.
 	self.is = function(variable) {
 		return typeof variable != "undefined";
 	}
@@ -471,7 +439,7 @@ BlazeGears = new function() {
 	//   variable - The variable to be checked.
 	// 
 	// Return Value:
-	//   Returns true if the the variable is an object, else false.
+	//   Returns true if the variable is an object, else false.
 	self.isAnonymousObject = function(variable) {
 		var constructorPattern = /^(\s*)function(\s*)Object\(\)(\s*)\{/;
 		var result = variable != null ? constructorPattern.test(variable.constructor) : false;
@@ -485,19 +453,19 @@ BlazeGears = new function() {
 	//   variable - The variable to be checked.
 	// 
 	// Return Value:
-	//   Returns true if the the variable is an array, else false.
+	//   Returns true if the variable is an array, else false.
 	self.isArray = function(variable) {
 		return variable instanceof Array;
 	}
 	
 	// Function: isBoolean
-	// Determines if a variable is a boolean object.
+	// Determines if a variable is a Boolean.
 	// 
 	// Arguments:
 	//   variable - The variable to be checked.
 	// 
 	// Return Value:
-	//   Returns true if the the variable is a boolean object, else false.
+	//   Returns true if the variable is a Boolean, else false.
 	self.isBoolean = function(variable) {
 		return variable instanceof Boolean || typeof variable == "boolean";
 	}
@@ -509,9 +477,21 @@ BlazeGears = new function() {
 	//   variable - The variable to be checked.
 	// 
 	// Return Value:
-	//   Returns true if the the variable is a date object, else false.
+	//   Returns true if the variable is a date object, else false.
 	self.isDate = function(variable) {
 		return variable instanceof Date
+	}
+	
+	// Function: isDefined
+	// Determines if a variable is not undefined.
+	// 
+	// Arguments:
+	//   variable - The variable to be checked.
+	// 
+	// Return Value:
+	//   Returns true if the variable is not undefined, else false.
+	self.isDefined = function(variable) {
+		return typeof variable != "undefined";
 	}
 	
 	// Function: isFunction
@@ -521,13 +501,13 @@ BlazeGears = new function() {
 	//   variable - The variable to be checked.
 	// 
 	// Return Value:
-	//   Returns true if the the variable is a function, else false.
+	//   Returns true if the variable is a function, else false.
 	self.isFunction = function(variable) {
 		return variable instanceof Function || typeof variable == "function";
 	}
 	
-	// Function: isInArray
-	// Determines if a value can be found in an array using linear search.
+	// Function: isInArray [Deprecated]
+	// This function is deprecated and its functionality will be completely removed. Determines if a value can be found in an array using linear search.
 	// 
 	// Arguments:
 	//   needle - The value to look for.
@@ -558,13 +538,13 @@ BlazeGears = new function() {
 	//   variable - The variable to be checked.
 	// 
 	// Return Value:
-	//   Returns true if the the variable is a number, else false.
+	//   Returns true if the variable is a number, else false.
 	self.isNumber = function(variable) {
 		return variable instanceof Number || typeof variable == "number";
 	}
 	
-	// Function: isObject
-	// A deprecated alias for <isAnonymousObject>.
+	// Function: isObject [Deprecated]
+	// Alias for <isAnonymousObject>.
 	self.isObject = function(variable) {
 		return self.isAnonymousObject(variable);
 	}
@@ -576,7 +556,7 @@ BlazeGears = new function() {
 	//   variable - The variable to be checked.
 	// 
 	// Return Value:
-	//   Returns true if the the variable is a regular expression, else false.
+	//   Returns true if the variable is a regular expression, else false.
 	self.isRegExp = function(variable) {
 		return variable instanceof RegExp;
 	}
@@ -588,13 +568,13 @@ BlazeGears = new function() {
 	//   variable - The variable to be checked.
 	// 
 	// Return Value:
-	//   Returns true if the the variable is a string, else false.
+	//   Returns true if the variable is a string, else false.
 	self.isString = function(variable) {
 		return variable instanceof String || typeof variable == "string";
 	}
 	
-	// Function: renderFlash
-	// Generates the cross-browser markup for a Flash application.
+	// Function: renderFlash [Deprecated]
+	// This function is deprecated and its functionality will be completely removed. Generates the cross-browser markup for a Flash application.
 	// 
 	// Arguments:
 	//   id - The ID attribute for the object tag of the application.
@@ -620,19 +600,14 @@ BlazeGears = new function() {
 		return result;
 	}
 	
-	// Function: setEntityValue
-	// Sets the value of an entity created by <createEntity>.
+	// Function: setEntityValue [Deprecated]
+	// This function is deprecated and its functionality will be completely removed. Sets the value of an entity created by <createEntity [Deprecated]>.
 	// 
 	// Arguments:
 	//   id - The ID of the entity.
 	// 
 	// Return Value:
 	//   Returns true if the entity with this ID was found, else false.
-	// 
-	// See Also:
-	//   - <createEntity>
-	//   - <destroyEntity>
-	//   - <getEntityValue>
 	self.setEntityValue = function(id, value) {
 		var result = false;
 		
@@ -646,12 +621,16 @@ BlazeGears = new function() {
 		return result;
 	}
 	
-	// Function: updateEntity
-	// A deprecated alias for <setEntityValue>.
+	// Function: updateEntity [Deprecated]
+	// Alias for <setEntityValue [Deprecated]>.
 	self.updateEntity = function(id, value) {
 		return self.setEntityValue(id, value);
 	}
 }
+
+// Namespace: BlazeGears [Deprecated]
+// Alias for <blazegears>.
+BlazeGears = blazegears;
 
 BlazeGears.StyleSheet("*[class|='BlazeGears'] .Clear", {
 	clear: "both",

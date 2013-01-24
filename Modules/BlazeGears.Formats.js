@@ -24,11 +24,31 @@ Email: info@yeticave.com
 Homepage: http://www.yeticave.com
 */
 
-// Class: BlazeGears.Formats
+// Namespace: blazegears.formatting
+blazegears.formatting = {};
+
+// Class: blazegears.formatting.DateFormatter
+blazegears.formatting.DateFormatter = function() {};
+
+// Class: blazegears.formatting.NumberFormatter
+blazegears.formatting.NumberFormatter = function() {};
+
+// Class: blazegears.formatting.FileSizeFormatter
+blazegears.formatting.FileSizeFormatter = function() {};
+blazegears.formatting.FileSizeFormatter.prototype = new blazegears.formatting.NumberFormatter();
+blazegears.formatting.FileSizeFormatter.prototype.constructor = blazegears.formatting.FileSizeFormatter;
+
+// Class: blazegears.formatting.PHPDateFormatter
+blazegears.formatting.PHPDateFormatter = function() {};
+
+// Class: blazegears.formatting.UnixDateFormatter
+blazegears.formatting.UnixDateFormatter = function() {};
+
+// Class: BlazeGears.Formats [Deprecated]
 // A singleton class that handles various string formatting tasks.
 // 
 // Superclasses:
-//   <BlazeGears.BaseClass>
+//   <BlazeGears.BaseClass [Deprecated]>
 BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 	// Field: date_format
 	// The default date format dictionary used by <formatDate>.

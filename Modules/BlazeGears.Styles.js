@@ -24,11 +24,11 @@ Email: info@yeticave.com
 Homepage: http://www.yeticave.com
 */
 
-// Class: BlazeGears.Styles
-// A singleton class that performs some common CSS and other visual tasks.
+// Class: BlazeGears.Styles [Deprecated]
+// This class is deprecated and its functionality will be completely removed. A singleton class that performs some common CSS and other visual tasks.
 // 
 // Superclasses:
-//   <BlazeGears.BaseClass>
+//   <BlazeGears.BaseClass [Deprecated]>
 BlazeGears.Styles = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 	// Method: alignElements
 	// Aligns an absolutely positioned element to another element.

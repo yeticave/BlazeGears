@@ -24,8 +24,8 @@ Email: info@yeticave.com
 Homepage: http://www.yeticave.com
 */
 
-// Class: BlazeGears.Classes
-// This namespace contains the functions and interfaces that can be used declare classes that has some advantages (and some drawbacks) over regular JavaScript classes.
+// Class: BlazeGears.Classes [Deprecated]
+// This namespace is deprecated and its functionality will be completely removed. Contains the functions and interfaces that can be used declare classes that has some advantages (and some drawbacks) over regular JavaScript classes.
 // 
 // The declaration of a class is being done by passing an object to one of the class declaring functions. 
 // 
@@ -48,7 +48,7 @@ BlazeGears.Classes = new function() {
 	//   This method takes a variable amount of arguments. The last argument must be the declaration object and all the prior ones will be the superclasses of the class.
 	//
 	//Return Value:
-	//   Returns the declared class, which implements the <BlazeGears.Classes.ClassInterface>.
+	//   Returns the declared class, which implements the <BlazeGears.Classes.ClassInterface [Deprecated]>.
 	self.declareClass = function() {
 		if (arguments.length > 0) {
 			arguments[arguments.length - 1].__singleton__ = false;
@@ -64,7 +64,7 @@ BlazeGears.Classes = new function() {
 	//   This method takes a variable amount of arguments. The last argument must be the declaration object and all the prior ones will be the superclasses of the class.
 	// 
 	// Return Value:
-	//   Returns the declared class, which implements the <BlazeGears.Classes.SingletonInterface>.
+	//   Returns the declared class, which implements the <BlazeGears.Classes.SingletonInterface [Deprecated]>.
 	self.declareSingleton = function() {
 		if (arguments.length > 0) {
 			arguments[arguments.length - 1].__singleton__ = true;
@@ -279,3 +279,44 @@ BlazeGears.Classes = new function() {
 		return blazegears_class;
 	}
 }
+
+// Class: BlazeGears.Classes.ClassInterface [Deprecated]
+// Declared classes will implement this interface.
+// 
+// Notes:
+//   This class has no actual functionality, it's just being used for documentation.
+BlazeGears.Classes.ClassInterface = function() {
+	var self = this;
+	
+	// Field: __class__
+	// Points to the class itself.
+	self.__class__ = null;
+	
+	// Method: __init__
+	// The constructor of the class. By default it does nothing, but it can be overridden.
+	self.__init__ = function(self) { }
+	
+	// Method: __super__
+	// Searches the class' superclasses for a method and calls it.
+	// 
+	// Arguments:
+	//   This method takes a variable amount of arguments. The first argument has to be the name of the sought method, the rest will be passed to the method, if it exists.
+	// 
+	// Exceptions:
+	//   An Error will be thrown, if the sought method can't be found.
+	// 
+	// Return Value:
+	//   Returns the return value of the sought method.
+	self.__super__ = function(name) { }
+	
+	// Method: $__super__
+	// The static version of the <__super__> method.
+	self.$__super__ = function() { }
+}
+
+// Class: BlazeGears.Classes.SingletonInterface [Deprecated]
+// Declared singletons will implement this interface besides the <BlazeGears.Classes.ClassInterface [Deprecated]>.
+// 
+// Notes:
+//   This class has no actual functionality, it's just being used for documentation.
+BlazeGears.Classes.SingletonInterface = function() { }

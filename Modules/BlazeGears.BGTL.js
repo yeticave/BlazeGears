@@ -24,8 +24,14 @@ Email: info@yeticave.com
 Homepage: http://www.yeticave.com
 */
 
-// Class: BlazeGears.BGTL
-// A singleton class that compiles HTML templates written in the BlazeGears Templating Language.
+// Namespace: blazegears.bgtl
+blazegears.bgtl = {};
+
+// Class: blazegears.bgtl.Compiler
+blazegears.bgtl.Compiler = function() {};
+
+// Class: BlazeGears.BGTL [Deprecated]
+// This class has been deprecated, use <blazegears.bgtl.Compiler> instead. A singleton class that compiles HTML templates written in the BlazeGears Templating Language.
 // 
 // The language's syntax is based on a mix of JavaScript and <BottlePy's Simple Template at http://bottlepy.org/docs/dev/stpl.html>.
 // 
@@ -188,8 +194,8 @@ BlazeGears.BGTL = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 		return self.renderTemplate(template, parameters);
 	},
 	
-	// Method: parse
-	// A deprecated alias for <compileTemplate>.
+	// Method: parse [Deprecated]
+	// Alias for <compileTemplate>.
 	parse: function(self, template) {
 		return self.compileTemplate(template);
 	},
@@ -214,3 +220,30 @@ BlazeGears.BGTL = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 		return result;
 	}
 });
+
+// Class: BlazeGears.BGTL.TemplateInterface [Deprecated]
+// Compiled template objects will implement this interface.
+// 
+// Notes:
+//   This class has no actual functionality, it just being used for documentation.
+// 
+// See Also:
+//   <BlazeGears.BGTL.compileTemplate>
+BlazeGears.BGTL.TemplateInterface = function()
+{
+	var self = this;
+	
+	// Method: execute [Deprecated]
+	// Alias for <render>.
+	self.execute = function(parameters) { }
+	
+	// Method: render
+	// Renders the template.
+	// 
+	// Arguments:
+	//   parameters - A dictionary of variables used for rendering where the keys are the variables' names.
+	// 
+	// Return Value:
+	//   Returns the markup rendered by the template.
+	self.render = function(parameters) { }
+}
