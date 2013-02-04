@@ -25,7 +25,7 @@ Homepage: http://www.yeticave.com
 */
 
 // Class: BlazeGears.Classes [Deprecated]
-// This namespace is deprecated and its functionality will be completely removed. Contains the functions and interfaces that can be used declare classes that has some advantages (and some drawbacks) over regular JavaScript classes.
+// This namespace has been deprecated and its functionality will be completely removed. Contains the functions and interfaces that can be used declare classes that has some advantages (and some drawbacks) over regular JavaScript classes.
 // 
 // The declaration of a class is being done by passing an object to one of the class declaring functions. 
 // 

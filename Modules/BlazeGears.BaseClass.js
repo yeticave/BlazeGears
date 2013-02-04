@@ -25,7 +25,7 @@ Homepage: http://www.yeticave.com
 */
 
 // Class: BlazeGears.BaseClass [Deprecated]
-// This class is deprecated and its functionality will be completely removed. Wraps all the functions from the <blazegears> namespace into a class context.
+// This class has been deprecated and its functionality will be completely removed. Wraps all the functions from the <blazegears> namespace into a class context.
 BlazeGears.BaseClass = BlazeGears.Classes.declareClass({
 	// Method: cloneArray
 	// See Also: <blazegears.cloneArray [Deprecated]>

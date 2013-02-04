@@ -226,9 +226,6 @@ BlazeGears.BGTL = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 // 
 // Notes:
 //   This class has no actual functionality, it just being used for documentation.
-// 
-// See Also:
-//   <BlazeGears.BGTL.compileTemplate>
 BlazeGears.BGTL.TemplateInterface = function()
 {
 	var self = this;

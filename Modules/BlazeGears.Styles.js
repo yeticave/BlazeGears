@@ -25,7 +25,7 @@ Homepage: http://www.yeticave.com
 */
 
 // Class: BlazeGears.Styles [Deprecated]
-// This class is deprecated and its functionality will be completely removed. A singleton class that performs some common CSS and other visual tasks.
+// This class has been deprecated and its functionality will be completely removed. A singleton class that performs some common CSS and other visual tasks.
 // 
 // Superclasses:
 //   <BlazeGears.BaseClass [Deprecated]>

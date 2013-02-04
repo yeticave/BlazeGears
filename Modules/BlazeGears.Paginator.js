@@ -25,7 +25,7 @@ Homepage: http://www.yeticave.com
 */
 
 // Class: BlazeGears.Paginator [Deprecated]
-// This class is deprecated and its functionality will be completely removed. Represents a pagination control widget.
+// This class has been deprecated and its functionality will be completely removed. Represents a pagination control widget.
 // 
 // Superclasses:
 //   <BlazeGears.BaseClass [Deprecated]>

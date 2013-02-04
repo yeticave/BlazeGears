@@ -25,7 +25,7 @@ Homepage: http://www.yeticave.com
 */
 
 // Class: BlazeGears.Form [Deprecated]
-// This function is deprecated and its functionality will be completely removed. Represents an HTML form in an object-oriented way.
+// This class has been deprecated and its functionality will be completely removed. Represents an HTML form in an object-oriented way.
 // 
 // Superclasses:
 //   <BlazeGears.BaseClass [Deprecated]>
@@ -270,7 +270,7 @@ BlazeGears.StyleSheet(".BlazeGears-Form .Field .Label", {
 BlazeGears.StyleSheet(".BlazeGears-Form .Field .Valid", {color: "green"});
 
 // Class: BlazeGears.Form.Field [Deprecated]
-// This class is deprecated and its functionality will be completely removed. Represents a field of a form object.
+// This class has been deprecated and its functionality will be completely removed. Represents a field of a form object.
 // 
 // Superclasses:
 //   <BlazeGears.BaseClass [Deprecated]>
@@ -481,7 +481,7 @@ BlazeGears.Form.Field = BlazeGears.Classes.declareClass(BlazeGears.BaseClass, {
 });
 
 // Class: BlazeGears.Form.Option [Deprecated]
-// This class is deprecated and its functionality will be completely removed. Represents an option of a field object, like radio buttons, checkboxes, and select-list options.
+// This class has been deprecated and its functionality will be completely removed. Represents an option of a field object, like radio buttons, checkboxes, and select-list options.
 // 
 // Superclasses:
 //   <BlazeGears.BaseClass [Deprecated]>
