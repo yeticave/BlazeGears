@@ -628,6 +628,15 @@ blazegears = new function() {
 	}
 }
 
+// Class: blazegears.NotOverridenError
+// The exception that will be thrown if a non-overridden abstract method gets called.
+blazegears.NotOverridenError = function() {
+	this.message = "This method has to be overridden by child class before it could be used.";
+	this.name = "blazegears.NotOverridenError";
+}
+blazegears.NotOverridenError.prototype = new Error();
+blazegears.NotOverridenError.prototype.constructor = blazegears.NotOverridenError;
+
 // Namespace: BlazeGears [Deprecated]
 // Alias for <blazegears>.
 BlazeGears = blazegears;
