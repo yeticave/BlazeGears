@@ -25,7 +25,8 @@ Homepage: http://www.yeticave.com
 */
 
 // Namespace: blazegears.formatting
-blazegears.formatting = {};
+var blazegears = (typeof blazegears === "undefined") ? {} : blazegears;
+blazegears.formatting = (typeof blazegears.formatting === "undefined") ? {} : blazegears.formatting;
 
 // Enum: blazegears.formatting.DecimalVisibility
 blazegears.formatting.DecimalVisibility = {
@@ -54,7 +55,7 @@ blazegears.formatting.DateFormatter = function() {
 
 // Method: formatDate
 blazegears.formatting.DateFormatter.prototype.formatDate = function(date, format) {
-	throw new blazegears.NotOverridenError();
+	throw new blazegears.NotOverriddenError();
 }
 
 // Method: getAbbreviatedNamesOfDays
@@ -378,7 +379,7 @@ blazegears.formatting.DateFormatter.prototype._getSwatchInternetTime = function(
 	result += date.getUTCSeconds();
 	result /= 86.4;
 	result = Math.floor(result);
-	result = this._padStringLeft(result, "0", 3);
+	result = blazegears._padStringLeft(result, "0", 3);
 	
 	return result;
 }
@@ -412,18 +413,6 @@ blazegears.formatting.DateFormatter.prototype._isLeapYear = function(date) {
 	var year = this._getFullYear(date);
 	
 	return ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0);
-}
-
-blazegears.formatting.DateFormatter.prototype._padStringLeft = function(string, padding, expected_width) {
-	var result = string.toString();
-	
-	if (padding.length > 0) {
-		while (result.length < expected_width) {
-			result = padding + result;
-		}
-	}
-	
-	return result;
 }
 
 // creates a date object from the provided value
@@ -674,7 +663,7 @@ blazegears.formatting.PHPDateFormatter.prototype.formatDate = function(date, for
 				break;
 			
 			case "H": // international hours (00 - 23)
-				result += this._padStringLeft(this._getHours(date), "0", 2);
+				result += blazegears._padStringLeft(this._getHours(date), "0", 2);
 				break;
 			
 			case "I": // daylight saving time (0 - 1)
@@ -714,7 +703,7 @@ blazegears.formatting.PHPDateFormatter.prototype.formatDate = function(date, for
 				break;
 			
 			case "W": // iso-8601 weeks (01 - 53)
-				result += this._padStringLeft(this._getIso8601Week(date), "0", 2);
+				result += blazegears._padStringLeft(this._getIso8601Week(date), "0", 2);
 				break;
 			
 			case "Y": // years (1970 - 2038)
@@ -734,7 +723,7 @@ blazegears.formatting.PHPDateFormatter.prototype.formatDate = function(date, for
 				break;
 			
 			case "d": // days (01 - 31)
-				result += this._padStringLeft(this._getDate(date), "0", 2);
+				result += blazegears._padStringLeft(this._getDate(date), "0", 2);
 				break;
 			
 			case "e": // time zone names (e.g. Nuku'alofa)
@@ -746,11 +735,11 @@ blazegears.formatting.PHPDateFormatter.prototype.formatDate = function(date, for
 				break;
 			
 			case "h": // hours (01 - 12)
-				result += this._padStringLeft(this._getTwelveHourHours(date), "0", 2);
+				result += blazegears._padStringLeft(this._getTwelveHourHours(date), "0", 2);
 				break;
 			
 			case "i": // minutes (00 - 59)
-				result += this._padStringLeft(this._getMinutes(date), "0", 2);
+				result += blazegears._padStringLeft(this._getMinutes(date), "0", 2);
 				break;
 			
 			case "j": // days (1 - 31)
@@ -762,7 +751,7 @@ blazegears.formatting.PHPDateFormatter.prototype.formatDate = function(date, for
 				break;
 			
 			case "m": // months (01 - 12)
-				result += this._padStringLeft(this._getMonth(date) + 1, "0", 2);
+				result += blazegears._padStringLeft(this._getMonth(date) + 1, "0", 2);
 				break;
 			
 			case "n": // months (1 - 12)
@@ -778,7 +767,7 @@ blazegears.formatting.PHPDateFormatter.prototype.formatDate = function(date, for
 				break;
 			
 			case "s": // seconds (00 - 59)
-				result += this._padStringLeft(this._getSeconds(date), "0", 2);
+				result += blazegears._padStringLeft(this._getSeconds(date), "0", 2);
 				break;
 			
 			case "t": // number of days in the month (28 - 31)
@@ -808,7 +797,6 @@ blazegears.formatting.PHPDateFormatter.prototype.formatDate = function(date, for
 	
 	return result;
 }
-
 
 // Class: blazegears.formatting.UnixDateFormatter
 blazegears.formatting.UnixDateFormatter = function() {
@@ -928,11 +916,11 @@ blazegears.formatting.UnixDateFormatter.prototype.formatDate = function(date, fo
 					break;
 				
 				case "H": // international hours (00 - 23)
-					chunk = this._padStringLeft(this._getHours(date), padding, 2);
+					chunk = blazegears._padStringLeft(this._getHours(date), padding, 2);
 					break;
 				
 				case "I": // hours (01 - 12)
-					chunk = this._padStringLeft(this._getTwelveHourHours(date), padding, 2);
+					chunk = blazegears._padStringLeft(this._getTwelveHourHours(date), padding, 2);
 					break;
 				
 				case "L": // leap years (0 - 1)
@@ -940,7 +928,7 @@ blazegears.formatting.UnixDateFormatter.prototype.formatDate = function(date, fo
 					break;
 				
 				case "M": // minutes (00 - 59)
-					chunk = this._padStringLeft(this._getMinutes(date), padding, 2);
+					chunk = blazegears._padStringLeft(this._getMinutes(date), padding, 2);
 					break;
 				
 				case "N": // nanoseconds (000000000 - 999999999)
@@ -956,7 +944,7 @@ blazegears.formatting.UnixDateFormatter.prototype.formatDate = function(date, fo
 					break;
 				
 				case "S": // seconds (00 - 59)
-					chunk = this._padStringLeft(this._getSeconds(date), padding, 2);
+					chunk = blazegears._padStringLeft(this._getSeconds(date), padding, 2);
 					break;
 				
 				case "T": // same as "%H:%M:%S".
@@ -965,15 +953,15 @@ blazegears.formatting.UnixDateFormatter.prototype.formatDate = function(date, fo
 					break;
 				
 				case "U": // weeks, staring on sunday (00 - 53)
-					chunk = this._padStringLeft(this._getSundayWeek(date), padding, 2);
+					chunk = blazegears._padStringLeft(this._getSundayWeek(date), padding, 2);
 					break;
 				
 				case "V": // iso-8601 weeks (01 - 53)
-					chunk = this._padStringLeft(this._getIso8601Week(date), padding, 2);
+					chunk = blazegears._padStringLeft(this._getIso8601Week(date), padding, 2);
 					break;
 				
 				case "W": // weeks, staring on monday (00 - 53)
-					chunk = this._padStringLeft(this._getMondayWeek(date), padding, 2);
+					chunk = blazegears._padStringLeft(this._getMondayWeek(date), padding, 2);
 					break;
 				
 				case "Y": // years (1970 - 2038)
@@ -1007,40 +995,40 @@ blazegears.formatting.UnixDateFormatter.prototype.formatDate = function(date, fo
 					break;
 				
 				case "d": // days (01 - 31)
-					chunk = this._padStringLeft(this._getDate(date), padding, 2);
+					chunk = blazegears._padStringLeft(this._getDate(date), padding, 2);
 					break;
 				
 				case "e": // same as "%_d"
 					if (!has_padding_modifier) {
 						padding = " ";
 					}
-					chunk = this._padStringLeft(this._getDate(date), padding, 2);
+					chunk = blazegears._padStringLeft(this._getDate(date), padding, 2);
 					break;
 				
 				case "g": // abbreviated iso-8601 years (00 - 99)
-					chunk = this._padStringLeft(this._getIso8601Year(date) % 100, padding, 2);
+					chunk = blazegears._padStringLeft(this._getIso8601Year(date) % 100, padding, 2);
 					break;
 				
 				case "j": // days of the year (001 - 366)
-					chunk = this._padStringLeft(this._getDayOfYear(date), padding, 3);
+					chunk = blazegears._padStringLeft(this._getDayOfYear(date), padding, 3);
 					break;
 				
 				case "k": // same as "%_H"
 					if (!has_padding_modifier) {
 						padding = " ";
 					}
-					chunk = this._padStringLeft(this._getHours(date), padding, 2);
+					chunk = blazegears._padStringLeft(this._getHours(date), padding, 2);
 					break;
 				
 				case "l": // same as "%_I"
 					if (!has_padding_modifier) {
 						padding = " ";
 					}
-					chunk = this._padStringLeft(this._getTwelveHourHours(date), padding, 2);
+					chunk = blazegears._padStringLeft(this._getTwelveHourHours(date), padding, 2);
 					break;
 				
 				case "m": // months (01 - 12)
-					chunk = this._padStringLeft(this._getMonth(date) + 1, padding, 2);
+					chunk = blazegears._padStringLeft(this._getMonth(date) + 1, padding, 2);
 					break;
 				
 				case "n": // newline
@@ -1083,7 +1071,7 @@ blazegears.formatting.UnixDateFormatter.prototype.formatDate = function(date, fo
 					break;
 				
 				case "y": // abbreviated years (00 - 99)
-					chunk = this._padStringLeft(this._getFullYear(date) % 100, padding, 2);
+					chunk = blazegears._padStringLeft(this._getFullYear(date) % 100, padding, 2);
 					break;
 				
 				case "z": // time zone offset (-1200 - +1300)

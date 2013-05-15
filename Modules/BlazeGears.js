@@ -346,6 +346,11 @@ blazegears = new function() {
 		}
 	}
 	
+	// Function: getVersion
+	self.getVersion = function() {
+		return [1, 2, 0, 0];
+	}
+	
 	// Function: includeCss [Deprecated]
 	// This function is deprecated and its functionality will be completely removed. Generates a link element in the head of the document for including a CSS file.
 	// 
@@ -626,16 +631,144 @@ blazegears = new function() {
 	self.updateEntity = function(id, value) {
 		return self.setEntityValue(id, value);
 	}
+	
+	self._countStringOccurrences = function(needle, haystack) {
+		var length;
+		var position;
+		var result = 0;
+		
+		needle = needle ? String(needle) : "";
+		haystack = haystack ? String(haystack) : "";
+		length = needle.length;
+		
+		if (length > 0) {
+			while (true) {
+				position = haystack.indexOf(needle, position);
+				if (position > -1) {
+					++result;
+					position += length;
+				} else {
+					break;
+				}
+			}
+		}
+		
+		return result;
+	}
+	
+	self._forceParseInt = function(value, default_value) {
+		var result = parseInt(value);
+		
+		if (isNaN(result)) {
+			result = blazegears.isDefined(default_value) ? default_value : 0
+		}
+		
+		return result;
+	}
+	
+	self._getColumnNumber = function(string, offset) {
+		var last_line_break;
+		var result;
+		
+		string = string.substr(0, offset);
+		string = string.replace("\r\n", "\n");
+		string = string.replace("\r", "\n");
+		last_line_break = string.lastIndexOf("\n");
+		result = offset - last_line_break;
+		
+		return result;
+	}
+	
+	self._getLineNumber = function(string, offset) {
+		var result;
+		
+		string = string.substr(0, offset);
+		string = string.replace("\r\n", "\n");
+		string = string.replace("\r", "\n");
+		result = self._countStringOccurrences("\n", string) + 1;
+		
+		return result;
+	}
+	
+	self._padStringLeft = function(string, padding, expected_width) {
+		var result = string.toString();
+		
+		if (padding.length > 0) {
+			while (result.length < expected_width) {
+				result = padding + result;
+			}
+		}
+		
+		return result;
+	}
 }
 
-// Class: blazegears.NotOverridenError
-// The exception that will be thrown if a non-overridden abstract method gets called.
-blazegears.NotOverridenError = function() {
-	this.message = "This method has to be overridden by child class before it could be used.";
-	this.name = "blazegears.NotOverridenError";
+// Class: blazegears.Error
+blazegears.Error = function(message, inner_error) {
+	Error.call(this);
+	this.message = blazegears.Error._composeMessage("An error occurred", message, inner_error);
+	this.name = "blazegears.Error";
+	this._inner_error = blazegears.isDefined(inner_error) ? inner_error : null;
 }
-blazegears.NotOverridenError.prototype = new Error();
-blazegears.NotOverridenError.prototype.constructor = blazegears.NotOverridenError;
+blazegears.Error.prototype = new Error();
+blazegears.Error.prototype.constructor = blazegears.Error;
+
+// Method: getInnerError
+blazegears.Error.prototype.getInnerError = function() {
+	return this._inner_error;
+}
+
+// composes the message for the error depending on if there's a message or inner error available
+blazegears.Error._composeMessage = function(default_message, message, inner_error) {
+	var result;
+	
+	if (blazegears.isDefined(message) && message !== null) {
+		result = message.toString();
+	} else {
+		result = default_message;
+		if (blazegears.isDefined(inner_error) && inner_error !== null) {
+			if (inner_error instanceof Error) {
+				result += ": " + inner_error.message.toString();
+			} else {
+				result += ": " + inner_error.toString();
+			}
+		} else {
+			result += ".";
+		}
+	}
+	
+	return result;
+}
+
+// Class: blazegears.ArgumentError
+blazegears.ArgumentError = function(argument_name, message, inner_error) {
+	blazegears.Error(this, message, inner_error);
+	this.message = blazegears.Error._composeMessage("The <" + argument_name + "> argument is invalid", message, inner_error);
+	this.name = "blazegears.ArgumentError";
+	this._argument_name = argument_name;
+}
+blazegears.ArgumentError.prototype = new blazegears.Error();
+blazegears.ArgumentError.prototype.constructor = blazegears.ArgumentError;
+
+// Method: getArgumentName
+blazegears.ArgumentError.prototype.getArgumentName = function() {
+	return this._argument_name;
+}
+
+// generates the message for an invalid argument type
+blazegears.ArgumentError._invalidArgumentType = function(argument_name, expected_type) {
+	return new blazegears.ArgumentError(argument_name, "The <" + argument_name + "> argument is expected to be an instance of <" + expected_type + ">.");
+}
+
+// Class: blazegears.NotOverriddenError
+blazegears.NotOverriddenError = function(message, inner_error) {
+	blazegears.Error(this, message, inner_error);
+	this.message = blazegears.Error._composeMessage("This method has to be overridden by a child class", message, inner_error);
+	this.name = "blazegears.NotOverriddenError";
+	this._argument_name = argument_name;
+}
+blazegears.NotOverriddenError.prototype = new blazegears.Error();
+blazegears.NotOverriddenError.prototype.constructor = blazegears.NotOverriddenError;
 
 // Namespace: BlazeGears [Deprecated]
 // Alias for <blazegears>.

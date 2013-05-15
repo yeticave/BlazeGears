@@ -25,7 +25,8 @@ Homepage: http://www.yeticave.com
 */
 
 // Namespace: blazegears.fragvars
-blazegears.fragvars = {};
+var blazegears = (typeof blazegears === "undefined") ? {} : blazegears;
+blazegears.fragvars = (typeof blazegears.fragvars === "undefined") ? {} : blazegears.fragvars;
 
 // Class: blazegears.fragvars.Manager
 // A singleton class that handles variables stored in the fragment section of the current URL.
@@ -38,7 +39,7 @@ blazegears.fragvars.Manager = BlazeGears.Classes.declareSingleton(BlazeGears.Sty
 	ie_history: true,
 	
 	// Field: redundant_events [Deprecated]
-	// This field is deprecated and redundant events will be permanently disabled in the future. If it's true, the same event callback functions can be called multiple times when the same callback is used by multiple FragVars, else they won't be called more than once.
+	// This field is deprecated and redundant events won't be filtered in the future. If it's true, the same event callback functions can be called multiple times when the same callback is used by multiple FragVars, else they won't be called more than once.
 	redundant_events: true,
 	
 	_fragvar_assigner: "=",
