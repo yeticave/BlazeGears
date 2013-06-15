@@ -36,7 +36,7 @@ blazegears.formatting.DecimalVisibility = {
 	STRIP_TRAILING_ZEROS: 3
 };
 
-// Enum: blazegears.formatting.TimeZone
+// Enum: blazegears.formatting.TimeZoneOffset
 blazegears.formatting.TimeZoneOffset = {
 	AUTOMATIC: null,
 	UTC: 0
@@ -73,15 +73,16 @@ blazegears.formatting.DateFormatter.prototype.setAbbreviatedNamesOfDays = functi
 
 // Method: getAbbreviatedNamesOfMeridiems
 blazegears.formatting.DateFormatter.prototype.getAbbreviatedNamesOfMeridiems = function() {
-	return this._short_meridiems.slice();
+	return [this._short_meridiems[2], this._short_meridiems[3]];
 }
 
 // Method: setAbbreviatedNamesOfMeridiems
 blazegears.formatting.DateFormatter.prototype.setAbbreviatedNamesOfMeridiems = function(names_of_meridiems) {
 	this._short_meridiems = [];
-	for (var i = 0; i < 4; ++i) {
-		this._short_meridiems.push(names_of_meridiems[i].toString());
-	}
+	this._short_meridiems.push(names_of_meridiems[0].toString().toUpperCase());
+	this._short_meridiems.push(names_of_meridiems[1].toString().toUpperCase());
+	this._short_meridiems.push(names_of_meridiems[0].toString());
+	this._short_meridiems.push(names_of_meridiems[1].toString());
 }
 
 // Method: getAbbreviatedNamesOfMonths
@@ -436,7 +437,7 @@ blazegears.formatting.DateFormatter.prototype._prepareDate = function(date) {
 blazegears.formatting.NumberFormatter = function() {
 	this._decimal_delimiter = ".";
 	this._decimal_precision = 0;
-	this._decimal_visibility = blazegears.formatting.DecimalVisibility.ALL;
+	this._decimal_visibility = blazegears.formatting.DecimalVisibility.SIGNIFICANT_DIGITS;
 	this._group_delimiter = ",";
 	this._group_size = 3;
 	this._is_leading_zero_enabled = true;
@@ -472,14 +473,22 @@ blazegears.formatting.NumberFormatter.prototype.formatNumber = function(number) 
 	// create the decimals
 	if (this._decimal_precision > 0) {
 		// calculate the actual decimal part
+		if (negative) {
+			decimal *= -1;
+		}
 		decimal = this._rounding_callback.call(this, decimal * Math.pow(10, this._decimal_precision));
-		decimal = decimal.toString();
+		
+		var absolute_decimal = Math.abs(decimal * Math.pow(10, -this._decimal_precision));
+		if (absolute_decimal >= 1) {
+		}
+		
+		decimal = Math.abs(decimal).toString();
 		while (decimal.length < this._decimal_precision) {
 			decimal = "0" + decimal;
 		}
 		
 		// remove the unnecessary zeroes
-		if (this._decimal_visibility != DecimalVisibility.ALL) {
+		if (this._decimal_visibility != DecimalVisibility.SIGNIFICANT_DIGITS) {
 			for (var i = decimal.length - 1; i >= 0; i--) {
 				if (decimal.charAt(i) == "0") {
 					decimal = decimal.substr(0, i);
@@ -492,6 +501,8 @@ blazegears.formatting.NumberFormatter.prototype.formatNumber = function(number) 
 		// apply the decimal separator
 		if (decimal.length > 0) {
 			decimal = this._decimal_delimiter + decimal;
+		} else if (this._decimal_visibility === DecimalVisibility.MINIMUM_ONE_DIGIT) {
+			decimal = this._decimal_delimiter + "0";
 		}
 	} else {
 		decimal = "";
@@ -1253,17 +1264,13 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 		}
 		
 		if (formatter != null) {
-			if (this._is_utc_time_enabled) {
-				formatter.setTimeZoneOffset(blazegears.formatting.TimeZoneOffset.UTC);
-			}
-			
-			formatter.setAbbreviatedNamesOfDays(self.texts.short_days);
-			formatter.setAbbreviatedNamesOfMeridiems([self.texts.short_upper_meridiems[0], self.texts.short_upper_meridiems[1], self.texts.short_lower_meridiems[0], self.texts.short_lower_meridiems[1]]);
-			formatter.setAbbreviatedNamesOfMonths(self.texts.short_months);
-			formatter.setNamesOfDays(self.texts.full_days);
-			formatter.setNamesOfMonths(self.texts.full_months);
-			formatter.setOrdinalSuffixes(self.texts.ordinal_suffixes);
-			
+			formatter._is_utc_time_enabled = this._is_utc_time_enabled;
+			formatter._short_day_names = self.texts.short_days;
+			formatter._short_meridiems = [self.texts.short_upper_meridiems[0], self.texts.short_upper_meridiems[1], self.texts.short_lower_meridiems[0], self.texts.short_lower_meridiems[1]];
+			formatter._short_month_names = self.texts.short_months;
+			formatter._full_day_names = self.texts.full_days;
+			formatter._full_month_names = self.texts.full_months;
+			formatter._ordinal_suffixes = self.texts.ordinal_suffixes;
 			result = formatter.formatDate(date, configuration.syntax);
 		}
 		
@@ -1339,7 +1346,7 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 		if (number < 0) {
 			negative = true;
 		}
-		decimal_visibility = configuration.force_decimals ? DecimalVisibility.ALL : DecimalVisibility.STRIP_TRAILING_ZEROS;
+		decimal_visibility = configuration.force_decimals ? DecimalVisibility.SIGNIFICANT_DIGITS : DecimalVisibility.STRIP_TRAILING_ZEROS;
 		formatter.enableLeadingZero(configuration.leading_zero);
 		formatter.setDecimalDelimiter(configuration.decimal_delimiter);
 		formatter.setDecimalPrecision(configuration.decimal_length);
@@ -1348,6 +1355,7 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 		formatter.setGroupSize(configuration.group_length);
 		formatter.setNegativePrefix("");
 		formatter.setNegativeSuffix("");
+		formatter.setRoundingCallback(Math.round);
 		result = formatter.formatNumber(number);
 		
 		// apply the affixes
