@@ -30,8 +30,7 @@ blazegears.formatting = (typeof blazegears.formatting === "undefined") ? {} : bl
 
 // Enum: blazegears.formatting.DecimalVisibility
 blazegears.formatting.DecimalVisibility = {
-	NONE: 0,
-	SIGNIFICANT_DIGITS: 1,
+	FULL_PRECISION: 1,
 	MINIMUM_ONE_DIGIT: 2,
 	STRIP_TRAILING_ZEROS: 3
 };
@@ -437,7 +436,7 @@ blazegears.formatting.DateFormatter.prototype._prepareDate = function(date) {
 blazegears.formatting.NumberFormatter = function() {
 	this._decimal_delimiter = ".";
 	this._decimal_precision = 0;
-	this._decimal_visibility = blazegears.formatting.DecimalVisibility.SIGNIFICANT_DIGITS;
+	this._decimal_visibility = blazegears.formatting.DecimalVisibility.FULL_PRECISION;
 	this._group_delimiter = ",";
 	this._group_size = 3;
 	this._is_leading_zero_enabled = true;
@@ -449,94 +448,88 @@ blazegears.formatting.NumberFormatter = function() {
 // Method: formatNumber
 blazegears.formatting.NumberFormatter.prototype.formatNumber = function(number) {
 	var DecimalVisibility = blazegears.formatting.DecimalVisibility;
-	var counter = 0;
-	var decimal;
-	var digits;
-	var groups = [];
-	var negative = false;
-	var result = number;
+	var decimal_part;
+	var decimal_significand;
+	var group_count;
+	var group_offset;
+	var groups;
+	var has_decimal_part = true;
+	var i;
+	var integer_part;
+	var integer_string;
+	var integer_string_length;
+	var is_negative;
+	var result;
 	
 	// validate the number
 	if (!blazegears.isNumber(number)) {
 		number = parseFloat(number);
+		if (isNaN(number)) {
+			number = 0;
+		}
 	}
+	is_negative = number < 0;
 	
-	// get some info of the number
-	if (number < 0) {
-		number = Math.abs(number);
-		negative = true;
-	}
-	decimal = number - Math.floor(number);
-	number = Math.floor(number);
-	digits = number.toString().length % this._group_size;
+	// separate the number into integer and decimal parts
+	integer_part = number > 0 ? Math.floor(number) : Math.ceil(number);
+	decimal_part = number - integer_part;
 	
-	// create the decimals
+	// create the decimal string
 	if (this._decimal_precision > 0) {
-		// calculate the actual decimal part
-		if (negative) {
-			decimal *= -1;
-		}
-		decimal = this._rounding_callback.call(this, decimal * Math.pow(10, this._decimal_precision));
-		
-		var absolute_decimal = Math.abs(decimal * Math.pow(10, -this._decimal_precision));
-		if (absolute_decimal >= 1) {
-		}
-		
-		decimal = Math.abs(decimal).toString();
-		while (decimal.length < this._decimal_precision) {
-			decimal = "0" + decimal;
-		}
-		
-		// remove the unnecessary zeroes
-		if (this._decimal_visibility != DecimalVisibility.SIGNIFICANT_DIGITS) {
-			for (var i = decimal.length - 1; i >= 0; i--) {
-				if (decimal.charAt(i) == "0") {
-					decimal = decimal.substr(0, i);
-				} else {
-					break;
-				}
+		decimal_significand = Math.abs(this._rounding_callback.call(this, Math.pow(10, this._decimal_precision) * decimal_part)).toString();
+		if (this._decimal_visibility === DecimalVisibility.FULL_PRECISION) {
+			while (decimal_significand.length < this._decimal_precision) {
+				decimal_significand += "0";
 			}
-		}
-		
-		// apply the decimal separator
-		if (decimal.length > 0) {
-			decimal = this._decimal_delimiter + decimal;
-		} else if (this._decimal_visibility === DecimalVisibility.MINIMUM_ONE_DIGIT) {
-			decimal = this._decimal_delimiter + "0";
+		} else if (this._decimal_visibility === DecimalVisibility.STRIP_TRAILING_ZEROS) {
+			while (decimal_significand.length > 0 && decimal_significand.charAt(decimal_significand.length - 1) === "0") {
+				decimal_significand = decimal_significand.substr(0, decimal_significand.length - 1);
+			}
+		} else if (decimal_significand.length === 0) {
+			decimal_significand += "0";
 		}
 	} else {
-		decimal = "";
+		has_decimal_part = false;
+		integer_part = this._rounding_callback.call(this, number);
 	}
 	
-	// if the first group won't be full then assign the leading digits there
-	number = number.toString();
-	if (digits != 0) {
-		groups[0] = number.substr(0, digits);
-		number = number.substr(digits);
-		counter++;
+	// separate the integer part into groups
+	integer_string = Math.abs(integer_part).toString();
+	if (this._group_size > 0 && this._group_delimiter.length > 0 && integer_string.length > this._group_delimiter.length) {
+		integer_string_length = integer_string.length;
+		group_count = Math.ceil(integer_string_length / this._group_size);
+		groups = [];
+		
+		for (i = 0; i < group_count; ++i) {
+			group_offset = integer_string_length - this._group_size * (group_count - i);
+			if (group_offset < 0) {
+				groups.push(integer_string.substr(0, this._group_size + group_offset));
+			} else {
+				groups.push(integer_string.substr(group_offset, this._group_size));
+			}
+		}
+		integer_string = groups.join(this._group_delimiter);
 	}
 	
-	// assign the digits to their groups
-	while (number.length > 0) {
-		groups[counter] = number.substr(0, this._group_size);
-		number = number.substr(this._group_size);
-		counter++;
+	// combine the parts into the result
+	if (Math.abs(integer_part) > 0) {
+		result = integer_string;
+	} else if (this._is_leading_zero_enabled) {
+		result = "0";
+	} else {
+		result = "";
+	}
+	if (has_decimal_part && decimal_significand.length > 0) {
+		result += this._decimal_delimiter + decimal_significand;
+	}
+	if (is_negative) {
+		result = this._negative_prefix + result + this._negative_suffix;
+	}
+	if (result.length === 0) {
+		result = "0";
 	}
 	
-	// remove the leading zero
-	if (!this._is_leading_zero_enabled && groups.length == 1 && parseInt(groups[0]) == 0 && decimal.length > 0) {
-		groups[0] = "";
-	}
-	
-	// join the groups and the decimals
-	number = groups.join(this._group_delimiter) + decimal;
-	
-	// apply the negative affixes
-	if (negative) {
-		number = this._negative_prefix + number + this._negative_suffix;
-	}
-	
-	return number;
+	return result;
 }
 
 // Method: enableLeadingZero
@@ -1346,7 +1339,7 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 		if (number < 0) {
 			negative = true;
 		}
-		decimal_visibility = configuration.force_decimals ? DecimalVisibility.SIGNIFICANT_DIGITS : DecimalVisibility.STRIP_TRAILING_ZEROS;
+		decimal_visibility = configuration.force_decimals ? DecimalVisibility.FULL_PRECISION : DecimalVisibility.STRIP_TRAILING_ZEROS;
 		formatter.enableLeadingZero(configuration.leading_zero);
 		formatter.setDecimalDelimiter(configuration.decimal_delimiter);
 		formatter.setDecimalPrecision(configuration.decimal_length);
