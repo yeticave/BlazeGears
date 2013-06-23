@@ -3,7 +3,7 @@ var blazegears = (typeof blazegears === "undefined") ? {} : blazegears;
 blazegears.bgtl = (typeof blazegears.bgtl === "undefined") ? {} : blazegears.bgtl;
 blazegears.bgtl.tests = (typeof blazegears.bgtl.tests === "undefined") ? {} : blazegears.bgtl.tests;
 
-blazegears.bgtl.tests.compilerAndTemplateTest = function() {
+blazegears.bgtl.tests.compilingAndRenderingTest = function() {
 	var compiler = new blazegears.bgtl.Compiler();
 	var template;
 	
@@ -203,4 +203,4 @@ blazegears.bgtl.tests.compilerAndTemplateTest = function() {
 	verifyError(compiler, "\n\n    {%foreach (var i as this.error())%}test{%end%}", null, 3, 5, blazegears.bgtl.RenderingError, "RenderingError", "Verify that an invalid foreach-as construct argument causes an error.");
 	verifyError(compiler, "\n\n    {%foreach (var i in this.error())%}test{%end%}", null, 3, 5, blazegears.bgtl.RenderingError, "RenderingError", "Verify that an invalid foreach-in construct argument causes an error.");
 }
-test("Compiler & Template", blazegears.bgtl.tests.compilerAndTemplateTest);
+test("Compiling & Rendering", blazegears.bgtl.tests.compilingAndRenderingTest);
