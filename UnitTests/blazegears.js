@@ -28,8 +28,8 @@ blazegears.tests.typeDeterminationTest = function() {
 	
 	// undefined
 	var undefined_argument;
-	ok(!blazegears.is(undefined_argument), "Verify that the variable is undefined.");
-	ok(blazegears.is(null), "Verify that null is not undefined.");
+	ok(blazegears.isUndefined(undefined_argument), "Verify that the variable is undefined.");
+	ok(!blazegears.isUndefined(null), "Verify that null is not undefined.");
 	
 	// anonymous object
 	var constructed_object = new Object();

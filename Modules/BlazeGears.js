@@ -432,7 +432,7 @@ blazegears.includeJs = function(filename, once) {
 }
 
 // Function: is [Deprecated]
-// Alias for <isDefined>.
+// This function is deprecated, use <isUndefined> instead. Determines if a variable is not undefined.
 blazegears.is = function(variable) {
 	return typeof variable != "undefined";
 }
@@ -485,18 +485,6 @@ blazegears.isBoolean = function(variable) {
 //   Returns true if the variable is a date object, else false.
 blazegears.isDate = function(variable) {
 	return variable instanceof Date
-}
-
-// Function: isDefined
-// Determines if a variable is not undefined.
-// 
-// Arguments:
-//   variable - The variable to be checked.
-// 
-// Return Value:
-//   Returns true if the variable is not undefined, else false.
-blazegears.isDefined = function(variable) {
-	return typeof variable != "undefined";
 }
 
 // Function: isFunction
@@ -576,6 +564,18 @@ blazegears.isRegExp = function(variable) {
 //   Returns true if the variable is a string, else false.
 blazegears.isString = function(variable) {
 	return variable instanceof String || typeof variable == "string";
+}
+
+// Function: isUndefined
+// Determines if a variable is undefined.
+// 
+// Arguments:
+//   variable - The variable to be checked.
+// 
+// Return Value:
+//   Returns true if the variable is undefined, else false.
+blazegears.isUndefined = function(variable) {
+	return typeof variable === "undefined";
 }
 
 // Function: renderFlash [Deprecated]
@@ -660,7 +660,7 @@ blazegears._forceParseInt = function(value, default_value) {
 	var result = parseInt(value);
 	
 	if (isNaN(result)) {
-		result = blazegears.isDefined(default_value) ? default_value : 0
+		result = blazegears.isUndefined(default_value) ? 0 : default_value;
 	}
 	
 	return result;
@@ -707,7 +707,7 @@ blazegears.Error = function(message, inner_error) {
 	Error.call(this);
 	this.message = blazegears.Error._composeMessage("An error occurred", message, inner_error);
 	this.name = "blazegears.Error";
-	this._inner_error = blazegears.isDefined(inner_error) ? inner_error : null;
+	this._inner_error = blazegears.isUndefined(inner_error) ? null : inner_error;
 }
 blazegears.Error.prototype = new Error();
 blazegears.Error.prototype.constructor = blazegears.Error;
@@ -721,19 +721,19 @@ blazegears.Error.prototype.getInnerError = function() {
 blazegears.Error._composeMessage = function(default_message, message, inner_error) {
 	var result;
 	
-	if (blazegears.isDefined(message) && message !== null) {
-		result = message.toString();
-	} else {
+	if (blazegears.isUndefined(message) || message === null) {
 		result = default_message;
-		if (blazegears.isDefined(inner_error) && inner_error !== null) {
+		if (blazegears.isUndefined(inner_error) || inner_error === null) {
+			result += ".";
+		} else {
 			if (inner_error instanceof Error) {
 				result += ": " + inner_error.message.toString();
 			} else {
 				result += ": " + inner_error.toString();
 			}
-		} else {
-			result += ".";
 		}
+	} else {
+		result = message.toString();
 	}
 	
 	return result;

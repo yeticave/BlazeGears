@@ -408,9 +408,9 @@ blazegears.bgtl._DelimiterMatch = function(delimiter, offset) {
 
 // represents a valid keyword parser keyword
 blazegears.bgtl._Keyword = function(name, requires_argument, is_block, end_keyword) {
-	if (!blazegears.isDefined(end_keyword)) end_keyword = null;
-	if (!blazegears.isDefined(is_block)) is_block = false;
-	if (!blazegears.isDefined(requires_argument)) requires_argument = false;
+	if (blazegears.isUndefined(end_keyword)) end_keyword = null;
+	if (blazegears.isUndefined(is_block)) is_block = false;
+	if (blazegears.isUndefined(requires_argument)) requires_argument = false;
 	this.end_keyword = end_keyword;
 	this.is_block = is_block;
 	this.name = name;
@@ -435,10 +435,10 @@ blazegears.bgtl._Lexer.prototype.createKeyword = function(name, requires_argumen
 
 // finds the next subtring that isn't preceded with a backslash
 blazegears.bgtl._Lexer.prototype.findNextDelimiter = function(needles, haystack, offset, must_find, line_number, column_number, is_escapeable, ignore_strings, ignore_parenthesised) {
-	if (!blazegears.isDefined(must_find)) { must_find = false; }
-	if (!blazegears.isDefined(is_escapeable)) { is_escapeable = true; }
-	if (!blazegears.isDefined(ignore_parenthesised)) { ignore_parenthesised = true; }
-	if (!blazegears.isDefined(ignore_strings)) { ignore_strings = true; }
+	if (blazegears.isUndefined(must_find)) { must_find = false; }
+	if (blazegears.isUndefined(is_escapeable)) { is_escapeable = true; }
+	if (blazegears.isUndefined(ignore_parenthesised)) { ignore_parenthesised = true; }
+	if (blazegears.isUndefined(ignore_strings)) { ignore_strings = true; }
 	
 	var DelimiterMatch = blazegears.bgtl._DelimiterMatch;
 	var current_offset;
@@ -544,7 +544,7 @@ blazegears.bgtl._Lexer.prototype.findNextTag = function(lexeme, offset) {
 			}
 			result.keyword = this.getKeyword(result);
 			
-			if (construct_tag_parts.length >= 4 && blazegears.isDefined(construct_tag_parts[3]) && construct_tag_parts[3].length > 0) {
+			if (construct_tag_parts.length >= 4 && !blazegears.isUndefined(construct_tag_parts[3]) && construct_tag_parts[3].length > 0) {
 				argument_opening = this.findNextDelimiter(["("], tag_body, 0, false, result.line_number, result.column_number, false);
 				argument_closing = this.findNextDelimiter([")"], tag_body, argument_opening.offset + 1, true, result.line_number, result.column_number, true, false, false);
 				result.argument = tag_body.substr(argument_opening.offset + 1, argument_closing.offset - 1 - argument_opening.offset);
@@ -581,8 +581,8 @@ blazegears.bgtl._Lexer.prototype.getKeyword = function(token) {
 
 // parses a lexeme and converts it into a token collection
 blazegears.bgtl._Lexer.prototype.tokenizeLexeme = function(lexeme, offset, closing_keyword) {
-	if (!blazegears.isDefined(closing_keyword)) closing_keyword = null;
-	if (!blazegears.isDefined(offset)) offset = 0;
+	if (blazegears.isUndefined(closing_keyword)) closing_keyword = null;
+	if (blazegears.isUndefined(offset)) offset = 0;
 	
 	var Token = blazegears.bgtl._Token;
 	var TokenType = blazegears.bgtl._TokenType;
