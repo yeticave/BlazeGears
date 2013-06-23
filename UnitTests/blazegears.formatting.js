@@ -97,12 +97,13 @@ blazegears.formatting.tests.numberFormattingTest = function() {
 	strictEqual(formatter.formatNumber("z"), "0.00", "Try formatting a NaN value.");
 	
 	// decimal visibility
-	formatter.setDecimalVisibility(DecimalVisibility.MINIMUM_ONE_DIGIT);
-	strictEqual(formatter.formatNumber(1.00), "1.0", "Show at least one decimal digits.");
-	formatter.setDecimalVisibility(DecimalVisibility.STRIP_TRAILING_ZEROS);
-	strictEqual(formatter.formatNumber(1.10), "1.1", "Strip the trailing zeros from the decimal digits.");
 	formatter.setDecimalVisibility(DecimalVisibility.FULL_PRECISION);
 	strictEqual(formatter.formatNumber(1.00), "1.00", "Show all the significant decimal digits.");
+	formatter.setDecimalVisibility(DecimalVisibility.MINIMUM_ONE_DIGIT);
+	strictEqual(formatter.formatNumber(1.10), "1.1", "Show at least one decimal digits.");
+	formatter.setDecimalVisibility(DecimalVisibility.STRIP_TRAILING_ZEROS);
+	strictEqual(formatter.formatNumber(1.10), "1.1", "Strip the trailing zeros from a decimal number.");
+	strictEqual(formatter.formatNumber(1), "1", "Strip the trailing zeros from an integer.");
 	formatter.setDecimalVisibility(DecimalVisibility.FULL_PRECISION);
 	
 	// decimal precision

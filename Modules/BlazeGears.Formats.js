@@ -481,11 +481,12 @@ blazegears.formatting.NumberFormatter.prototype.formatNumber = function(number) 
 			while (decimal_significand.length < this._decimal_precision) {
 				decimal_significand += "0";
 			}
-		} else if (this._decimal_visibility === DecimalVisibility.STRIP_TRAILING_ZEROS) {
+		} else {
 			while (decimal_significand.length > 0 && decimal_significand.charAt(decimal_significand.length - 1) === "0") {
 				decimal_significand = decimal_significand.substr(0, decimal_significand.length - 1);
 			}
-		} else if (decimal_significand.length === 0) {
+		}
+		if (decimal_significand.length === 0 && this._decimal_visibility === DecimalVisibility.MINIMUM_ONE_DIGIT) {
 			decimal_significand += "0";
 		}
 	} else {
