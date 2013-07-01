@@ -184,8 +184,15 @@ blazegears.formatting.tests.phpDateFormattingTest = function() {
 	var specifier;
 	var timestamp;
 	
+	// literals
+	formatter.setDateFormat("\\t\\e\\s\\t");
+	strictEqual(formatter.formatDate(new Date()), "test", "Format a literal.");
+	formatter.setDateFormat("\\\\");
+	strictEqual(formatter.formatDate(new Date()), "\\", "Format an escaped backslash.");
+	
 	formatter.setTimeZoneOffset(TimeZoneOffset.UTC);
 	for (specifier in results) {
+		formatter.setDateFormat(specifier);
 		if (blazegears.isInArray(specifier, broken_specifiers)) {
 			continue;
 		}
@@ -193,7 +200,7 @@ blazegears.formatting.tests.phpDateFormattingTest = function() {
 			result = {};
 			for (timestamp in results[specifier]) {
 				if (results[specifier].hasOwnProperty(timestamp)) {
-					result[timestamp] = formatter.formatDate(parseInt(timestamp) * 1000, specifier);
+					result[timestamp] = formatter.formatDate(parseInt(timestamp) * 1000);
 				}
 			}
 			deepEqual(result, results[specifier], "Use the " + specifier + " specifier.");
@@ -211,8 +218,15 @@ blazegears.formatting.tests.unixDateFormattingTest = function() {
 	var specifier;
 	var timestamp;
 	
+	// literals
+	formatter.setDateFormat("test");
+	strictEqual(formatter.formatDate(new Date()), "test", "Format a literal.");
+	formatter.setDateFormat("%%");
+	strictEqual(formatter.formatDate(new Date()), "%", "Format an escaped percentage mark.");
+	
 	formatter.setTimeZoneOffset(TimeZoneOffset.UTC);
 	for (specifier in results) {
+		formatter.setDateFormat("%" + specifier);
 		if (blazegears.isInArray(specifier, broken_specifiers)) {
 			continue;
 		}
@@ -220,7 +234,7 @@ blazegears.formatting.tests.unixDateFormattingTest = function() {
 			result = {};
 			for (timestamp in results[specifier]) {
 				if (results[specifier].hasOwnProperty(timestamp)) {
-					result[timestamp] = formatter.formatDate(parseInt(timestamp) * 1000, "%" + specifier);
+					result[timestamp] = formatter.formatDate(parseInt(timestamp) * 1000);
 				}
 			}
 			deepEqual(result, results[specifier], "Use the %" + specifier + " specifier.");

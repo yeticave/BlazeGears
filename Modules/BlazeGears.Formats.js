@@ -43,6 +43,8 @@ blazegears.formatting.TimeZoneOffset = {
 
 // Class: blazegears.formatting.DateFormatter
 blazegears.formatting.DateFormatter = function() {
+	this._format = null;
+	this._format_cache = null;
 	this._is_utc_time_enabled = false;
 	this._full_day_names = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 	this._full_month_names = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -50,11 +52,6 @@ blazegears.formatting.DateFormatter = function() {
 	this._ordinal_suffixes = ["st", "nd", "rd", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th", "th", "st"];
 	this._short_day_names = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 	this._short_month_names = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-}
-
-// Method: formatDate
-blazegears.formatting.DateFormatter.prototype.formatDate = function(date, format) {
-	throw new blazegears.NotOverriddenError();
 }
 
 // Method: getAbbreviatedNamesOfDays
@@ -94,6 +91,19 @@ blazegears.formatting.DateFormatter.prototype.setAbbreviatedNamesOfMonths = func
 	this._short_month_names = [];
 	for (var i = 0; i < 12; ++i) {
 		this._short_month_names.push(names_of_months[i].toString());
+	}
+}
+
+// Method: getDateFormat
+blazegears.formatting.DateFormatter.prototype.getDateFormat = function() {
+	return this._format;
+}
+
+// Method: setDateFormat
+blazegears.formatting.DateFormatter.prototype.setDateFormat = function(format) {
+	if (format !== this._format) {
+		this._format = format;
+		this._format_cache = null;
 	}
 }
 
@@ -156,6 +166,39 @@ blazegears.formatting.DateFormatter.prototype.setTimeZoneOffset = function(time_
 	} else if (time_zone_offset == TimeZoneOffset.UTC) {
 		this._is_utc_time_enabled = true;
 	}
+}
+
+// Method: formatDate
+blazegears.formatting.DateFormatter.prototype.formatDate = function(date) {
+	var format_cache;
+	var format_cache_length;
+	var i;
+	var token;
+	var result = "";
+	
+	date = this._prepareDate(date);
+	if (this._format_cache === null) {
+		this._format_cache = [];
+		this.parseDateFormat(this._format_cache, this._format);
+	}
+	format_cache = this._format_cache;
+	format_cache_length = format_cache.length;
+	
+	for (i = 0; i < format_cache_length; ++i) {
+		token = format_cache[i];
+		if (blazegears.isFunction(token)) {
+			result += token.call(this, date).toString();
+		} else {
+			result += token.toString();
+		}
+	}
+	
+	return result;
+}
+
+// Method: generateDateFormatCache
+blazegears.formatting.DateFormatter.prototype.parseDateFormat = function(result, format) {
+	throw blazegears.NotOverriddenError();
 }
 
 // short names of days (sun - sat)
@@ -277,6 +320,11 @@ blazegears.formatting.DateFormatter.prototype._getLastDayOfYear = function(date)
 	var last_day = new Date(this._getFullYear(date), 11, 31, 0, 0, 0, 0);
 	
 	return this._getDay(last_day);
+}
+
+// leap years (0 - 1)
+blazegears.formatting.DateFormatter.prototype._getLeapYear = function(date) {
+	return this._isLeapYear(date) ? "1" : "0";
 }
 
 // short lowercase meridiems (am - pm)
@@ -421,8 +469,7 @@ blazegears.formatting.DateFormatter.prototype._prepareDate = function(date) {
 	var timestamp;
 	
 	if (blazegears.isDate(date)) {
-		timestamp = date.getTime();
-		result = new Date(timestamp);
+		result = date;
 	} else if (blazegears.isNumber(date)) {
 		result = new Date(date);
 	} else {
@@ -626,16 +673,15 @@ blazegears.formatting.NumberFormatter.prototype.setRoundingCallback = function(r
 // Class: blazegears.formatting.PHPDateFormatter
 blazegears.formatting.PHPDateFormatter = function() {
 	blazegears.formatting.DateFormatter.call(this);
+	this._format = "c";
 }
 blazegears.formatting.PHPDateFormatter.prototype = new blazegears.formatting.DateFormatter();
 blazegears.formatting.PHPDateFormatter.prototype.constructor = blazegears.formatting.PHPDateFormatter;
 
-// Method: formatDate
-blazegears.formatting.PHPDateFormatter.prototype.formatDate = function(date, format) {
+// Method: generateDateFormatCache
+blazegears.formatting.PHPDateFormatter.prototype.parseDateFormat = function(result, format) {
 	var character;
-	var result = "";
 	
-	date = this._prepareDate(date);
 	for (var i = 0; i < format.length; i++) {
 		character = format.charAt(i);
 		switch(character) {
@@ -643,188 +689,221 @@ blazegears.formatting.PHPDateFormatter.prototype.formatDate = function(date, for
 				i++;
 				character = format.charAt(i);
 				if (i < format.length) {
-					result += character;
+					if (result.length === 0 || blazegears.isFunction(result[result.length - 1])) {
+						result.push(character);
+					} else {
+						result[result.length - 1] += character;
+					}
 				}
 				break;
 			
 			case "A": // abbreviated upper-case meridiems (AM - PM)
-				result += this._getUpperCaseMeridiem(date);
+				result.push(this._getUpperCaseMeridiem);
 				break;
 			
 			case "B": // swatch internet time (000 - 999)
-				result += this._getSwatchInternetTime(date);
+				result.push(this._getSwatchInternetTime);
 				break;
 			
 			case "D": // abbreviated weekday names (Sun - Sat)
-				result += this._getAbbreviatedDayName(date);
+				result.push(this._getAbbreviatedDayName);
 				break;
 			
 			case "F": // month names (January - December)
-				result += this._getMonthName(date);
+				result.push(this._getMonthName);
 				break;
 			
 			case "G": // international hours (0 - 23)
-				result += this._getHours(date);
+				result.push(this._getHours);
 				break;
 			
 			case "H": // international hours (00 - 23)
-				result += blazegears._padStringLeft(this._getHours(date), "0", 2);
+				result.push(this._getInternationalHours);
 				break;
 			
 			case "I": // daylight saving time (0 - 1)
-				result += 0;
+				result.push("0");
 				break;
 			
 			case "L": // leap years (0 - 1)
-				result += this._isLeapYear(date) ? "1" : "0";
+				result.push(this._getLeapYear);
 				break;
 			
 			case "M": // abbreviated month names (Jan - Dec)
-				result += this._getAbbreviatedMonthName(date);
+				result.push(this._getAbbreviatedMonthName);
 				break;
 			
 			case "N": // weekdays, starting on monday (1 - 7)
-				result += this._getDayOfWeek(date);
+				result.push(this._getDayOfWeek);
 				break;
 			
 			case "O": // time zone offset in hours and minutes (-1200 - +1300)
-				//result += this._formatUnixDate(date, "%z");
 				break;
 			
 			case "P": // time zone offset in hours and minutes (-12:00 - +13:00)
-				//result += this._formatUnixDate(date, "%:z");
 				break;
 			
 			case "S": // ordinals for the days of the month (st, nd, rd, or th)
-				result += this._getOrdinalSuffix(date);
+				result.push(this._getOrdinalSuffix);
 				break;
 			
 			case "T": // abbreviated time zone names (e.g. UTC)
-				//result += "";
 				break;
 			
 			case "U": // unix timestamp
-				result += this._getTimestamp(date);
+				result.push(this._getTimestamp);
 				break;
 			
 			case "W": // iso-8601 weeks (01 - 53)
-				result += blazegears._padStringLeft(this._getIso8601Week(date), "0", 2);
+				result.push(this._getPaddedIso8601Week);
 				break;
 			
 			case "Y": // years (1970 - 2038)
-				result += this._getFullYear(date);
+				result.push(this._getFullYear);
 				break;
 			
 			case "Z": // time zone offset in seconds (-43200 - 50400)
-				//result += "";
 				break;
 			
 			case "a": // abbreviated lower-case meridiems (am - pm)
-				result += this._getLowerCaseMeridiem(date);
+				result.push(this._getLowerCaseMeridiem);
 				break;
 			
 			case "c": // same as "Y-m-d\\TH:i:sP"
-				result += this.formatDate(date, "Y-m-d\\TH:i:sP");
+				this.parseDateFormat(result, "Y-m-d\\TH:i:sP");
 				break;
 			
 			case "d": // days (01 - 31)
-				result += blazegears._padStringLeft(this._getDate(date), "0", 2);
+				result.push(this._getPaddedDays);
 				break;
 			
 			case "e": // time zone names (e.g. Nuku'alofa)
-				//result += "";
 				break;
 			
 			case "g": // hours (1 - 12)
-				result += this._getTwelveHourHours(date);
+				result.push(this._getTwelveHourHours);
 				break;
 			
 			case "h": // hours (01 - 12)
-				result += blazegears._padStringLeft(this._getTwelveHourHours(date), "0", 2);
+				result.push(this._getPaddedShortHours);
 				break;
 			
 			case "i": // minutes (00 - 59)
-				result += blazegears._padStringLeft(this._getMinutes(date), "0", 2);
+				result.push(this._getPaddedMinutes);
 				break;
 			
 			case "j": // days (1 - 31)
-				result += this._getDate(date);
+				result.push(this._getDate);
 				break;
 			
 			case "l": // weekday names (Sunday - Saturday)
-				result += this._getDayName(date);
+				result.push(this._getDayName);
 				break;
 			
 			case "m": // months (01 - 12)
-				result += blazegears._padStringLeft(this._getMonth(date) + 1, "0", 2);
+				result.push(this._getPaddedMonth);
 				break;
 			
 			case "n": // months (1 - 12)
-				result += this._getMonth(date) + 1;
+				result.push(this._getIncrementedMonth);
 				break;
 			
 			case "o": // iso-8601 years (1970 - 2038)
-				result += this._getIso8601Year(date);
+				result.push(this._getIso8601Year);
 				break;
 			
 			case "r": // same as "D, d M Y H:i:s O"
-				result += this._formatPhpDate(date, "D, d M Y H:i:s O");
+				this.parseDateFormat(result, "D, d M Y H:i:s O");
 				break;
 			
 			case "s": // seconds (00 - 59)
-				result += blazegears._padStringLeft(this._getSeconds(date), "0", 2);
+				result.push(this._getPaddedSeconds);
 				break;
 			
 			case "t": // number of days in the month (28 - 31)
-				result += this._getNumberOfDaysInMonth(date);
+				result.push(this._getNumberOfDaysInMonth);
 				break;
 			
 			case "u": // microseconds (000000 - 999999)
-				result += "000000";
+				result.push("000000");
 				break;
 			
 			case "w": // weekdays, starting on sunday (0 - 6)
-				result += this._getDay(date);
+				result.push(this._getDay);
 				break;
 			
 			case "y": // abbreviated years (00 - 99)
-				result += this._getAbbreviatedYear(date);
+				result.push(this._getAbbreviatedYear);
 				break;
 			
 			case "z": // days of the year (0 - 365)
-				result += this._getDayOfYear(date) - 1;
+				result.push(this._getDecrementedDayOfYear);
 				break;
 			
 			default:
-				result += character;
+				result.push(character);
 		}
 	}
-	
-	return result;
+}
+
+blazegears.formatting.PHPDateFormatter.prototype._getDecrementedDayOfYear = function(date) {
+	return this._getDayOfYear(date) - 1;
+}
+
+blazegears.formatting.PHPDateFormatter.prototype._getInternationalHours = function(date) {
+	return blazegears._padStringLeft(this._getHours(date), "0", 2);
+}
+
+blazegears.formatting.PHPDateFormatter.prototype._getIncrementedMonth = function(date) {
+	return this._getMonth(date) + 1;
+}
+
+blazegears.formatting.PHPDateFormatter.prototype._getPaddedDays = function(date) {
+	return blazegears._padStringLeft(this._getDate(date), "0", 2);
+}
+
+blazegears.formatting.PHPDateFormatter.prototype._getPaddedIso8601Week = function(date) {
+	return blazegears._padStringLeft(this._getIso8601Week(date), "0", 2);
+}
+
+blazegears.formatting.PHPDateFormatter.prototype._getPaddedMinutes = function(date) {
+	return blazegears._padStringLeft(this._getMinutes(date), "0", 2);
+}
+
+blazegears.formatting.PHPDateFormatter.prototype._getPaddedMonth = function(date) {
+	return blazegears._padStringLeft(this._getMonth(date) + 1, "0", 2);
+}
+
+blazegears.formatting.PHPDateFormatter.prototype._getPaddedSeconds = function(date) {
+	return blazegears._padStringLeft(this._getSeconds(date), "0", 2);
+}
+
+blazegears.formatting.PHPDateFormatter.prototype._getPaddedShortHours = function(date) {
+	return blazegears._padStringLeft(this._getTwelveHourHours(date), "0", 2);
 }
 
 // Class: blazegears.formatting.UnixDateFormatter
 blazegears.formatting.UnixDateFormatter = function() {
 	blazegears.formatting.DateFormatter.call(this);
+	this._format = "%Y-%m-%dT%H:%M:%S%:z";
+	"Y-m-d\\TH:i:sP"
 }
 blazegears.formatting.UnixDateFormatter.prototype = new blazegears.formatting.DateFormatter();
 blazegears.formatting.UnixDateFormatter.prototype.constructor = blazegears.formatting.UnixDateFormatter;
 
-// Method: formatDate
-blazegears.formatting.UnixDateFormatter.prototype.formatDate = function(date, format) {
+// Method: generateDateFormatCache
+blazegears.formatting.UnixDateFormatter.prototype.parseDateFormat = function(result, format) {
 	var character;
-	var chunk;
+	var closure;
 	var has_padding_modifier = false;
 	var local_date = false;
 	var local_numbers = false;
 	var opposite;
 	var padding;
 	var precision;
-	var result = "";
 	var specifier;
 	var upper;
 	
-	date = this._prepareDate(date);
 	for (var i = 0; i < format.length; i++) {
 		character = format.charAt(i);
 		if (character == "%") {
@@ -887,196 +966,323 @@ blazegears.formatting.UnixDateFormatter.prototype.formatDate = function(date, fo
 			
 			switch (character) {
 				case "%":
-					chunk = "%";
+					result.push("%");
 					break;
 				
 				case "A": // weekday names (Sunday - Saturday)
-					chunk = this._getDayName(date);
-					if (upper || opposite) {
-						chunk = chunk.toUpperCase();
+					closure = function(upper, opposite) {
+						return function(date) {
+							var result = this._getDayName(date);
+							if (upper || opposite) {
+								result = result.toUpperCase();
+							}
+							return result;
+						}
 					}
+					result.push(closure(upper, opposite));
 					break;
 				
 				case "B": // month names (January - December)
-					chunk = this._getMonthName(date);
-					if (upper || opposite) {
-						chunk = chunk.toUpperCase();
+					closure = function(upper, opposite) {
+						return function(date) {
+							var result = this._getMonthName(date);
+							if (upper || opposite) {
+								result = result.toUpperCase();
+							}
+							return result;
+						}
 					}
+					result.push(closure(upper, opposite));
 					break;
 				
 				case "C": // centuries (20 - 21)
-					chunk = this._getCentury(date) - 1;
+					result.push(this._getDecrementedCentury);
 					break;
 				
 				case "D": // same as "%m/%d/%y"
-					chunk = this.formatDate(date, "%m/%d/%y");
+					this.parseDateFormat(result, "%m/%d/%y");
 					break;
 				
 				case "F": // same as "%Y-%m-%d"
-					chunk = this.formatDate(date, "%Y-%m-%d");
+					this.parseDateFormat(result, "%Y-%m-%d");
 					break;
 				
 				case "G": // iso-8601 years (1970 - 2038)
-					chunk = this._getIso8601Year(date);
+					result.push(this._getIso8601Year);
 					break;
 				
 				case "H": // international hours (00 - 23)
-					chunk = blazegears._padStringLeft(this._getHours(date), padding, 2);
+					closure = function(padding) {
+						return function(date) {
+							return blazegears._padStringLeft(this._getHours(date), padding, 2);
+						}
+					}
+					result.push(closure(padding));
 					break;
 				
 				case "I": // hours (01 - 12)
-					chunk = blazegears._padStringLeft(this._getTwelveHourHours(date), padding, 2);
+					closure = function(padding) {
+						return function(date) {
+							return blazegears._padStringLeft(this._getTwelveHourHours(date), padding, 2);
+						}
+					}
+					result.push(closure(padding));
 					break;
 				
 				case "L": // leap years (0 - 1)
-					chunk = this._isLeapYear(date) ? "1" : "0";
+					result.push(this._getLeapYear);
 					break;
 				
 				case "M": // minutes (00 - 59)
-					chunk = blazegears._padStringLeft(this._getMinutes(date), padding, 2);
+					closure = function(padding) {
+						return function(date) {
+							return blazegears._padStringLeft(this._getMinutes(date), padding, 2);
+						}
+					}
+					result.push(closure(padding));
 					break;
 				
 				case "N": // nanoseconds (000000000 - 999999999)
-					chunk = "000000000";
+					result.push("000000000");
 					break;
 				
 				case "P": // abbreviated lower-case meridiems (am - pm)
-					chunk = this._getLowerCaseMeridiem(date);
+					result.push(this._getLowerCaseMeridiem);
 					break;
 				
 				case "R": // same as "%H:%M"
-					chunk = this.formatDate(date, "%H:%M");
+					this.parseDateFormat(result, "%H:%M");
 					break;
 				
 				case "S": // seconds (00 - 59)
-					chunk = blazegears._padStringLeft(this._getSeconds(date), padding, 2);
+					closure = function(padding) {
+						return function(date) {
+							return blazegears._padStringLeft(this._getSeconds(date), padding, 2);
+						}
+					}
+					result.push(closure(padding));
 					break;
 				
 				case "T": // same as "%H:%M:%S".
 				case "X":
-					chunk = this.formatDate(date, "%H:%M:%S");
+					this.parseDateFormat(result, "%H:%M:%S");
 					break;
 				
 				case "U": // weeks, staring on sunday (00 - 53)
-					chunk = blazegears._padStringLeft(this._getSundayWeek(date), padding, 2);
+					closure = function(padding) {
+						return function(date) {
+							return blazegears._padStringLeft(this._getSundayWeek(date), padding, 2);
+						}
+					}
+					result.push(closure(padding));
 					break;
 				
 				case "V": // iso-8601 weeks (01 - 53)
-					chunk = blazegears._padStringLeft(this._getIso8601Week(date), padding, 2);
+					closure = function(padding) {
+						return function(date) {
+							return blazegears._padStringLeft(this._getIso8601Week(date), padding, 2);
+						}
+					}
+					result.push(closure(padding));
 					break;
 				
 				case "W": // weeks, staring on monday (00 - 53)
-					chunk = blazegears._padStringLeft(this._getMondayWeek(date), padding, 2);
+					closure = function(padding) {
+						return function(date) {
+							return blazegears._padStringLeft(this._getMondayWeek(date), padding, 2);
+						}
+					}
+					result.push(closure(padding));
 					break;
 				
 				case "Y": // years (1970 - 2038)
-					chunk = this._getFullYear(date);
+					result.push(this._getFullYear);
 					break;
 				
 				case "Z": // abbreviated time zone names (e.g. UTC)
-					chunk = "";
 					break;
 				
 				case "a": // abbreviated weekday names (Sun - Sat)
-					chunk = this._getAbbreviatedDayName(date);
-					if (upper || opposite) {
-						chunk = chunk.toUpperCase();
+					closure = function(upper, opposite) {
+						return function(date) {
+							var result = this._getAbbreviatedDayName(date);
+							if (upper || opposite) {
+								result = result.toUpperCase();
+							}
+							return result;
+						}
 					}
+					result.push(closure(upper, opposite));
 					break;
 				
 				case "b": // abbreviated month names (Jan - Dec)
 				case "h":
-					chunk = this._getAbbreviatedMonthName(date);
-					if (upper || opposite) {
-						chunk = chunk.toUpperCase();
+					closure = function(upper, opposite) {
+						return function(date) {
+							var result = this._getAbbreviatedMonthName(date);
+							if (upper || opposite) {
+								result = result.toUpperCase();
+							}
+							return result;
+						}
 					}
+					result.push(closure(upper, opposite));
 					break;
 				
-				case "c": // same as "%a %b %d %H:%M:%S %Y"
-					chunk = this.formatDate(date, "%a %b %_d %H:%M:%S %Y");
-					if (upper) {
-						chunk = chunk.toUpperCase();
+				case "c": // same as "%a %b %_d %H:%M:%S %Y"
+					var inner_format = [];
+					this.parseDateFormat(inner_format, "%a %b %_d %H:%M:%S %Y");
+					
+					closure = function(inner_format, upper) {
+						return function(date) {
+							var i;
+							var inner_format_length = inner_format.length;
+							var result = "";
+							var token;
+							
+							for (i = 0; i < inner_format_length; ++i) {
+								token = inner_format[i];
+								if (blazegears.isFunction(token)) {
+									result += token.call(this, date).toString();
+								} else {
+									result += token.toString();
+								}
+							}
+							
+							if (upper) {
+								result = result.toUpperCase();
+							}
+							
+							return result;
+						}
 					}
+					result.push(closure(inner_format, upper));
 					break;
 				
 				case "d": // days (01 - 31)
-					chunk = blazegears._padStringLeft(this._getDate(date), padding, 2);
+					closure = function(padding) {
+						return function(date) {
+							return blazegears._padStringLeft(this._getDate(date), padding, 2);
+						}
+					}
+					result.push(closure(padding));
 					break;
 				
 				case "e": // same as "%_d"
-					if (!has_padding_modifier) {
-						padding = " ";
+					closure = function(padding, has_padding_modifier) {
+						if (!has_padding_modifier) {
+							padding = " ";
+						}
+						return function(date) {
+							return blazegears._padStringLeft(this._getDate(date), padding, 2);
+						}
 					}
-					chunk = blazegears._padStringLeft(this._getDate(date), padding, 2);
+					result.push(closure(padding, has_padding_modifier));
 					break;
 				
 				case "g": // abbreviated iso-8601 years (00 - 99)
-					chunk = blazegears._padStringLeft(this._getIso8601Year(date) % 100, padding, 2);
+					closure = function(padding) {
+						return function(date) {
+							return blazegears._padStringLeft(this._getIso8601Year(date) % 100, padding, 2);
+						}
+					}
+					result.push(closure(padding));
 					break;
 				
 				case "j": // days of the year (001 - 366)
-					chunk = blazegears._padStringLeft(this._getDayOfYear(date), padding, 3);
+					closure = function(padding) {
+						return function(date) {
+							return blazegears._padStringLeft(this._getDayOfYear(date), padding, 3);
+						}
+					}
+					result.push(closure(padding));
 					break;
 				
 				case "k": // same as "%_H"
-					if (!has_padding_modifier) {
-						padding = " ";
+					closure = function(padding, has_padding_modifier) {
+						if (!has_padding_modifier) {
+							padding = " ";
+						}
+						return function(date) {
+							return blazegears._padStringLeft(this._getHours(date), padding, 2);
+						}
 					}
-					chunk = blazegears._padStringLeft(this._getHours(date), padding, 2);
+					result.push(closure(padding, has_padding_modifier));
 					break;
 				
 				case "l": // same as "%_I"
-					if (!has_padding_modifier) {
-						padding = " ";
+					closure = function(padding, has_padding_modifier) {
+						if (!has_padding_modifier) {
+							padding = " ";
+						}
+						return function(date) {
+							return blazegears._padStringLeft(this._getTwelveHourHours(date), padding, 2);
+						}
 					}
-					chunk = blazegears._padStringLeft(this._getTwelveHourHours(date), padding, 2);
+					result.push(closure(padding, has_padding_modifier));
 					break;
 				
 				case "m": // months (01 - 12)
-					chunk = blazegears._padStringLeft(this._getMonth(date) + 1, padding, 2);
+					closure = function(padding) {
+						return function(date) {
+							return blazegears._padStringLeft(this._getMonth(date) + 1, padding, 2);
+						}
+					}
+					result.push(closure(padding));
 					break;
 				
 				case "n": // newline
-					chunk = "\n";
+					result.push("\n");
 					break;
 				
 				case "o": // ordinals for the days of the month (st, nd, rd, or th)
-					chunk = this._getOrdinalSuffix(date);
+					result.push(this._getOrdinalSuffix);
 					break;
 				
 				case "p": // abbreviated upper-case meridiems (AM - PM)
-					chunk = this._getUpperCaseMeridiem(date);
-					if (opposite) {
-						chunk = chunk.toLowerCase();
+					closure = function(opposite) {
+						return function(date) {
+							var result = this._getUpperCaseMeridiem(date);
+							if (opposite) {
+								result = result.toLowerCase();
+							}
+							return result;
+						}
 					}
+					result.push(closure(opposite));
 					break;
 				
 				case "r": // same as "%I:%M:%S %p"
-					chunk = this.formatDate(date, "%I:%M:%S %p");
+					this.parseDateFormat(result, "%I:%M:%S %p");
 					break;
 				
 				case "s": // unix timestamp
-					chunk = this._getTimestamp(date);
+					result.push(this._getTimestamp);
 					break;
 				
 				case "t": // tab
-					chunk = "\t";
+					result.push("\t");
 					break;
 				
 				case "u": // weekdays, starting on monday (1 - 7)
-					chunk = this._getDayOfWeek(date);
+					result.push(this._getDayOfWeek);
 					break;
 				
 				case "w": // weekdays, starting on sunday (0 - 6)
-					chunk = this._getDay(date);
+					result.push(this._getDay);
 					break;
 				
 				case "x": // same as "%m/%d/%y"
-					chunk = this.formatDate(date, "%m/%d/%y");
+					this.parseDateFormat(result, "%m/%d/%y");
 					break;
 				
 				case "y": // abbreviated years (00 - 99)
-					chunk = blazegears._padStringLeft(this._getFullYear(date) % 100, padding, 2);
+					closure = function(padding) {
+						return function(date) {
+							return blazegears._padStringLeft(this._getFullYear(date) % 100, padding, 2);
+						}
+					}
+					result.push(closure(padding));
 					break;
 				
 				case "z": // time zone offset (-1200 - +1300)
@@ -1086,20 +1292,19 @@ blazegears.formatting.UnixDateFormatter.prototype.formatDate = function(date, fo
 					//	case 2: break; // (-12:00:00 - +13:00:00)
 					//	case 3: break; // minimal required precision
 					//}
-					chunk = "";
 					break;
 				
 				default:
 					continue;
 			}
-			
-			result += chunk;
 		} else {
-			result += character;
+			result.push(character);
 		}
 	}
-	
-	return result;
+}
+
+blazegears.formatting.UnixDateFormatter.prototype._getDecrementedCentury = function(date) {
+	return this._getCentury(date) - 1;
 }
 
 // Class: BlazeGears.Formats [Deprecated]
