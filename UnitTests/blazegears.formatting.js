@@ -7,72 +7,72 @@ blazegears.formatting.tests.dateFormattingTest = function() {
 	var date;
 	var formatter = new blazegears.formatting.DateFormatter();
 	var i;
-	var new_abbreviated_names;
-	var new_names;
+	var new_full_names;
+	var new_short_names;
 	var original_names;
 	
 	// using utc
 	formatter.setTimeZoneOffset(blazegears.formatting.TimeZoneOffset.UTC);
 	
 	// months
-	original_names = formatter.getNamesOfMonths();
-	new_abbreviated_names = [];
-	new_names = [];
+	original_names = formatter.getFullMonthNames();
+	new_short_names = [];
+	new_full_names = [];
 	for (i = 0; i < 12; ++i)
 	{
-		new_names.push("a" + i.toString());
-		new_abbreviated_names.push("b" + i.toString());
+		new_full_names.push("a" + i.toString());
+		new_short_names.push("b" + i.toString());
 	}
-	formatter.setNamesOfMonths(new_names);
-	formatter.setAbbreviatedNamesOfMonths(new_abbreviated_names);
+	formatter.setFullMonthNames(new_full_names);
+	formatter.setShortMonthNames(new_short_names);
 	for (i = 0; i < 12; ++i) {
 		date = new Date(30 * 86400000 * i + 15 * 86400000 + 43200000);
-		strictEqual(formatter._getMonthName(date), new_names[i], "Set " + original_names[i] + "'s full name.");
-		strictEqual(formatter._getAbbreviatedMonthName(date), new_abbreviated_names[i], "Set " + original_names[i] + "'s abbreviated name.");
+		strictEqual(formatter._getMonthName(date), new_full_names[i], "Set " + original_names[i] + "'s full name.");
+		strictEqual(formatter._getAbbreviatedMonthName(date), new_short_names[i], "Set " + original_names[i] + "'s abbreviated name.");
 	}
 	
 	// days
-	original_names = formatter.getNamesOfDays();
-	new_abbreviated_names = [];
-	new_names = [];
+	original_names = formatter.getFullDayNames();
+	new_short_names = [];
+	new_full_names = [];
 	for (i = 0; i < 7; ++i)
 	{
-		new_names.push("c" + i.toString());
-		new_abbreviated_names.push("d" + i.toString());
+		new_full_names.push("c" + i.toString());
+		new_short_names.push("d" + i.toString());
 	}
-	formatter.setNamesOfDays(new_names);
-	formatter.setAbbreviatedNamesOfDays(new_abbreviated_names);
+	formatter.setFullDayNames(new_full_names);
+	formatter.setShortDayNames(new_short_names);
 	for (i = 0; i < 7; ++i) {
 		date = new Date(86400000 * (i + 3) + 43200000);
-		strictEqual(formatter._getDayName(date), new_names[i], "Set " + original_names[i] + "'s full name.");
-		strictEqual(formatter._getAbbreviatedDayName(date), new_abbreviated_names[i], "Set " + original_names[i] + "'s abbreviated name.");
+		strictEqual(formatter._getDayName(date), new_full_names[i], "Set " + original_names[i] + "'s full name.");
+		strictEqual(formatter._getAbbreviatedDayName(date), new_short_names[i], "Set " + original_names[i] + "'s abbreviated name.");
 	}
 	
 	// ordinal suffixes
 	original_names = formatter.getOrdinalSuffixes();
-	new_names = [];
+	new_full_names = [];
 	for (i = 0; i < 31; ++i)
 	{
-		new_names.push("e" + i.toString());
+		new_full_names.push("e" + i.toString());
 	}
-	formatter.setOrdinalSuffixes(new_names);
+	formatter.setOrdinalSuffixes(new_full_names);
 	for (i = 0; i < 31; ++i) {
 		date = new Date(86400000 * i + 43200000);
-		strictEqual(formatter._getOrdinalSuffix(date), new_names[i], "Set the ordinal suffix for the " + (i + 1) + original_names[i] + ".");
+		strictEqual(formatter._getOrdinalSuffix(date), new_full_names[i], "Set the ordinal suffix for the " + (i + 1) + original_names[i] + ".");
 	}
 	
 	// meridiems
-	original_names = formatter.getAbbreviatedNamesOfMeridiems();
-	new_abbreviated_names = [];
+	original_names = formatter.getShortMeridiemNames();
+	new_short_names = [];
 	for (i = 0; i < 2; ++i)
 	{
-		new_abbreviated_names.push("f" + i.toString());
+		new_short_names.push("f" + i.toString());
 	}
-	formatter.setAbbreviatedNamesOfMeridiems(new_abbreviated_names);
+	formatter.setShortMeridiemNames(new_short_names);
 	for (i = 0; i < 2; ++i) {
 		date = new Date(i * 28800000 + 28800000);
-		strictEqual(formatter._getLowerCaseMeridiem(date), new_abbreviated_names[i], "Set the lowercase " + original_names[i] + ".");
-		strictEqual(formatter._getUpperCaseMeridiem(date), new_abbreviated_names[i].toUpperCase(), "Set the uppercase " + original_names[i] + ".");
+		strictEqual(formatter._getLowerCaseMeridiem(date), new_short_names[i], "Set the lowercase " + original_names[i] + ".");
+		strictEqual(formatter._getUpperCaseMeridiem(date), new_short_names[i].toUpperCase(), "Set the uppercase " + original_names[i] + ".");
 	}
 }
 test("Date Formatting", blazegears.formatting.tests.dateFormattingTest);

@@ -103,46 +103,6 @@ blazegears.formatting.DateFormatter = function() {
 	this._short_month_names = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 }
 
-// Method: getAbbreviatedNamesOfDays
-blazegears.formatting.DateFormatter.prototype.getAbbreviatedNamesOfDays = function() {
-	return this._short_day_names.slice();
-}
-
-// Method: setAbbreviatedNamesOfDays
-blazegears.formatting.DateFormatter.prototype.setAbbreviatedNamesOfDays = function(names_of_days) {
-	this._short_day_names = [];
-	for (var i = 0; i < 7; ++i) {
-		this._short_day_names.push(names_of_days[i].toString());
-	}
-}
-
-// Method: getAbbreviatedNamesOfMeridiems
-blazegears.formatting.DateFormatter.prototype.getAbbreviatedNamesOfMeridiems = function() {
-	return [this._short_meridiems[2], this._short_meridiems[3]];
-}
-
-// Method: setAbbreviatedNamesOfMeridiems
-blazegears.formatting.DateFormatter.prototype.setAbbreviatedNamesOfMeridiems = function(names_of_meridiems) {
-	this._short_meridiems = [];
-	this._short_meridiems.push(names_of_meridiems[0].toString().toUpperCase());
-	this._short_meridiems.push(names_of_meridiems[1].toString().toUpperCase());
-	this._short_meridiems.push(names_of_meridiems[0].toString());
-	this._short_meridiems.push(names_of_meridiems[1].toString());
-}
-
-// Method: getAbbreviatedNamesOfMonths
-blazegears.formatting.DateFormatter.prototype.getAbbreviatedNamesOfMonths = function() {
-	return this._short_month_names.slice();
-}
-
-// Method: setAbbreviatedNamesOfMonths
-blazegears.formatting.DateFormatter.prototype.setAbbreviatedNamesOfMonths = function(names_of_months) {
-	this._short_month_names = [];
-	for (var i = 0; i < 12; ++i) {
-		this._short_month_names.push(names_of_months[i].toString());
-	}
-}
-
 // Method: getDateFormat
 blazegears.formatting.DateFormatter.prototype.getDateFormat = function() {
 	return this._format;
@@ -156,29 +116,29 @@ blazegears.formatting.DateFormatter.prototype.setDateFormat = function(format) {
 	}
 }
 
-// Method: getNamesOfDays
-blazegears.formatting.DateFormatter.prototype.getNamesOfDays = function() {
+// Method: getFullDayNames
+blazegears.formatting.DateFormatter.prototype.getFullDayNames = function() {
 	return this._full_day_names.slice();
 }
 
-// Method: setNamesOfDays
-blazegears.formatting.DateFormatter.prototype.setNamesOfDays = function(names_of_days) {
+// Method: setFullDayNames
+blazegears.formatting.DateFormatter.prototype.setFullDayNames = function(day_names) {
 	this._full_day_names = [];
 	for (var i = 0; i < 7; ++i) {
-		this._full_day_names.push(names_of_days[i].toString());
+		this._full_day_names.push(day_names[i].toString());
 	}
 }
 
-// Method: getNamesOfMonths
-blazegears.formatting.DateFormatter.prototype.getNamesOfMonths = function() {
+// Method: getFullMonthNames
+blazegears.formatting.DateFormatter.prototype.getFullMonthNames = function() {
 	return this._full_month_names.slice();
 }
 
-// Method: setNamesOfMonths
-blazegears.formatting.DateFormatter.prototype.setNamesOfMonths = function(names_of_months) {
+// Method: setFullMonthNames
+blazegears.formatting.DateFormatter.prototype.setFullMonthNames = function(month_names) {
 	this._full_month_names = [];
 	for (var i = 0; i < 12; ++i) {
-		this._full_month_names.push(names_of_months[i].toString());
+		this._full_month_names.push(month_names[i].toString());
 	}
 }
 
@@ -192,6 +152,46 @@ blazegears.formatting.DateFormatter.prototype.setOrdinalSuffixes = function(ordi
 	this._ordinal_suffixes = [];
 	for (var i = 0; i < 31; ++i) {
 		this._ordinal_suffixes.push(ordinal_suffixes[i].toString());
+	}
+}
+
+// Method: getShortDayNames
+blazegears.formatting.DateFormatter.prototype.getShortDayNames = function() {
+	return this._short_day_names.slice();
+}
+
+// Method: setShortDayNames
+blazegears.formatting.DateFormatter.prototype.setShortDayNames = function(day_names) {
+	this._short_day_names = [];
+	for (var i = 0; i < 7; ++i) {
+		this._short_day_names.push(day_names[i].toString());
+	}
+}
+
+// Method: getShortMeridiemNames
+blazegears.formatting.DateFormatter.prototype.getShortMeridiemNames = function() {
+	return [this._short_meridiems[2], this._short_meridiems[3]];
+}
+
+// Method: setShortMeridiemNames
+blazegears.formatting.DateFormatter.prototype.setShortMeridiemNames = function(meridiem_names) {
+	this._short_meridiems = [];
+	this._short_meridiems.push(meridiem_names[0].toString().toUpperCase());
+	this._short_meridiems.push(meridiem_names[1].toString().toUpperCase());
+	this._short_meridiems.push(meridiem_names[0].toString());
+	this._short_meridiems.push(meridiem_names[1].toString());
+}
+
+// Method: getShortMonthNames
+blazegears.formatting.DateFormatter.prototype.getShortMonthNames = function() {
+	return this._short_month_names.slice();
+}
+
+// Method: setShortMonthNames
+blazegears.formatting.DateFormatter.prototype.setShortMonthNames = function(month_names) {
+	this._short_month_names = [];
+	for (var i = 0; i < 12; ++i) {
+		this._short_month_names.push(month_names[i].toString());
 	}
 }
 
@@ -210,9 +210,9 @@ blazegears.formatting.DateFormatter.prototype.getTimeZoneOffset = function() {
 blazegears.formatting.DateFormatter.prototype.setTimeZoneOffset = function(time_zone_offset) {
 	var TimeZoneOffset = blazegears.formatting.TimeZoneOffset;
 	
-	if (time_zone_offset == TimeZoneOffset.AUTOMATIC) {
+	if (time_zone_offset === TimeZoneOffset.AUTOMATIC) {
 		this._is_utc_time_enabled = false;
-	} else if (time_zone_offset == TimeZoneOffset.UTC) {
+	} else if (time_zone_offset === TimeZoneOffset.UTC) {
 		this._is_utc_time_enabled = true;
 	}
 }
@@ -234,8 +234,8 @@ blazegears.formatting.DateFormatter.prototype.formatDate = function(date) {
 	return result;
 }
 
-// Method: generateDateFormatCache
-blazegears.formatting.DateFormatter.prototype.parseDateFormat = function(result, format) {
+// Method: parseDateFormat
+blazegears.formatting.DateFormatter.prototype.parseDateFormat = function(format) {
 	throw blazegears.NotOverriddenError();
 }
 
@@ -1490,7 +1490,8 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 			formatter._full_day_names = self.texts.full_days;
 			formatter._full_month_names = self.texts.full_months;
 			formatter._ordinal_suffixes = self.texts.ordinal_suffixes;
-			result = formatter.formatDate(date, configuration.syntax);
+			formatter.setDateFormat(configuration.syntax);
+			result = formatter.formatDate(date);
 		}
 		
 		return result;
