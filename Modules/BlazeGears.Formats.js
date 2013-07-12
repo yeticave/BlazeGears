@@ -30,9 +30,9 @@ blazegears.formatting = (typeof blazegears.formatting === "undefined") ? {} : bl
 
 // Enum: blazegears.formatting.DecimalVisibility
 blazegears.formatting.DecimalVisibility = {
-	FULL_PRECISION: 1,
-	MINIMUM_ONE_DIGIT: 2,
-	STRIP_TRAILING_ZEROS: 3
+	FIXED: 1,
+	MINIMAL: 2,
+	TRUNCATED: 3
 };
 
 // Enum: blazegears.formatting.TimeZoneOffset
@@ -42,17 +42,17 @@ blazegears.formatting.TimeZoneOffset = {
 };
 
 // Class: blazegears.formatting.DateFormat
-blazegears.formatting.DateFormat = function() {
+blazegears.formatting.DateFormatTemplate = function() {
 	this._tokens = [];
 }
 
 // Method: addCallback
-blazegears.formatting.DateFormat.prototype.addCallback = function(callback) {
+blazegears.formatting.DateFormatTemplate.prototype.addCallback = function(callback) {
 	this._tokens.push(callback);
 }
 
 // Method: addLiteral
-blazegears.formatting.DateFormat.prototype.addLiteral = function(literal) {
+blazegears.formatting.DateFormatTemplate.prototype.addLiteral = function(literal) {
 	if (this._tokens.length === 0 || blazegears.isFunction(this._tokens[this._tokens.length - 1])) {
 		this._tokens.push(literal.toString());
 	} else {
@@ -60,19 +60,19 @@ blazegears.formatting.DateFormat.prototype.addLiteral = function(literal) {
 	}
 }
 
-// Method: mergeDateFormat
-blazegears.formatting.DateFormat.prototype.mergeDateFormat = function(date_format) {
+// Method: merge
+blazegears.formatting.DateFormatTemplate.prototype.merge = function(date_format_template) {
 	var i;
-	var token_count = date_format._tokens.length;
-	var tokens = date_format._tokens;
+	var token_count = date_format_template._tokens.length;
+	var tokens = date_format_template._tokens;
 	
 	for (i = 0; i < token_count; ++i) {
 		this._tokens.push(tokens[i]);
 	}
 }
 
-// Method: renderDate
-blazegears.formatting.DateFormat.prototype.renderDate = function(context, date) {
+// Method: render
+blazegears.formatting.DateFormatTemplate.prototype.render = function(context, date) {
 	var result = "";
 	var token;
 	var tokens = this._tokens;
@@ -93,7 +93,7 @@ blazegears.formatting.DateFormat.prototype.renderDate = function(context, date) 
 // Class: blazegears.formatting.DateFormatter
 blazegears.formatting.DateFormatter = function() {
 	this._format = null;
-	this._format_cache = null;
+	this._template = null;
 	this._is_utc_time_enabled = false;
 	this._full_day_names = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 	this._full_month_names = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -112,7 +112,7 @@ blazegears.formatting.DateFormatter.prototype.getDateFormat = function() {
 blazegears.formatting.DateFormatter.prototype.setDateFormat = function(format) {
 	if (format !== this._format) {
 		this._format = format;
-		this._format_cache = null;
+		this._template = null;
 	}
 }
 
@@ -168,18 +168,26 @@ blazegears.formatting.DateFormatter.prototype.setShortDayNames = function(day_na
 	}
 }
 
-// Method: getShortMeridiemNames
-blazegears.formatting.DateFormatter.prototype.getShortMeridiemNames = function() {
+// Method: getShortLowerMeridiemNames
+blazegears.formatting.DateFormatter.prototype.getShortLowerMeridiemNames = function() {
 	return [this._short_meridiems[2], this._short_meridiems[3]];
 }
 
-// Method: setShortMeridiemNames
-blazegears.formatting.DateFormatter.prototype.setShortMeridiemNames = function(meridiem_names) {
-	this._short_meridiems = [];
-	this._short_meridiems.push(meridiem_names[0].toString().toUpperCase());
-	this._short_meridiems.push(meridiem_names[1].toString().toUpperCase());
-	this._short_meridiems.push(meridiem_names[0].toString());
-	this._short_meridiems.push(meridiem_names[1].toString());
+// Method: setShortLowerMeridiemNames
+blazegears.formatting.DateFormatter.prototype.setShortLowerMeridiemNames = function(meridiem_names) {
+	this._short_meridiems[2] = meridiem_names[0].toString();
+	this._short_meridiems[3] = meridiem_names[1].toString();
+}
+
+// Method: getShortUpperMeridiemNames
+blazegears.formatting.DateFormatter.prototype.getShortUpperMeridiemNames = function() {
+	return [this._short_meridiems[0], this._short_meridiems[1]];
+}
+
+// Method: setShortUpperMeridiemNames
+blazegears.formatting.DateFormatter.prototype.setShortUpperMeridiemNames = function(meridiem_names) {
+	this._short_meridiems[0] = meridiem_names[0].toString();
+	this._short_meridiems[1] = meridiem_names[1].toString();
 }
 
 // Method: getShortMonthNames
@@ -219,17 +227,13 @@ blazegears.formatting.DateFormatter.prototype.setTimeZoneOffset = function(time_
 
 // Method: formatDate
 blazegears.formatting.DateFormatter.prototype.formatDate = function(date) {
-	var format_cache;
-	var format_cache_length;
-	var i;
-	var token;
 	var result = "";
 	
 	date = this._prepareDate(date);
-	if (this._format_cache === null) {
-		this._format_cache = this.parseDateFormat(this._format);
+	if (this._template === null) {
+		this._template = this.parseDateFormat(this._format);
 	}
-	result = this._format_cache.renderDate(this, date);
+	result = this._template.render(this, date);
 	
 	return result;
 }
@@ -521,7 +525,7 @@ blazegears.formatting.DateFormatter.prototype._prepareDate = function(date) {
 blazegears.formatting.NumberFormatter = function() {
 	this._decimal_delimiter = ".";
 	this._decimal_precision = 0;
-	this._decimal_visibility = blazegears.formatting.DecimalVisibility.FULL_PRECISION;
+	this._decimal_visibility = blazegears.formatting.DecimalVisibility.FIXED;
 	this._group_delimiter = ",";
 	this._group_size = 3;
 	this._is_leading_zero_enabled = true;
@@ -562,7 +566,7 @@ blazegears.formatting.NumberFormatter.prototype.formatNumber = function(number) 
 	// create the decimal string
 	if (this._decimal_precision > 0) {
 		decimal_significand = Math.abs(this._rounding_callback.call(this, Math.pow(10, this._decimal_precision) * decimal_part)).toString();
-		if (this._decimal_visibility === DecimalVisibility.FULL_PRECISION) {
+		if (this._decimal_visibility === DecimalVisibility.FIXED) {
 			while (decimal_significand.length < this._decimal_precision) {
 				decimal_significand += "0";
 			}
@@ -571,7 +575,7 @@ blazegears.formatting.NumberFormatter.prototype.formatNumber = function(number) 
 				decimal_significand = decimal_significand.substr(0, decimal_significand.length - 1);
 			}
 		}
-		if (decimal_significand.length === 0 && this._decimal_visibility === DecimalVisibility.MINIMUM_ONE_DIGIT) {
+		if (decimal_significand.length === 0 && this._decimal_visibility === DecimalVisibility.MINIMAL) {
 			decimal_significand += "0";
 		}
 	} else {
@@ -719,7 +723,7 @@ blazegears.formatting.PHPDateFormatter.prototype.constructor = blazegears.format
 // Method: generateDateFormatCache
 blazegears.formatting.PHPDateFormatter.prototype.parseDateFormat = function(format) {
 	var character;
-	var result = new blazegears.formatting.DateFormat();
+	var result = new blazegears.formatting.DateFormatTemplate();
 	
 	for (var i = 0; i < format.length; i++) {
 		character = format.charAt(i);
@@ -803,7 +807,7 @@ blazegears.formatting.PHPDateFormatter.prototype.parseDateFormat = function(form
 				break;
 			
 			case "c": // same as "Y-m-d\\TH:i:sP"
-				result.mergeDateFormat(this.parseDateFormat("Y-m-d\\TH:i:sP"));
+				result.merge(this.parseDateFormat("Y-m-d\\TH:i:sP"));
 				break;
 			
 			case "d": // days (01 - 31)
@@ -846,7 +850,7 @@ blazegears.formatting.PHPDateFormatter.prototype.parseDateFormat = function(form
 				break;
 			
 			case "r": // same as "D, d M Y H:i:s O"
-				result.mergeDateFormat(this.parseDateFormat("D, d M Y H:i:s O"));
+				result.merge(this.parseDateFormat("D, d M Y H:i:s O"));
 				break;
 			
 			case "s": // seconds (00 - 59)
@@ -935,7 +939,7 @@ blazegears.formatting.UnixDateFormatter.prototype.parseDateFormat = function(for
 	var opposite;
 	var padding;
 	var precision;
-	var result = new blazegears.formatting.DateFormat();
+	var result = new blazegears.formatting.DateFormatTemplate();
 	var specifier;
 	var upper;
 	
@@ -1035,11 +1039,11 @@ blazegears.formatting.UnixDateFormatter.prototype.parseDateFormat = function(for
 					break;
 				
 				case "D": // same as "%m/%d/%y"
-					result.mergeDateFormat(this.parseDateFormat("%m/%d/%y"));
+					result.merge(this.parseDateFormat("%m/%d/%y"));
 					break;
 				
 				case "F": // same as "%Y-%m-%d"
-					result.mergeDateFormat(this.parseDateFormat("%Y-%m-%d"));
+					result.merge(this.parseDateFormat("%Y-%m-%d"));
 					break;
 				
 				case "G": // iso-8601 years (1970 - 2038)
@@ -1086,7 +1090,7 @@ blazegears.formatting.UnixDateFormatter.prototype.parseDateFormat = function(for
 					break;
 				
 				case "R": // same as "%H:%M"
-					result.mergeDateFormat(this.parseDateFormat("%H:%M"));
+					result.merge(this.parseDateFormat("%H:%M"));
 					break;
 				
 				case "S": // seconds (00 - 59)
@@ -1100,7 +1104,7 @@ blazegears.formatting.UnixDateFormatter.prototype.parseDateFormat = function(for
 				
 				case "T": // same as "%H:%M:%S".
 				case "X":
-					result.mergeDateFormat(this.parseDateFormat("%H:%M:%S"));
+					result.merge(this.parseDateFormat("%H:%M:%S"));
 					break;
 				
 				case "U": // weeks, staring on sunday (00 - 53)
@@ -1167,7 +1171,7 @@ blazegears.formatting.UnixDateFormatter.prototype.parseDateFormat = function(for
 				case "c": // same as "%a %b %_d %H:%M:%S %Y"
 					closure = function(inner_format, upper) {
 						return function(date) {
-							var result = inner_format.renderDate(this, date);
+							var result = inner_format.render(this, date);
 							if (upper) {
 								result = result.toUpperCase();
 							}
@@ -1271,7 +1275,7 @@ blazegears.formatting.UnixDateFormatter.prototype.parseDateFormat = function(for
 					break;
 				
 				case "r": // same as "%I:%M:%S %p"
-					result.mergeDateFormat(this.parseDateFormat("%I:%M:%S %p"));
+					result.merge(this.parseDateFormat("%I:%M:%S %p"));
 					break;
 				
 				case "s": // unix timestamp
@@ -1291,7 +1295,7 @@ blazegears.formatting.UnixDateFormatter.prototype.parseDateFormat = function(for
 					break;
 				
 				case "x": // same as "%m/%d/%y"
-					result.mergeDateFormat(this.parseDateFormat("%m/%d/%y"));
+					result.merge(this.parseDateFormat("%m/%d/%y"));
 					break;
 				
 				case "y": // abbreviated years (00 - 99)
@@ -1566,7 +1570,7 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 		if (number < 0) {
 			negative = true;
 		}
-		decimal_visibility = configuration.force_decimals ? DecimalVisibility.FULL_PRECISION : DecimalVisibility.STRIP_TRAILING_ZEROS;
+		decimal_visibility = configuration.force_decimals ? DecimalVisibility.FIXED : DecimalVisibility.TRUNCATED;
 		formatter.enableLeadingZero(configuration.leading_zero);
 		formatter.setDecimalDelimiter(configuration.decimal_delimiter);
 		formatter.setDecimalPrecision(configuration.decimal_length);

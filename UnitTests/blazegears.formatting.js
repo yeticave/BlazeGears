@@ -61,18 +61,30 @@ blazegears.formatting.tests.dateFormattingTest = function() {
 		strictEqual(formatter._getOrdinalSuffix(date), new_full_names[i], "Set the ordinal suffix for the " + (i + 1) + original_names[i] + ".");
 	}
 	
-	// meridiems
-	original_names = formatter.getShortMeridiemNames();
+	// lower meridiems
+	original_names = formatter.getShortLowerMeridiemNames();
 	new_short_names = [];
 	for (i = 0; i < 2; ++i)
 	{
 		new_short_names.push("f" + i.toString());
 	}
-	formatter.setShortMeridiemNames(new_short_names);
+	formatter.setShortLowerMeridiemNames(new_short_names);
 	for (i = 0; i < 2; ++i) {
 		date = new Date(i * 28800000 + 28800000);
-		strictEqual(formatter._getLowerCaseMeridiem(date), new_short_names[i], "Set the lowercase " + original_names[i] + ".");
-		strictEqual(formatter._getUpperCaseMeridiem(date), new_short_names[i].toUpperCase(), "Set the uppercase " + original_names[i] + ".");
+		strictEqual(formatter._getLowerCaseMeridiem(date), new_short_names[i], "Set the lower case " + original_names[i] + ".");
+	}
+	
+	// upper meridiems
+	original_names = formatter.getShortUpperMeridiemNames();
+	new_short_names = [];
+	for (i = 0; i < 2; ++i)
+	{
+		new_short_names.push("g" + i.toString());
+	}
+	formatter.setShortUpperMeridiemNames(new_short_names);
+	for (i = 0; i < 2; ++i) {
+		date = new Date(i * 28800000 + 28800000);
+		strictEqual(formatter._getUpperCaseMeridiem(date), new_short_names[i], "Set the upper case " + original_names[i] + ".");
 	}
 }
 test("Date Formatting", blazegears.formatting.tests.dateFormattingTest);
@@ -84,7 +96,7 @@ blazegears.formatting.tests.numberFormattingTest = function() {
 	formatter.enableLeadingZero(true);
 	formatter.setDecimalDelimiter(".");
 	formatter.setDecimalPrecision(2);
-	formatter.setDecimalVisibility(DecimalVisibility.FULL_PRECISION);
+	formatter.setDecimalVisibility(DecimalVisibility.FIXED);
 	formatter.getGroupDelimiter(",");
 	formatter.setGroupSize(3);
 	formatter.setNegativePrefix("-");
@@ -97,14 +109,14 @@ blazegears.formatting.tests.numberFormattingTest = function() {
 	strictEqual(formatter.formatNumber("z"), "0.00", "Try formatting a NaN value.");
 	
 	// decimal visibility
-	formatter.setDecimalVisibility(DecimalVisibility.FULL_PRECISION);
+	formatter.setDecimalVisibility(DecimalVisibility.FIXED);
 	strictEqual(formatter.formatNumber(1.00), "1.00", "Show all the significant decimal digits.");
-	formatter.setDecimalVisibility(DecimalVisibility.MINIMUM_ONE_DIGIT);
+	formatter.setDecimalVisibility(DecimalVisibility.MINIMAL);
 	strictEqual(formatter.formatNumber(1.10), "1.1", "Show at least one decimal digits.");
-	formatter.setDecimalVisibility(DecimalVisibility.STRIP_TRAILING_ZEROS);
+	formatter.setDecimalVisibility(DecimalVisibility.TRUNCATED);
 	strictEqual(formatter.formatNumber(1.10), "1.1", "Strip the trailing zeros from a decimal number.");
 	strictEqual(formatter.formatNumber(1), "1", "Strip the trailing zeros from an integer.");
-	formatter.setDecimalVisibility(DecimalVisibility.FULL_PRECISION);
+	formatter.setDecimalVisibility(DecimalVisibility.FIXED);
 	
 	// decimal precision
 	formatter.setDecimalPrecision(4);
