@@ -759,6 +759,59 @@ blazegears.ArgumentError._invalidArgumentType = function(argument_name, expected
 	return new blazegears.ArgumentError(argument_name, "The <" + argument_name + "> argument is expected to be an instance of <" + expected_type + ">.");
 }
 
+// Class: blazegears.EventHandler
+blazegears.EventHandler = function() {
+	this._callbacks = [];
+}
+
+// Method: addCallback
+blazegears.EventHandler.prototype.addCallback = function(context, callback) {
+	this._callbacks.push([context, callback]);
+}
+
+// Method: dispose
+blazegears.EventHandler.prototype.dispose = function() {
+	var callbacks = this._callbacks;
+	var callback_count = callbacks.length;
+	var i;
+	
+	for (i = 0; i < callback_count; ++i) {
+		callbacks[i][0] = null;
+		callbacks[i][1] = null;
+		callbacks[i].length = 0;
+		callbacks.splice(i, 1);
+	}
+	callbacks.length = 0;
+}
+
+// Method: raiseEvent
+blazegears.EventHandler.prototype.raiseEvent = function() {
+	var callbacks = this._callbacks;
+	var callback_count = callbacks.length;
+	var i;
+	
+	for (i = 0; i < callback_count; ++i) {
+		callbacks[i][1].apply(callbacks[i][0], arguments);
+	}
+}
+
+// Method: removeCallback
+blazegears.EventHandler.prototype.removeCallback = function(context, callback) {
+	var callbacks = this._callbacks;
+	var callback_count = callbacks.length;
+	var i;
+	
+	for (i = 0; i < callback_count; ++i) {
+		if (context === callbacks[i][0] && callback === callbacks[i][1]) {
+			callbacks[i][0] = null;
+			callbacks[i][1] = null;
+			callbacks[i].length = 0;
+			callbacks.splice(i, 1);
+			break;
+		}
+	}
+}
+
 // Class: blazegears.NotOverriddenError
 blazegears.NotOverriddenError = function(message, inner_error) {
 	blazegears.Error(this, message, inner_error);

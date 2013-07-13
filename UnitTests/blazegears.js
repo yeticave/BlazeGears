@@ -14,6 +14,35 @@ blazegears.tests.escapingTest = function() {
 }
 test("Escaping", blazegears.tests.escapingTest);
 
+blazegears.tests.eventHandlingTest = function() {
+	var context_value = 123;
+	var argument_value = 456;
+	
+	var EventClass = function(serial) {
+		this.event_handler = new blazegears.EventHandler();
+		this.serial = serial;
+		this.event_handler.addCallback(this, this.callback);
+	}
+	
+	EventClass.prototype.callback = function(parameter) {
+		strictEqual(this.serial, context_value, "Verify the context.");
+		strictEqual(parameter, argument_value, "Verify the argument.");
+	}
+	
+	EventClass.prototype.dispose = function() {
+		this.event_handler.dispose();
+	}
+	
+	EventClass.prototype.raiseEvent = function() {
+		this.event_handler.raiseEvent(argument_value);
+	}
+	
+	var test_object = new EventClass(context_value);
+	test_object.raiseEvent();
+	test_object.dispose();
+}
+test("Event Handling", 2, blazegears.tests.eventHandlingTest);
+
 blazegears.tests.typeDeterminationTest = function() {
 	var control = new function() {
 		var array_member = new Array();
