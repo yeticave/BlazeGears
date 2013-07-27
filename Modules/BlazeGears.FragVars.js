@@ -28,18 +28,164 @@ Homepage: http://www.yeticave.com
 var blazegears = (typeof blazegears === "undefined") ? {} : blazegears;
 blazegears.fragvars = (typeof blazegears.fragvars === "undefined") ? {} : blazegears.fragvars;
 
+// Enum: blazegears.fragvars.HistoryMode
+blazegears.fragvars.HistoryMode = {
+	AUTOMATIC: null,
+	NONE: 1
+};
+
+// Class: blazegears.fragvars.FragVar
+blazegears.fragvars.FragVar = function(id, value) {
+	if (blazegears.isUndefined(value)) value = null;
+	this._id = id;
+	this._value = this.getValue();
+	this._value_changed_event = new blazegears.Event();
+}
+
+// Method: getId
+blazegears.fragvars.FragVar.prototype.getId = function() {
+	return this._id;
+}
+
+// Method: getValue
+blazegears.fragvars.FragVar.prototype.getValue = function() {
+	return blazegears.fragvars.Manager.getFragVarValue(this._id);
+}
+
+// Method: setValue
+blazegears.fragvars.FragVar.prototype.setValue = function(value) {
+	if (value !== this._value) {
+		this._value = value;
+		blazegears.fragvars.Manager.setFragVarValue(this._id, value);
+	}
+}
+
+// Method: getValueChangedEvent
+blazegears.fragvars.FragVar.prototype.getValueChangedEvent = function() {
+	return this._value_changed_event;
+}
+
+blazegears.fragvars.FragVar.prototype._updateValue = function(value) {
+	this._value_changed_event.raise(this);
+}
+
 // Class: blazegears.fragvars.Manager
-// A singleton class that handles variables stored in the fragment section of the current URL.
+blazegears.fragvars.Manager = {};
+
+blazegears.fragvars.Manager._fragvar_values = {};
+blazegears.fragvars.Manager._fragvars = {};
+blazegears.fragvars.Manager._history_mode = blazegears.fragvars.HistoryMode.NONE;
+blazegears.fragvars.Manager._manager = null;
+
+// Method: getHistoryMode
+blazegears.fragvars.Manager.getHistoryMode = function() {
+	return blazegears.fragvars.Manager._history_mode;
+}
+
+// Method: setHistoryMode
+blazegears.fragvars.Manager.setHistoryMode = function(history_mode) {
+	var Manager = blazegears.fragvars.Manager;
+	Manager._history_mode = history_mode;
+	if (Manager._manager !== null) {
+		Manager._manager.ie_history = history_mode === blazegears.fragvars.HistoryMode.AUTOMATIC;
+	}
+}
+
+// Method: createFragVar
+blazegears.fragvars.Manager.createFragVar = function(id) {
+	var Manager = blazegears.fragvars.Manager;
+	var fragvar;
+	var result;
+	
+	if (Manager._fragvars.hasOwnProperty(id)) {
+		result = Manager._fragvars[id];
+	} else {
+		Manager._initialize();
+		fragvar = Manager._manager.createFragVar(id);
+		fragvar._internalOnChange = Manager._internalOnChange;
+		result = new blazegears.fragvars.FragVar(id);
+		Manager._fragvars[id] = result;
+	}
+	
+	return result;
+}
+
+// Method: getFragVar
+blazegears.fragvars.Manager.getFragVar = function(id) {
+	var fragvars = blazegears.fragvars.Manager._fragvars;
+	var result = null;
+	
+	if (fragvars.hasOwnProperty(id)) {
+		result = fragvars[id];
+	}
+	
+	return result;
+}
+
+// Method: getFragVarValue
+blazegears.fragvars.Manager.getFragVarValue = function(id) {
+	var values = blazegears.fragvars.Manager._manager.getFragVarValues();
+	var result = null;
+	
+	if (values.hasOwnProperty(id)) {
+		result = values[id].toString();
+	}
+	
+	return result;
+}
+
+// Method: getFragVarValues
+blazegears.fragvars.Manager.getFragVarValues = function() {
+	blazegears.fragvars.Manager._initialize();
+	return blazegears.fragvars.Manager._manager.getFragVarValues();
+}
+
+// Method: setFragVarValue
+blazegears.fragvars.Manager.setFragVarValue = function(id, value) {
+	var values = {};
+	values[id] = value;
+	blazegears.fragvars.Manager.setFragVarValues(values);
+}
+
+// Method: setFragVarValues
+blazegears.fragvars.Manager.setFragVarValues = function(values) {
+	var Manager = blazegears.fragvars.Manager;
+	var i;
+	
+	Manager._initialize();
+	for (i in values) {
+		if (values.hasOwnProperty(i)) {
+			Manager.createFragVar(i);
+		}
+	}
+	Manager._manager.setFragVarValues(values);
+}
+
+blazegears.fragvars.Manager._initialize = function() {
+	var Manager = blazegears.fragvars.Manager;
+	if (Manager._manager === null) {
+		Manager._manager = new BlazeGears.FragVars();
+		Manager.setHistoryMode(Manager._history_mode);
+	}
+}
+
+blazegears.fragvars.Manager._internalOnChange = function() {
+	var fragvar = blazegears.fragvars.Manager.getFragVar(this._id);
+	fragvar._updateValue(this.getValue());
+}
+
+// Class: BlazeGears.FragVars [Deprecated]
+// This class has been deprecated, use <blazegears.fragvars.Manager> instead. A singleton class that handles variables stored in the fragment section of the current URL.
 // 
 // Superclasses:
 //   <BlazeGears.Styles [Deprecated]>
-blazegears.fragvars.Manager = BlazeGears.Classes.declareSingleton(BlazeGears.Styles, {
-	// Field: ie_history [Deprecated]
-	// This field is deprecated and its functionality will be irrelevant in the future. If it's true, upon updating the URL the changes will be saved to an iframe, so the the forward and back buttons will properly work under Internet Explorer.
+BlazeGears.FragVars = BlazeGears.Classes.declareSingleton(BlazeGears.Styles, {
+	// Field: ie_history
+	// If it's true, upon updating the URL the changes will be saved to an iframe, so the the forward and back buttons will properly work under Internet Explorer.
 	ie_history: true,
 	
-	// Field: redundant_events [Deprecated]
-	// This field is deprecated and redundant events won't be filtered in the future. If it's true, the same event callback functions can be called multiple times when the same callback is used by multiple FragVars, else they won't be called more than once.
+	// Field: redundant_events
+	// If it's true, the same event callback functions can be called multiple times when the same callback is used by multiple FragVars, else they won't be called more than once.
 	redundant_events: true,
 	
 	_fragvar_assigner: "=",
@@ -237,6 +383,9 @@ blazegears.fragvars.Manager = BlazeGears.Classes.declareSingleton(BlazeGears.Sty
 						callbacks.push(self._fragvars[i].onChange);
 						callers.push(self._fragvars[i]);
 					}
+					if (self._fragvars[i]._internalOnChange !== null) {
+						self._fragvars[i]._internalOnChange.call(self._fragvars[i]);
+					}
 				}
 			}
 			for (var i in callbacks) {
@@ -300,6 +449,8 @@ blazegears.fragvars.Manager = BlazeGears.Classes.declareSingleton(BlazeGears.Sty
 			}
 			
 			window.location.hash = hash;
+			clearTimeout(this._timer);
+			this._refresh();
 		}
 	}
 });
@@ -308,14 +459,15 @@ blazegears.fragvars.Manager = BlazeGears.Classes.declareSingleton(BlazeGears.Sty
 document.write("<!--[if lte IE 7]><iframe id='blazegears_fragvars_iframe' title='IE 7' style='display: none;'></iframe><![endif]-->");
 document.write("<!--[if gte IE 8]><iframe id='blazegears_fragvars_iframe' title='IE 8+' style='display: none;'></iframe><![endif]-->");
 
-// Class: blazegears.fragvars.FragVar
-// A class that represents a single FragVar.
+// Class: BlazeGears.FragVars.FragVar [Deprecated]
+// This class has been deprecated, use <blazegears.fragvars.FragVar> instead. A class that represents a single FragVar.
 // 
 // Superclasses:
 //   <BlazeGears.BaseClass [Deprecated]>
-blazegears.fragvars.FragVar = BlazeGears.Classes.declareClass(BlazeGears.BaseClass, {
+BlazeGears.FragVars.FragVar = BlazeGears.Classes.declareClass(BlazeGears.BaseClass, {
 	_id: null,
 	_parent: null,
+	_internalOnChange: null,
 	
 	// Group: Events
 	
@@ -380,11 +532,3 @@ blazegears.fragvars.FragVar = BlazeGears.Classes.declareClass(BlazeGears.BaseCla
 		self._parent = parent;
 	}
 });
-
-// Class: BlazeGears.FragVars [Deprecated]
-// Alias for <blazegears.fragvars.Manager>.
-BlazeGears.FragVars = blazegears.fragvars.Manager;
-
-// Class: BlazeGears.FragVars.FragVar [Deprecated]
-// Alias for <blazegears.fragvars.FragVar>.
-BlazeGears.FragVars.FragVar = blazegears.fragvars.FragVar;

@@ -17,11 +17,12 @@ test("Escaping", blazegears.tests.escapingTest);
 blazegears.tests.eventHandlingTest = function() {
 	var context_value = 123;
 	var argument_value = 456;
+	var test_object;
 	
 	var EventClass = function(serial) {
-		this.event_handler = new blazegears.EventHandler();
+		this.event = new blazegears.Event();
 		this.serial = serial;
-		this.event_handler.addCallback(this, this.callback);
+		this.event.addCallback(this, this.callback);
 	}
 	
 	EventClass.prototype.callback = function(parameter) {
@@ -30,18 +31,19 @@ blazegears.tests.eventHandlingTest = function() {
 	}
 	
 	EventClass.prototype.dispose = function() {
-		this.event_handler.dispose();
+		this.event.dispose();
 	}
 	
-	EventClass.prototype.raiseEvent = function() {
-		this.event_handler.raiseEvent(argument_value);
+	EventClass.prototype.raise = function() {
+		this.event.raise(argument_value);
 	}
 	
-	var test_object = new EventClass(context_value);
-	test_object.raiseEvent();
+	expect(2);
+	test_object = new EventClass(context_value);
+	test_object.raise();
 	test_object.dispose();
 }
-test("Event Handling", 2, blazegears.tests.eventHandlingTest);
+test("Event Handling", blazegears.tests.eventHandlingTest);
 
 blazegears.tests.typeDeterminationTest = function() {
 	var control = new function() {
