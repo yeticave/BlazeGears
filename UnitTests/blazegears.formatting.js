@@ -205,7 +205,7 @@ blazegears.formatting.tests.phpDateFormattingTest = function() {
 	formatter.setTimeZoneOffset(TimeZoneOffset.UTC);
 	for (specifier in results) {
 		formatter.setDateFormat(specifier);
-		if (blazegears.isInArray(specifier, broken_specifiers)) {
+		if (BlazeGears.isInArray(specifier, broken_specifiers)) {
 			continue;
 		}
 		if (results.hasOwnProperty(specifier)) {
@@ -239,7 +239,7 @@ blazegears.formatting.tests.unixDateFormattingTest = function() {
 	formatter.setTimeZoneOffset(TimeZoneOffset.UTC);
 	for (specifier in results) {
 		formatter.setDateFormat("%" + specifier);
-		if (blazegears.isInArray(specifier, broken_specifiers)) {
+		if (BlazeGears.isInArray(specifier, broken_specifiers)) {
 			continue;
 		}
 		if (results.hasOwnProperty(specifier)) {

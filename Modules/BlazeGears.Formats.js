@@ -53,7 +53,7 @@ blazegears.formatting.DateFormatTemplate.prototype.addCallback = function(callba
 
 // Method: addLiteral
 blazegears.formatting.DateFormatTemplate.prototype.addLiteral = function(literal) {
-	if (this._tokens.length === 0 || blazegears.isFunction(this._tokens[this._tokens.length - 1])) {
+	if (this._tokens.length === 0 || BlazeGears.isFunction(this._tokens[this._tokens.length - 1])) {
 		this._tokens.push(literal.toString());
 	} else {
 		this._tokens[this._tokens.length - 1] += literal.toString();
@@ -80,7 +80,7 @@ blazegears.formatting.DateFormatTemplate.prototype.render = function(context, da
 	
 	for (i = 0; i < token_count; ++i) {
 		token = tokens[i];
-		if (blazegears.isFunction(token)) {
+		if (BlazeGears.isFunction(token)) {
 			result += token.call(context, date).toString();
 		} else {
 			result += token.toString();
@@ -415,9 +415,9 @@ blazegears.formatting.DateFormatter.prototype._getNumberOfDaysInMonth = function
 	var month = this._getMonth(date);
 	var result;
 	
-	if (blazegears.isInArray(month, [0, 2, 4, 6, 7, 9, 11])) {
+	if (BlazeGears.isInArray(month, [0, 2, 4, 6, 7, 9, 11])) {
 		result = 31;
-	} else if (blazegears.isInArray(month, [3, 5, 8, 10])) {
+	} else if (BlazeGears.isInArray(month, [3, 5, 8, 10])) {
 		result = 30;
 	} else if (this._isLeapYear(date)) {
 		result = 29;
@@ -510,9 +510,9 @@ blazegears.formatting.DateFormatter.prototype._prepareDate = function(date) {
 	var result;
 	var timestamp;
 	
-	if (blazegears.isDate(date)) {
+	if (BlazeGears.isDate(date)) {
 		result = date;
-	} else if (blazegears.isNumber(date)) {
+	} else if (BlazeGears.isNumber(date)) {
 		result = new Date(date);
 	} else {
 		result = new Date();
@@ -551,7 +551,7 @@ blazegears.formatting.NumberFormatter.prototype.formatNumber = function(number) 
 	var result;
 	
 	// validate the number
-	if (!blazegears.isNumber(number)) {
+	if (!BlazeGears.isNumber(number)) {
 		number = parseFloat(number);
 		if (isNaN(number)) {
 			number = 0;
@@ -957,7 +957,7 @@ blazegears.formatting.UnixDateFormatter.prototype.parseDateFormat = function(for
 			upper = false;
 			
 			while (true) {
-				if (blazegears.isInArray(character, ["-", "_", "0", "^", "#", "E", "O", ":"])) {
+				if (BlazeGears.isInArray(character, ["-", "_", "0", "^", "#", "E", "O", ":"])) {
 					specifier += character;
 					switch (character) {
 						case "-": // disable padding
@@ -1564,7 +1564,7 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 		}
 		
 		// format the number
-		if (!blazegears.isNumber(number)) {
+		if (!BlazeGears.isNumber(number)) {
 			number = parseFloat(number);
 		}
 		if (number < 0) {

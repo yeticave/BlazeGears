@@ -203,12 +203,12 @@ blazegears.bgtl.Compiler.prototype._generateToken = function(result, token, leve
 			case TokenType.VARIABLE:
 				if (this._is_debug_mode_enabled) {
 					result.addCode(token, indentation + "try {");
-					result.addCode(token, indentation2 + result_variable_name + " += blazegears.escapeHtml(" + token.value + ");");
+					result.addCode(token, indentation2 + result_variable_name + " += BlazeGears.escapeHtml(" + token.value + ");");
 					result.addCode(token, indentation + "} catch (error) {");
 					result.addCode(token, indentation2 + "throw blazegears.bgtl.RenderingError._variableRenderingFailed(" + token.line_number + ", " + token.column_number + ", error);");
 					result.addCode(token, indentation + "}");
 				} else {
-					result.addCode(token, indentation + result_variable_name + " += blazegears.escapeHtml(" + token.value + ");");
+					result.addCode(token, indentation + result_variable_name + " += BlazeGears.escapeHtml(" + token.value + ");");
 				}
 				break;
 		}
@@ -296,7 +296,7 @@ blazegears.bgtl.Compiler._generateForeachConstruct = function(result, token, lev
 	}
 	
 	result.addCode(token, indentation + "var _bgtl_iterator;");
-	result.addCode(token, indentation + "if (blazegears.isArray(_bgtl_iteratee)) {");
+	result.addCode(token, indentation + "if (BlazeGears.isArray(_bgtl_iteratee)) {");
 	result.addCode(token, indentation2 + "for (_bgtl_iterator = 0; _bgtl_iterator < _bgtl_iteratee.length; ++_bgtl_iterator) {");
 	if (is_in) {
 		result.addCode(token, indentation3 + iterator + " = _bgtl_iterator;");
@@ -408,9 +408,9 @@ blazegears.bgtl._DelimiterMatch = function(delimiter, offset) {
 
 // represents a valid keyword parser keyword
 blazegears.bgtl._Keyword = function(name, requires_argument, is_block, end_keyword) {
-	if (blazegears.isUndefined(end_keyword)) end_keyword = null;
-	if (blazegears.isUndefined(is_block)) is_block = false;
-	if (blazegears.isUndefined(requires_argument)) requires_argument = false;
+	if (end_keyword === undefined) end_keyword = null;
+	if (is_block === undefined) is_block = false;
+	if (requires_argument === undefined) requires_argument = false;
 	this.end_keyword = end_keyword;
 	this.is_block = is_block;
 	this.name = name;
@@ -435,10 +435,10 @@ blazegears.bgtl._Lexer.prototype.createKeyword = function(name, requires_argumen
 
 // finds the next subtring that isn't preceded with a backslash
 blazegears.bgtl._Lexer.prototype.findNextDelimiter = function(needles, haystack, offset, must_find, line_number, column_number, is_escapeable, ignore_strings, ignore_parenthesised) {
-	if (blazegears.isUndefined(must_find)) { must_find = false; }
-	if (blazegears.isUndefined(is_escapeable)) { is_escapeable = true; }
-	if (blazegears.isUndefined(ignore_parenthesised)) { ignore_parenthesised = true; }
-	if (blazegears.isUndefined(ignore_strings)) { ignore_strings = true; }
+	if (must_find === undefined) { must_find = false; }
+	if (is_escapeable === undefined) { is_escapeable = true; }
+	if (ignore_parenthesised === undefined) { ignore_parenthesised = true; }
+	if (ignore_strings === undefined) { ignore_strings = true; }
 	
 	var DelimiterMatch = blazegears.bgtl._DelimiterMatch;
 	var current_offset;
@@ -544,7 +544,7 @@ blazegears.bgtl._Lexer.prototype.findNextTag = function(lexeme, offset) {
 			}
 			result.keyword = this.getKeyword(result);
 			
-			if (construct_tag_parts.length >= 4 && !blazegears.isUndefined(construct_tag_parts[3]) && construct_tag_parts[3].length > 0) {
+			if (construct_tag_parts.length >= 4 && construct_tag_parts[3] !== undefined && construct_tag_parts[3].length > 0) {
 				argument_opening = this.findNextDelimiter(["("], tag_body, 0, false, result.line_number, result.column_number, false);
 				argument_closing = this.findNextDelimiter([")"], tag_body, argument_opening.offset + 1, true, result.line_number, result.column_number, true, false, false);
 				result.argument = tag_body.substr(argument_opening.offset + 1, argument_closing.offset - 1 - argument_opening.offset);
@@ -581,8 +581,8 @@ blazegears.bgtl._Lexer.prototype.getKeyword = function(token) {
 
 // parses a lexeme and converts it into a token collection
 blazegears.bgtl._Lexer.prototype.tokenizeLexeme = function(lexeme, offset, closing_keyword) {
-	if (blazegears.isUndefined(closing_keyword)) closing_keyword = null;
-	if (blazegears.isUndefined(offset)) offset = 0;
+	if (closing_keyword === undefined) closing_keyword = null;
+	if (offset === undefined) offset = 0;
 	
 	var Token = blazegears.bgtl._Token;
 	var TokenType = blazegears.bgtl._TokenType;
@@ -612,7 +612,7 @@ blazegears.bgtl._Lexer.prototype.tokenizeLexeme = function(lexeme, offset, closi
 			if (token.type === TokenType.CONSTRUCT) {
 				// if the found tag is a closing tag to the current block tag, drop back one level
 				if (closing_keyword !== null && token.offset >= child_closing_offset) {
-					if (closing_keyword === token.value || (blazegears.isArray(closing_keyword) && blazegears.isInArray(token.value, closing_keyword))) {
+					if (closing_keyword === token.value || (BlazeGears.isArray(closing_keyword) && BlazeGears.isInArray(token.value, closing_keyword))) {
 						return result;
 					}
 				}

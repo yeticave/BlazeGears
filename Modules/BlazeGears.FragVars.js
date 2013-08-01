@@ -36,7 +36,7 @@ blazegears.fragvars.HistoryMode = {
 
 // Class: blazegears.fragvars.FragVar
 blazegears.fragvars.FragVar = function(id, value) {
-	if (blazegears.isUndefined(value)) value = null;
+	if (value === undefined) value = null;
 	this._id = id;
 	this._value = this.getValue();
 	this._value_changed_event = new blazegears.Event();
