@@ -28,9 +28,44 @@ Homepage: http://www.yeticave.com
 // The main namespace that contains all the fundamental functionality.
 var blazegears = (typeof blazegears === "undefined") ? {} : blazegears;
 
-// Function: getVersion
+/*
+Function: getVersion
+	Gets the API's version number.
+
+Return Value:
+	An *Array* of three *Numbers*, representing the major, minor, and patch versions of the API.
+
+Remarks:
+	Starting from v2.0.0, the API versioning will follow the <Semantic Versioning v2.0.0 specifications at http://semver.org/spec/v2.0.0.html>.
+
+Examples:
+	(begin code)
+		// v1.2.3-beta.3+build.5:
+		blazegears.getVersion(); // [1, 2, 3]
+	(end)
+*/
 blazegears.getVersion = function() {
 	return [1, 1, 0, 0];
+}
+
+/*
+Function: getVersionMetadata
+	Gets the API's version metadata.
+
+Return Value:
+	A *String* reperesentation of the API's pre-release/build metadata. It's usually empty for stable releases.
+
+Remarks:
+	Starting from v2.0.0, the API versioning will follow the <Semantic Versioning v2.0.0 specifications at http://semver.org/spec/v2.0.0.html>.
+
+Examples:
+	(begin code)
+		// v1.2.3-beta.3+build.5:
+		blazegears.getVersionExtension(); // -beta.3+build.5
+	(end)
+*/
+blazegears.getVersionMetadata = function() {
+	return "-s.1";
 }
 
 blazegears._countStringOccurrences = function(needle, haystack) {
@@ -103,8 +138,48 @@ blazegears._padStringLeft = function(string, padding, expected_width) {
 	return result;
 }
 
-// Class: blazegears.Error
+/*
+Class: blazegears.Error
+	The base class for all custom exceptions. It will try to compose the most appropriate error message from *message* and *inner_error*.
+
+Parent Class:
+	*Error*
+
+Arguments:
+	[message = null] - (*String*) The base error message. If it's *null*, a generic message will be used.
+	[inner_error = null] - (*Error*) Setter for <getInnerError>.
+
+Exceptions:
+	blazegears.ArgumentError - *inner_error* isn't an instance of *Error* and isn't *null*.
+
+Examples:
+	(begin code)
+		var a;
+		var b;
+		var new_error;
+		
+		try {
+			b = a.length
+		} catch (error) {
+			// An error with a message and an inner error:
+			new_error = new blazegears.Error("Assignment failed.", error);
+			new_error.toString(); // blazegears.Error: Assignment failed.
+			
+			// An error with only an inner error:
+			new_error = new blazegears.Error(null, error);
+			new_error.toString(); // blazegears.Error: An error occurred: Cannot read property 'length' of null
+			
+			// An error with no message or inner error:
+			new_error = new blazegears.Error();
+			new_error.toString(); // blazegears.Error: An error occurred.
+		}
+	(end)
+*/
 blazegears.Error = function(message, inner_error) {
+	if (inner_error !== null && !(inner_error instanceof Error)) {
+		throw  blazegears.ArgumentError._invalidArgumentType("inner_error", "Error");
+	}
+	
 	Error.call(this);
 	this.message = blazegears.Error._composeMessage("An error occurred", message, inner_error);
 	this.name = "blazegears.Error";
@@ -113,9 +188,20 @@ blazegears.Error = function(message, inner_error) {
 blazegears.Error.prototype = new Error();
 blazegears.Error.prototype.constructor = blazegears.Error;
 
-// Method: getInnerError
+/*
+Method: getInnerError
+	Gets the *Error* that's the cause of the current error.
+*/
 blazegears.Error.prototype.getInnerError = function() {
 	return this._inner_error;
+}
+
+/*
+Method: getMessage
+	Gets the *String* representation of the error message.
+*/
+blazegears.Error.prototype.getMessage = function() {
+	return this.message;
 }
 
 // composes the message for the error depending on if there's a message or inner error available
@@ -140,17 +226,29 @@ blazegears.Error._composeMessage = function(default_message, message, inner_erro
 	return result;
 }
 
-// Class: blazegears.ArgumentError
+/*
+Class: blazegears.ArgumentError
+	The exception that will be thrown when an argument provided to a function is invalid.
+
+Parent Class:
+	<Error>
+
+Arguments:
+	argument_name - (*String*) Setter for <getArgumentName>.
+	[message = null] - (*String*) Will be chained to <Error>'s constructor.
+	[inner_error = null] - (*Error*) Will be chained to <Error>'s constructor.
+*/
 blazegears.ArgumentError = function(argument_name, message, inner_error) {
 	blazegears.Error(this, message, inner_error);
 	this.message = blazegears.Error._composeMessage("The <" + argument_name + "> argument is invalid", message, inner_error);
 	this.name = "blazegears.ArgumentError";
-	this._argument_name = argument_name;
+	this._argument_name = argument_name.toString();
 }
 blazegears.ArgumentError.prototype = new blazegears.Error();
 blazegears.ArgumentError.prototype.constructor = blazegears.ArgumentError;
 
 // Method: getArgumentName
+// Gets the *String* representation of the name of the invalid argument.
 blazegears.ArgumentError.prototype.getArgumentName = function() {
 	return this._argument_name;
 }
@@ -161,16 +259,36 @@ blazegears.ArgumentError._invalidArgumentType = function(argument_name, expected
 }
 
 // Class: blazegears.Event
+// A collection of callbacks that can be simultaneously raised upon the occurrence of an event.
 blazegears.Event = function() {
 	this._callbacks = [];
 }
 
-// Method: addCallback
+/*
+Method: addCallback
+	Adds a callback to the collection.
+
+Arguments:
+	context - (*Object*) The object that will be assigned to *this* upon raising the event.
+	callback - (*Function*) The callback function.
+
+Exceptions:
+	blazegears.ArgumentError - *callback* is not an instance of *Function*.
+*/
 blazegears.Event.prototype.addCallback = function(context, callback) {
+	if (!BlazeGears.isFunction(callback)) {
+		throw blazegears.ArgumentError("callback", "Function");
+	}
 	this._callbacks.push([context, callback]);
 }
 
-// Method: dispose
+/*
+Method: dispose
+	Removes all the callbacks of the event.
+
+Remarks:
+	It is advised to dispose of the Event at the end of its usefulness to avoid retaining references to objects that otherwise would get garbage collected.
+*/
 blazegears.Event.prototype.dispose = function() {
 	var callbacks = this._callbacks;
 	var callback_count = callbacks.length;
@@ -185,7 +303,13 @@ blazegears.Event.prototype.dispose = function() {
 	callbacks.length = 0;
 }
 
-// Method: raise
+/*
+Method: raise
+	Raises the callbacks of the event.
+
+Arguments:
+	All arguments passed to this method will be applied to the callback as-is.
+*/
 blazegears.Event.prototype.raise = function() {
 	var callbacks = this._callbacks;
 	var callback_count = callbacks.length;
@@ -196,24 +320,54 @@ blazegears.Event.prototype.raise = function() {
 	}
 }
 
-// Method: removeCallback
+/*
+Method: removeCallback
+	Removes a callback from the collection.
+
+Arguments:
+	context - (*Object*) The object that would be be assigned to *this* upon raising the callback.
+	callback - (*Function*) The callback function.
+
+Return Value:
+	(Boolean) *true* if the callback was found and removed, otherwise *false*.
+
+Errors:
+	blazegears.ArgumentError - *callback* is not an instance of *Function*.
+*/
 blazegears.Event.prototype.removeCallback = function(context, callback) {
 	var callbacks = this._callbacks;
 	var callback_count = callbacks.length;
 	var i;
+	var result = false;
 	
+	if (!BlazeGears.isFunction(callback)) {
+		throw new blazegears.ArgumentError("callback");
+	}
 	for (i = 0; i < callback_count; ++i) {
 		if (context === callbacks[i][0] && callback === callbacks[i][1]) {
 			callbacks[i][0] = null;
 			callbacks[i][1] = null;
 			callbacks[i].length = 0;
 			callbacks.splice(i, 1);
+			result = true;
 			break;
 		}
 	}
+	
+	return result;
 }
 
-// Class: blazegears.NotOverriddenError
+/*
+Class: blazegears.NotOverriddenError
+	The error that will be thrown when an abstract method gets called.
+
+Parent Class:
+	<Error>
+
+Arguments:
+	[message = null] - (*String*) Will be chained to <Error>'s constructor.
+	[inner_error = null] - (*Error*) Will be chained to <Error>'s constructor.
+*/
 blazegears.NotOverriddenError = function(message, inner_error) {
 	blazegears.Error(this, message, inner_error);
 	this.message = blazegears.Error._composeMessage("This method has to be overridden by a child class", message, inner_error);
@@ -231,8 +385,8 @@ BlazeGears._entities = {}; // stores the declared entities
 BlazeGears._included_css = []; // stores the list of included css files
 BlazeGears._included_js = []; // stores the list of included javascript files
 
-// Variable: config [Deprecated]
-// This variable is deprecated and its functionality will be completely removed. The dictionary that's used for configuration.
+// Variable: config
+// The dictionary that's used for configuration.
 // 
 // Keys:
 //   display_errors - If it's true, <error> will display an alert window whenever it's called. Defaults to false.

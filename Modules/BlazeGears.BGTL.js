@@ -417,7 +417,7 @@ blazegears.bgtl._Keyword = function(name, requires_argument, is_block, end_keywo
 	this.requires_argument = requires_argument;
 }
 
-// Class: blazegears.bgtl._Lexer
+// the default lexical parser for bgtl
 blazegears.bgtl._Lexer = function() {
 	this._keywords = [];
 	this.createKeyword("elif", true, true, ["end", "elif", "else"]);
@@ -689,7 +689,7 @@ blazegears.bgtl._TokenType = {
 	VARIABLE: "VARIABLE"
 };
 
-// Class: blazegears.bgtl._TokenCollection
+// a collection of tokens
 blazegears.bgtl._TokenCollection = function() {
 	this._tokens = [];
 }
