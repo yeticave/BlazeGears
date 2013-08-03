@@ -176,6 +176,7 @@ Examples:
 	(end)
 */
 blazegears.Error = function(message, inner_error) {
+	if (inner_error === undefined) inner_error = null;
 	if (inner_error !== null && !(inner_error instanceof Error)) {
 		throw  blazegears.ArgumentError._invalidArgumentType("inner_error", "Error");
 	}
@@ -183,7 +184,7 @@ blazegears.Error = function(message, inner_error) {
 	Error.call(this);
 	this.message = blazegears.Error._composeMessage("An error occurred", message, inner_error);
 	this.name = "blazegears.Error";
-	this._inner_error = inner_error === undefined ? null : inner_error;
+	this._inner_error = inner_error;
 }
 blazegears.Error.prototype = new Error();
 blazegears.Error.prototype.constructor = blazegears.Error;
