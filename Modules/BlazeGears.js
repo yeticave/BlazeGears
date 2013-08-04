@@ -28,8 +28,12 @@ Homepage: http://www.yeticave.com
 // The main namespace that contains all the fundamental functionality.
 var blazegears = (typeof blazegears === "undefined") ? {} : blazegears;
 
+// Class: Core
+// Provides some basic information about the API.
+blazegears.Core = {};
+
 /*
-Function: getVersion
+Method: getVersion
 	Gets the API's version number.
 
 Return Value:
@@ -44,12 +48,12 @@ Examples:
 		blazegears.getVersion(); // [1, 2, 3]
 	(end)
 */
-blazegears.getVersion = function() {
+blazegears.Core.getVersion = function() {
 	return [1, 1, 0, 0];
 }
 
 /*
-Function: getVersionMetadata
+Method: getVersionMetadata
 	Gets the API's version metadata.
 
 Return Value:
@@ -64,7 +68,7 @@ Examples:
 		blazegears.getVersionExtension(); // -beta.3+build.5
 	(end)
 */
-blazegears.getVersionMetadata = function() {
+blazegears.Core.getVersionMetadata = function() {
 	return "-s.1";
 }
 
@@ -139,8 +143,8 @@ blazegears._padStringLeft = function(string, padding, expected_width) {
 }
 
 /*
-Class: blazegears.Error
-	The base class for all custom exceptions. It will try to compose the most appropriate error message from *message* and *inner_error*.
+Class: Error
+	The exception that will be thrown when an error occurs. It will try to compose the most appropriate error message from *message* and *inner_error*. All custom exceptions will inherit from this class.
 
 Parent Class:
 	*Error*
@@ -228,7 +232,7 @@ blazegears.Error._composeMessage = function(default_message, message, inner_erro
 }
 
 /*
-Class: blazegears.ArgumentError
+Class: ArgumentError
 	The exception that will be thrown when an argument provided to a function is invalid.
 
 Parent Class:
@@ -259,7 +263,7 @@ blazegears.ArgumentError._invalidArgumentType = function(argument_name, expected
 	return new blazegears.ArgumentError(argument_name, "The <" + argument_name + "> argument is expected to be an instance of <" + expected_type + ">.");
 }
 
-// Class: blazegears.Event
+// Class: Event
 // A collection of callbacks that can be simultaneously raised upon the occurrence of an event.
 blazegears.Event = function() {
 	this._callbacks = [];
@@ -359,7 +363,7 @@ blazegears.Event.prototype.removeCallback = function(context, callback) {
 }
 
 /*
-Class: blazegears.NotOverriddenError
+Class: NotOverriddenError
 	The error that will be thrown when an abstract method gets called.
 
 Parent Class:
@@ -606,7 +610,7 @@ BlazeGears.escape = function(text, encoding) {
 // 
 // Arguments:
 //   text - The string to be escaped.
-//   [method] [Deprecated] - This argument is deprecated and its functionality will be completely removed. The escaping method to be used. If not provided, <config [Deprecated]>.escape_encoding will be used.
+//   [method] [Deprecated] - This argument is deprecated and its functionality will be completely removed. The escaping method to be used. If not provided, <config>.escape_encoding will be used.
 // 
 // Return Value:
 //   Returns the escaped string.
