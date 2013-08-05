@@ -25,10 +25,97 @@ Homepage: http://www.yeticave.com
 */
 
 // Namespace: blazegears.bgtl
+// Deals with HTML templating.
 var blazegears = (typeof blazegears === "undefined") ? {} : blazegears;
 blazegears.bgtl = (typeof blazegears.bgtl === "undefined") ? {} : blazegears.bgtl;
 
-// Class: blazegears.bgtl.Compiler
+/*
+Class: blazegears.bgtl.Compiler
+	Builds <Templates> from BlazeGears Templating Language v2 code.
+
+Remarks:
+	There are a few quirks that should be kept in mind while writing BGTLv2 templates:
+		- Building a template while debug mode is enabled will add a lot of error catching logic, thus it's really important to disable it in production.
+		- While templates are currently not sandboxed, it's unadvised to access variables other than what's available in the template's context.
+		- Writing regular expressions in their literal form is not supported. The RegExp constructor does work.
+		- At the time of writing this documentation the only browser that's capable of detecting the number of the line that caused the failure in an eval'd statement is <Mozilla Firefox at http://www.mozilla.org/en-US/firefox>, the rest of the browsers won't properly report error line numbers.
+
+Syntax:
+	BGTLv2 supports two kinds of tags, variable tags and construct tags:
+		- Variable tags are enclosed by the {{ and }} delimiters. The expression between the two delimiters will be evaluated and the result will be stringified, HTML encoded, and added to the output.
+		- Construct tags are enclosed by the {% and %} delimiters. Please see below the available constructs.
+
+Constructs:
+	if - Takes one argument, the *condition*. Evaluates the *condition* and if it's *true*, the block it encloses will be rendered, otherwise it will be ignored. Needs to be closed with an *elif*, *else*, or *end* construct.
+	elif - Takes one argument, the *condition*. Must be preceded by an *if* or *elif* construct. If the preceding *if* and *elif* constructs were ignored, it evaluates the *condition* and if it's *true*, the block it encloses will be rendered, otherwise it will be ignored. Needs to be closed with an *elif*, *else*, or *end* construct.
+	else - Must be preceded by an *if* or *elif* construct. If the preceding *if* and *elif* constructs were ignored, the block it encloses will be rendered, otherwise it will be ignored. Needs to be closed with an *end* construct.
+	foreach-as - Takes two arguments, the *iterator* and the *iteratee*, separated by the *as* keyword. Iterates through every owned property of the *iteratee*. For each owned property the property's value will be assingned to the *iterator* and the enclosed block will be rendered. Needs to be closed with an *end* construct.
+	foreach-in - Takes two arguments, the *iterator* and the *iteratee*, separated by the *in* keyword. Iterates through every owned property of the *iteratee*. For each owned property the property's key will be assingned to the *iterator* and the enclosed block will be rendered. Needs to be closed with an *end* construct.
+	raw - Works similarly to a variable tag, but it doesn't do any HTML encoding on the result.
+	end - Used for closing blocks started by other constructs.
+
+Examples:
+	The basic usage of the constructs:
+	(begin code)
+		var compiler = new blazegears.bgtl.Compiler();
+		var lexeme;
+		var template;
+		
+		// if/elif/else constructs:
+		lexeme = "{%if (this.value === 1)%}if-branch";
+		lexeme += "{%elif (this.value === 2)%}elif-branch";
+		lexeme += "{%else%}else-branch{%end%}";
+		template = compiler.buildTemplate(lexeme);
+		template.render({ value: 1 }); // if-branch
+		template.render({ value: 2 }); // elif-branch
+		template.render({ value: 0 }); // else-branch
+		
+		// foreach-as
+		lexeme = "{%foreach (var item as this)%}{{item}}{%end%}";
+		template = compiler.buildTemplate(lexeme);
+		template.render(["A", "&", "B"]); // A&amp;B
+		
+		// foreach-in
+		lexeme = "{%foreach (var item in this)%}{{this[item]}}{%end%}";
+		template = compiler.buildTemplate(lexeme);
+		template.render(["A", "&", "B"]); // A&amp;B
+		
+		// raw
+		lexeme = "{%raw(this.value)%}";
+		template = compiler.buildTemplate(lexeme);
+		template.render({ value: "<h1>A&B</h1>" }); // <h1>A&B</h1>
+	(end)
+	A more complex example:
+	(begin code)
+		<div id="outputContainer"></div>
+		<script id="lexemeContainer" type="text/bgtl">
+			<ul>
+				{%foreach (var item as this)%}
+					<li>
+						{%if (item.link === undefined)%}
+							{{item.title}}
+						{%else%}
+							<a href="{{item.link}}">{{item.title}}</a>
+						{%end%}
+					</li>
+				{%end%}
+			</ul>
+		</script>
+		<script type="text/javascript">
+			var compiler = new blazegears.bgtl.Compiler();
+			var lexeme = document.getElementById("lexemeContainer").innerHTML;
+			var template = compiler.buildTemplate(lexeme);
+			
+			var items = [
+				{ title: "Lorem Ipsum", link: "http://www.example.com" },
+				{ title: "Dolor Sit Amet" },
+				{ title: "Consectetur Adipiscing Elit" }
+			];
+			
+			document.getElementById("outputContainer").innerHTML = template.render(items);
+		</script>
+	(end)
+*/
 blazegears.bgtl.Compiler = function() {
 	var Compiler = blazegears.bgtl.Compiler;
 	this._constructs = [];
@@ -42,8 +129,40 @@ blazegears.bgtl.Compiler = function() {
 	this._createConstruct("raw", Compiler._generateRawConstruct);
 }
 
-// Method: buildTemplate
-blazegears.bgtl.Compiler.prototype.buildTemplate = function(input) {
+/*
+Method: isDebugModeEnabled
+	Determines if debug mode is enabled.
+
+Return Value:
+	(*Boolean*) *true* if debug mode is enabled, otherwise *false*.
+*/
+blazegears.bgtl.Compiler.prototype.isDebugModeEnabled = function() {
+	return this._is_debug_mode_enabled;
+}
+
+/*
+Method: enableDebugMode
+	Setter for <isDebugModeEnabled>
+
+Arguments:
+	enable - (*Boolean*) If it's *true*, the debug mode will be enabled, otherwise it will be disabled.
+*/
+blazegears.bgtl.Compiler.prototype.enableDebugMode = function(enable) {
+	this._is_debug_mode_enabled = Boolean(enable);
+}
+
+/*
+Method: buildTemplate
+	Builds a <Template> from BGTLv2 code.
+
+Arguments:
+	lexeme - (*String*) The code to build the template from.
+
+Exceptions:
+	blazegears.bgtl.CompilingError - An error occurred during the compiling of the template.
+	blazegears.bgtl.LexingError - An error occurred during the lexical parsing of the template.
+*/
+blazegears.bgtl.Compiler.prototype.buildTemplate = function(lexeme) {
 	var column_number;
 	var code_collection;
 	var error_copy;
@@ -54,7 +173,7 @@ blazegears.bgtl.Compiler.prototype.buildTemplate = function(input) {
 	var result = new blazegears.bgtl.Template();
 	var tokens;
 	
-	tokens = this._lexer.tokenizeLexeme(input);
+	tokens = this._lexer.tokenizeLexeme(lexeme);
 	code_collection = this._compileTemplate(tokens);
 	try {
 		result._render_callback = new Function(code_collection.toString());
@@ -78,16 +197,6 @@ blazegears.bgtl.Compiler.prototype.buildTemplate = function(input) {
 	}
 	
 	return result;
-}
-
-// Method: enableDebugMode
-blazegears.bgtl.Compiler.prototype.enableDebugMode = function(enable) {
-	this._is_debug_mode_enabled = enable;
-}
-
-// Method: isDebugModeEnabled
-blazegears.bgtl.Compiler.prototype.isDebugModeEnabled = function() {
-	return this._is_debug_mode_enabled;
 }
 
 // the name of the variable that will be returned by the rendering method
@@ -704,7 +813,19 @@ blazegears.bgtl._TokenCollection.prototype.getTokens = function() {
 	return this._tokens.slice();
 }
 
-// Class: blazegears.bgtl.Error
+/*
+Class: blazegears.bgtl.Error
+	The exception that will be thrown when an error occurs during the building or the rendering of a template.
+
+Parent Class:
+	<Error>
+
+Arguments:
+	line_number - (*Number*) Setter for <getLineNumber>.
+	column_number - (*Number*) Setter for <getColumnNumber>.
+	message - (*String*) Will be chained to <Error>'s constructor.
+	inner_error - (*Error*) Will be chained to <Error>'s constructor.
+*/
 blazegears.bgtl.Error = function(line_number, column_number, message, inner_error) {
 	blazegears.Error.call(this, message, inner_error);
 	this._column_number = blazegears._forceParseInt(column_number);
@@ -716,21 +837,30 @@ blazegears.bgtl.Error.prototype = new blazegears.Error();
 blazegears.bgtl.Error.prototype.constructor = blazegears.bgtl.Error;
 
 // Method: getColumnNumber
+// Gets the *Number* representation of the column where the error occured.
 blazegears.bgtl.Error.prototype.getColumnNumber = function() {
 	return this._column_number;
 }
 
-// Method: getInnerError
-blazegears.bgtl.Error.prototype.getInnerError = function() {
-	return this._inner_error;
-}
-
 // Method: getLineNumber
+// Gets the *Number* representation of the line that caused the error.
 blazegears.bgtl.Error.prototype.getLineNumber = function() {
 	return this._line_number;
 }
 
-// Class: blazegears.bgtl.CompilingError
+/*
+Class: blazegears.bgtl.CompilingError
+	The exception that will be thrown when an error occurs during the compilation of a template.
+
+Parent Class:
+	<bgtl.Error>
+
+Arguments:
+	line_number - (*Number*) Will be chained to <bgtl.Error>'s constructor.
+	column_number - (*Number*) Will be chained to <bgtl.Error>'s constructor.
+	message - (*String*) Will be chained to <bgtl.Error>'s constructor.
+	inner_error - (*Error*) Will be chained to <bgtl.Error>'s constructor.
+*/
 blazegears.bgtl.CompilingError = function(line_number, column_number, message, inner_error) {
 	blazegears.bgtl.Error.call(this, line_number, column_number, message, inner_error);
 	this.message = blazegears.Error._composeMessage("Compilation failed on line " + this._line_number + " at column " + this._column_number, message, inner_error);
@@ -749,7 +879,19 @@ blazegears.bgtl.CompilingError._invalidConstruct = function(token) {
 	return new blazegears.bgtl.CompilingError(token.line_number, token.column_number, message);
 }
 
-// Class: blazegears.bgtl.LexingError
+/*
+Class: blazegears.bgtl.LexingError
+	The exception that will be thrown when an error occurs during the lexical parsing of a template.
+
+Parent Class:
+	<bgtl.Error>
+
+Arguments:
+	line_number - (*Number*) Will be chained to <bgtl.Error>'s constructor.
+	column_number - (*Number*) Will be chained to <bgtl.Error>'s constructor.
+	message - (*String*) Will be chained to <bgtl.Error>'s constructor.
+	inner_error - (*Error*) Will be chained to <bgtl.Error>'s constructor.
+*/
 blazegears.bgtl.LexingError = function(line_number, column_number, message, inner_error) {
 	blazegears.bgtl.Error.call(this, line_number, column_number, message, inner_error);
 	this.message = blazegears.Error._composeMessage("Lexing failed on line " + this._line_number + " at column " + this._column_number, message, inner_error);
@@ -783,7 +925,19 @@ blazegears.bgtl.LexingError._missingDelimiter = function(delimiter, line_number,
 	return new blazegears.bgtl.LexingError(line_number, column_number, message);
 }
 
-// Class: blazegears.bgtl.RenderingError
+/*
+Class: blazegears.bgtl.RenderingError
+	The exception that will be thrown when an error occurs during the rendering of a template.
+
+Parent Class:
+	<bgtl.Error>
+
+Arguments:
+	line_number - (*Number*) Will be chained to <bgtl.Error>'s constructor.
+	column_number - (*Number*) Will be chained to <bgtl.Error>'s constructor.
+	message - (*String*) Will be chained to <bgtl.Error>'s constructor.
+	inner_error - (*Error*) Will be chained to <bgtl.Error>'s constructor.
+*/
 blazegears.bgtl.RenderingError = function(line_number, column_number, message, inner_error) {
 	blazegears.bgtl.Error.call(this, line_number, column_number, message, inner_error);
 	this.message = blazegears.Error._composeMessage("Rendering failed on line " + this._line_number + " at column " + this._column_number, message, inner_error);
@@ -828,11 +982,18 @@ blazegears.bgtl.RenderingError._variableRenderingFailed = function(line_number, 
 }
 
 // Class: blazegears.bgtl.Template
+// Represents a renderable template.
 blazegears.bgtl.Template = function() {
 	this._render_callback = null;
 }
 
-// Method: render
+/*
+Method: render
+	Renders the template as a *String*.
+
+Arguments:
+	context - (*Object*) The object that will be assigned to *this* when rendering the template. Primitive objects will be boxed.
+*/
 blazegears.bgtl.Template.prototype.render = function(context) {
 	return this._render_callback.call(context);
 }

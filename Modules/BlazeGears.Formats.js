@@ -73,6 +73,7 @@ blazegears.formatting.DateFormatTemplate.prototype.merge = function(date_format_
 
 // Method: render
 blazegears.formatting.DateFormatTemplate.prototype.render = function(context, date) {
+	var i;
 	var result = "";
 	var token;
 	var tokens = this._tokens;

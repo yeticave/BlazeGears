@@ -253,7 +253,7 @@ blazegears.ArgumentError.prototype = new blazegears.Error();
 blazegears.ArgumentError.prototype.constructor = blazegears.ArgumentError;
 
 // Method: getArgumentName
-// Gets the *String* representation of the name of the invalid argument.
+// Gets the *String* representation of the name of the argument that's the cause of the error.
 blazegears.ArgumentError.prototype.getArgumentName = function() {
 	return this._argument_name;
 }
@@ -285,6 +285,43 @@ blazegears.Event.prototype.addCallback = function(context, callback) {
 		throw blazegears.ArgumentError("callback", "Function");
 	}
 	this._callbacks.push([context, callback]);
+}
+
+/*
+Method: removeCallback
+	Removes a callback from the collection.
+
+Arguments:
+	context - (*Object*) The object that would be be assigned to *this* upon raising the callback.
+	callback - (*Function*) The callback function.
+
+Return Value:
+	(Boolean) *true* if the callback was found and removed, otherwise *false*.
+
+Errors:
+	blazegears.ArgumentError - *callback* is not an instance of *Function*.
+*/
+blazegears.Event.prototype.removeCallback = function(context, callback) {
+	var callbacks = this._callbacks;
+	var callback_count = callbacks.length;
+	var i;
+	var result = false;
+	
+	if (!BlazeGears.isFunction(callback)) {
+		throw new blazegears.ArgumentError("callback");
+	}
+	for (i = 0; i < callback_count; ++i) {
+		if (context === callbacks[i][0] && callback === callbacks[i][1]) {
+			callbacks[i][0] = null;
+			callbacks[i][1] = null;
+			callbacks[i].length = 0;
+			callbacks.splice(i, 1);
+			result = true;
+			break;
+		}
+	}
+	
+	return result;
 }
 
 /*
@@ -323,43 +360,6 @@ blazegears.Event.prototype.raise = function() {
 	for (i = 0; i < callback_count; ++i) {
 		callbacks[i][1].apply(callbacks[i][0], arguments);
 	}
-}
-
-/*
-Method: removeCallback
-	Removes a callback from the collection.
-
-Arguments:
-	context - (*Object*) The object that would be be assigned to *this* upon raising the callback.
-	callback - (*Function*) The callback function.
-
-Return Value:
-	(Boolean) *true* if the callback was found and removed, otherwise *false*.
-
-Errors:
-	blazegears.ArgumentError - *callback* is not an instance of *Function*.
-*/
-blazegears.Event.prototype.removeCallback = function(context, callback) {
-	var callbacks = this._callbacks;
-	var callback_count = callbacks.length;
-	var i;
-	var result = false;
-	
-	if (!BlazeGears.isFunction(callback)) {
-		throw new blazegears.ArgumentError("callback");
-	}
-	for (i = 0; i < callback_count; ++i) {
-		if (context === callbacks[i][0] && callback === callbacks[i][1]) {
-			callbacks[i][0] = null;
-			callbacks[i][1] = null;
-			callbacks[i].length = 0;
-			callbacks.splice(i, 1);
-			result = true;
-			break;
-		}
-	}
-	
-	return result;
 }
 
 /*
