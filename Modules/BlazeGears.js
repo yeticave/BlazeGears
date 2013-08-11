@@ -26,7 +26,7 @@ Homepage: http://www.yeticave.com
 
 // Namespace: blazegears
 // The main namespace that contains all the fundamental functionality.
-var blazegears = (typeof blazegears === "undefined") ? {} : blazegears;
+var blazegears = blazegears || {};
 
 // Class: Core
 // Provides some basic information about the API.
@@ -182,7 +182,7 @@ Examples:
 blazegears.Error = function(message, inner_error) {
 	if (inner_error === undefined) inner_error = null;
 	if (inner_error !== null && !(inner_error instanceof Error)) {
-		throw  blazegears.ArgumentError._invalidArgumentType("inner_error", "Error");
+		throw blazegears.ArgumentError._invalidArgumentType("inner_error", "Error");
 	}
 	
 	Error.call(this);
@@ -201,10 +201,8 @@ blazegears.Error.prototype.getInnerError = function() {
 	return this._inner_error;
 }
 
-/*
-Method: getMessage
-	Gets the *String* representation of the error message.
-*/
+// Method: getMessage
+// Gets the error message as a *String*.
 blazegears.Error.prototype.getMessage = function() {
 	return this.message;
 }
@@ -244,16 +242,21 @@ Arguments:
 	[inner_error = null] - (*Error*) Will be chained to <Error>'s constructor.
 */
 blazegears.ArgumentError = function(argument_name, message, inner_error) {
-	blazegears.Error(this, message, inner_error);
-	this.message = blazegears.Error._composeMessage("The <" + argument_name + "> argument is invalid", message, inner_error);
+	blazegears.Error.call(this, message, inner_error);
+	if (argument_name === undefined || argument_name === null) {
+		this._argument_name = null;
+		this.message = blazegears.Error._composeMessage("An argument is invalid", message, inner_error);
+	} else {	
+		this._argument_name = argument_name.toString();
+		this.message = blazegears.Error._composeMessage("The <" + this._argument_name + "> argument is invalid", message, inner_error);
+	}
 	this.name = "blazegears.ArgumentError";
-	this._argument_name = argument_name.toString();
 }
 blazegears.ArgumentError.prototype = new blazegears.Error();
 blazegears.ArgumentError.prototype.constructor = blazegears.ArgumentError;
 
 // Method: getArgumentName
-// Gets the *String* representation of the name of the argument that's the cause of the error.
+// Gets the name of the argument that's the cause of the error as a *String*.
 blazegears.ArgumentError.prototype.getArgumentName = function() {
 	return this._argument_name;
 }
@@ -261,6 +264,26 @@ blazegears.ArgumentError.prototype.getArgumentName = function() {
 // generates the message for an invalid argument type
 blazegears.ArgumentError._invalidArgumentType = function(argument_name, expected_type) {
 	return new blazegears.ArgumentError(argument_name, "The <" + argument_name + "> argument is expected to be an instance of <" + expected_type + ">.");
+}
+
+// generates the message for an invalid array length
+blazegears.ArgumentError._invalidArrayLength = function(argument_name, expected_length) {
+	return new blazegears.ArgumentError(argument_name, "The <" + argument_name + "> argument is expected to be an instance of <Array> with a length of " + expected_length + ".");
+}
+
+// generates the message for an invalid enum value
+blazegears.ArgumentError._invalidEnumValue = function(argument_name, enum_type) {
+	return new blazegears.ArgumentError(argument_name, "The <" + argument_name + "> argument is expected to be one of the possible values of <" + enum_type + ">.");
+}
+
+// generates the message for a null argument
+blazegears.ArgumentError._nullArgument = function(argument_name) {
+	return new blazegears.ArgumentError(argument_name, "The <" + argument_name + "> argument can't be <null>.");
+}
+
+// generates the message for a missing argument
+blazegears.ArgumentError._undefinedArgument = function(argument_name) {
+	return new blazegears.ArgumentError(argument_name, "The <" + argument_name + "> argument is required.");
 }
 
 // Class: Event

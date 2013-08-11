@@ -25,8 +25,8 @@ Homepage: http://www.yeticave.com
 */
 
 // Namespace: blazegears.fragvars
-var blazegears = (typeof blazegears === "undefined") ? {} : blazegears;
-blazegears.fragvars = (typeof blazegears.fragvars === "undefined") ? {} : blazegears.fragvars;
+var blazegears = blazegears || {};
+blazegears.fragvars = blazegears.fragvars || {};
 
 // Enum: blazegears.fragvars.HistoryMode
 blazegears.fragvars.HistoryMode = {

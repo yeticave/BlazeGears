@@ -12,7 +12,7 @@ blazegears.formatting.tests.dateFormattingTest = function() {
 	var original_names;
 	
 	// using utc
-	formatter.setTimeZoneOffset(blazegears.formatting.TimeZoneOffset.UTC);
+	formatter.setTimeZone(blazegears.formatting.TimeZone.UTC);
 	
 	// months
 	original_names = formatter.getFullMonthNames();
@@ -188,7 +188,7 @@ blazegears.formatting.tests.numberFormattingTest = function() {
 test("Number Formatting", blazegears.formatting.tests.numberFormattingTest);
 
 blazegears.formatting.tests.phpDateFormattingTest = function() {
-	var TimeZoneOffset = blazegears.formatting.TimeZoneOffset;
+	var TimeZone = blazegears.formatting.TimeZone;
 	var broken_specifiers = ["I", "O", "P", "T", "Z", "c", "e", "r", "u"];
 	var formatter = new blazegears.formatting.PHPDateFormatter();
 	var result;
@@ -202,7 +202,7 @@ blazegears.formatting.tests.phpDateFormattingTest = function() {
 	formatter.setDateFormat("\\\\");
 	strictEqual(formatter.formatDate(new Date()), "\\", "Format an escaped backslash.");
 	
-	formatter.setTimeZoneOffset(TimeZoneOffset.UTC);
+	formatter.setTimeZone(TimeZone.UTC);
 	for (specifier in results) {
 		formatter.setDateFormat(specifier);
 		if (BlazeGears.isInArray(specifier, broken_specifiers)) {
@@ -222,7 +222,7 @@ blazegears.formatting.tests.phpDateFormattingTest = function() {
 test("PHP Date Formatting", blazegears.formatting.tests.phpDateFormattingTest);
 
 blazegears.formatting.tests.unixDateFormattingTest = function() {
-	var TimeZoneOffset = blazegears.formatting.TimeZoneOffset;
+	var TimeZone = blazegears.formatting.TimeZone;
 	var broken_specifiers = ["Z", "^Z", "#Z", "z", "-z", "_z", "0z"];
 	var formatter = new blazegears.formatting.UnixDateFormatter();
 	var result;
@@ -236,7 +236,7 @@ blazegears.formatting.tests.unixDateFormattingTest = function() {
 	formatter.setDateFormat("%%");
 	strictEqual(formatter.formatDate(new Date()), "%", "Format an escaped percentage mark.");
 	
-	formatter.setTimeZoneOffset(TimeZoneOffset.UTC);
+	formatter.setTimeZone(TimeZone.UTC);
 	for (specifier in results) {
 		formatter.setDateFormat("%" + specifier);
 		if (BlazeGears.isInArray(specifier, broken_specifiers)) {

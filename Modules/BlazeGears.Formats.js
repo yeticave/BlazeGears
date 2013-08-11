@@ -25,53 +25,113 @@ Homepage: http://www.yeticave.com
 */
 
 // Namespace: blazegears.formatting
-var blazegears = (typeof blazegears === "undefined") ? {} : blazegears;
-blazegears.formatting = (typeof blazegears.formatting === "undefined") ? {} : blazegears.formatting;
+// Deals with formatting dates and numbers.
+var blazegears = blazegears || {};
+blazegears.formatting = blazegears.formatting || {};
 
-// Enum: blazegears.formatting.DecimalVisibility
+/*
+Enum: blazegears.formatting.DecimalVisibility
+	Specifies the possible display modes of a *Number*'s decimal part.
+
+Values:
+	FIXED - The number of decimal digits will match the specified precision. In case there are less decimal digits than required, the decimal part will be zero-padded on the right.
+	MINIMAL - The decimal part's zero-padding on the right will be removed, but at least a single digit is kept at all times.
+	TRUNCATED - The decimal part's zero-padding on the right will be removed.
+*/
 blazegears.formatting.DecimalVisibility = {
 	FIXED: 1,
 	MINIMAL: 2,
 	TRUNCATED: 3
 };
 
-// Enum: blazegears.formatting.TimeZoneOffset
-blazegears.formatting.TimeZoneOffset = {
+/*
+Enum: blazegears.formatting.TimeZone
+	Specifies the usable time zones for date and time formatting.
+
+Values:
+	AUTOMATIC - The local time will be used for formatting.
+	UTC - UTC time will be used for formatting.
+*/
+blazegears.formatting.TimeZone = {
 	AUTOMATIC: null,
 	UTC: 0
 };
 
-// Class: blazegears.formatting.DateFormat
+// Class: blazegears.formatting.DateFormatTemplate
+// A collection of callbacks and literals for formatting date.
 blazegears.formatting.DateFormatTemplate = function() {
 	this._tokens = [];
 }
 
-// Method: addCallback
+/*
+Method: addCallback
+	Add a new date formatting callback to the collection.
+
+Arguments:
+	callback - (*Function*) The callback to add to the collection. The callback will be passed a single *Date* argument and must return a *String*, which will be added to the rendered output.
+
+Exceptions:
+	blazegears.ArgumentError - *callback* ins't an instance of *Function*.
+*/
 blazegears.formatting.DateFormatTemplate.prototype.addCallback = function(callback) {
+	if (!BlazeGears.isFunction(callback)) {
+		throw blazegears.ArgumentError._invalidArgumentType("callback", "Function");
+	}
 	this._tokens.push(callback);
 }
 
-// Method: addLiteral
+/*
+Method: addLiteral
+	Adds a literal to the collection that will be added to the rendered output.
+
+Arguments:
+	literal - (*String*) The literal to add to the collection.
+*/
 blazegears.formatting.DateFormatTemplate.prototype.addLiteral = function(literal) {
+	literal = literal === undefined || literal === null ? "" : literal.toString();
 	if (this._tokens.length === 0 || BlazeGears.isFunction(this._tokens[this._tokens.length - 1])) {
-		this._tokens.push(literal.toString());
+		this._tokens.push(literal);
 	} else {
-		this._tokens[this._tokens.length - 1] += literal.toString();
+		this._tokens[this._tokens.length - 1] += literal;
 	}
 }
 
-// Method: merge
+/*
+Method: merge
+	Merges the callbacks and literals of another <DateFormatTemplate> into the current one.
+
+Arguments:
+	date_format_template - (<DateFormatTemplate>) The collection to merge in.
+
+Exceptions:
+	blazegears.ArgumentError - *date_format_template* is not an instance of <DateFormatTemplate>.
+*/
 blazegears.formatting.DateFormatTemplate.prototype.merge = function(date_format_template) {
 	var i;
-	var token_count = date_format_template._tokens.length;
-	var tokens = date_format_template._tokens;
+	var token_count;
+	var tokens;
 	
+	if (date_format_template === undefined || date_format_template === null || !(date_format_template instanceof blazegears.formatting.DateFormatTemplate)) {
+		throw blazegears.ArgumentError._invalidArgumentType("date_format_template", "blazegears.formatting.DateFormat");
+	}
+	token_count = date_format_template._tokens.length;
+	tokens = date_format_template._tokens;
 	for (i = 0; i < token_count; ++i) {
 		this._tokens.push(tokens[i]);
 	}
 }
 
-// Method: render
+/*
+Method: render
+	Renders the template for a date.
+
+Arguments:
+	context - (*Object*) The object that will be assigned to *this* when calling the callbacks. Primitive objects will be boxed.
+	date - (*Date* / *Number*) The date that will be passed to the callback as their first argument. In case it's a *Number*, it will be treated as a timestamp and converted to a *Date*. Defaults to the current date.
+
+Return Value:
+	(*String*) Concatenates the return values of the callbacks and the literals in the order which they were added to the collection.
+*/
 blazegears.formatting.DateFormatTemplate.prototype.render = function(context, date) {
 	var i;
 	var result = "";
@@ -92,6 +152,7 @@ blazegears.formatting.DateFormatTemplate.prototype.render = function(context, da
 }
 
 // Class: blazegears.formatting.DateFormatter
+// The base class for date formatters.
 blazegears.formatting.DateFormatter = function() {
 	this._format = null;
 	this._template = null;
@@ -105,131 +166,271 @@ blazegears.formatting.DateFormatter = function() {
 }
 
 // Method: getDateFormat
+// Gets the date format as a *String*. Defaults to the syntax that's the closest to ISO 8601 and the implementation can produce.
 blazegears.formatting.DateFormatter.prototype.getDateFormat = function() {
 	return this._format;
 }
 
-// Method: setDateFormat
-blazegears.formatting.DateFormatter.prototype.setDateFormat = function(format) {
-	if (format !== this._format) {
-		this._format = format;
+/*
+Method: setDateFormat
+	Setter for <getDateFormat>.
+
+Arguments:
+	value - (*String*) The new value that will be lazily parsed into a <DateFormatTemplate>.
+*/
+blazegears.formatting.DateFormatter.prototype.setDateFormat = function(value) {
+	if (value !== this._format) {
+		this._format = value === undefined || value === null ? "" : value.toString();
 		this._template = null;
 	}
 }
 
 // Method: getFullDayNames
+// Gets a clone of the full names of days, from Sunday to Saturday, as an *Array* of 7 *Strings*.
 blazegears.formatting.DateFormatter.prototype.getFullDayNames = function() {
 	return this._full_day_names.slice();
 }
 
-// Method: setFullDayNames
-blazegears.formatting.DateFormatter.prototype.setFullDayNames = function(day_names) {
+/*
+Method: setFullDayNames
+	Setter for <getFullDayNames>.
+
+Arguments:
+	value - (*Array*) The value to clone.
+
+Exceptions:
+	blazegears.ArgumentError - *value* isn't an instance of *Array* or doesn't have a *length* of 7.
+*/
+blazegears.formatting.DateFormatter.prototype.setFullDayNames = function(value) {
 	this._full_day_names = [];
+	if (!BlazeGears.isArray(value)) {
+		throw blazegears.ArgumentError._invalidArgumentType("value", "Array");
+	}
+	if (value.length !== 7) {
+		throw blazegears.ArgumentError._invalidArrayLength("value", 7);
+	}
 	for (var i = 0; i < 7; ++i) {
-		this._full_day_names.push(day_names[i].toString());
+		this._full_day_names.push(value[i].toString());
 	}
 }
 
 // Method: getFullMonthNames
+// Gets a clone of the full names of months, from January to December, as an *Array* of 12 *Strings*.
 blazegears.formatting.DateFormatter.prototype.getFullMonthNames = function() {
 	return this._full_month_names.slice();
 }
 
-// Method: setFullMonthNames
-blazegears.formatting.DateFormatter.prototype.setFullMonthNames = function(month_names) {
+/*
+Method: setFullMonthNames
+	Setter for <getFullMonthNames>.
+
+Arguments:
+	value - (*Array*) The value to clone.
+
+Exceptions:
+	blazegears.ArgumentError - *value* isn't an instance of *Array* or doesn't have a *length* of 12.
+*/
+blazegears.formatting.DateFormatter.prototype.setFullMonthNames = function(value) {
 	this._full_month_names = [];
+	if (!BlazeGears.isArray(value)) {
+		throw blazegears.ArgumentError._invalidArgumentType("value", "Array");
+	}
+	if (value.length !== 12) {
+		throw blazegears.ArgumentError._invalidArrayLength("value", 12);
+	}
 	for (var i = 0; i < 12; ++i) {
-		this._full_month_names.push(month_names[i].toString());
+		this._full_month_names.push(value[i].toString());
 	}
 }
 
 // Method: getOrdinalSuffixes
+// Returns a clone of the ordinal suffixes as an *Array* of 31 *Strings*.
 blazegears.formatting.DateFormatter.prototype.getOrdinalSuffixes = function() {
 	return this._ordinal_suffixes.slice();
 }
 
-// Method: setOrdinalSuffixes
-blazegears.formatting.DateFormatter.prototype.setOrdinalSuffixes = function(ordinal_suffixes) {
+/*
+Method: setOrdinalSuffixes
+	Setter for <getOrdinalSuffixes>.
+
+Arguments:
+	value - (*Array*) The value to clone.
+
+Exceptions:
+	blazegears.ArgumentError - *value* isn't an instance of *Array* or doesn't have a *length* of 31.
+*/
+blazegears.formatting.DateFormatter.prototype.setOrdinalSuffixes = function(value) {
 	this._ordinal_suffixes = [];
+	if (!BlazeGears.isArray(value)) {
+		throw blazegears.ArgumentError._invalidArgumentType("value", "Array");
+	}
+	if (value.length !== 31) {
+		throw blazegears.ArgumentError._invalidArrayLength("value", 31);
+	}
 	for (var i = 0; i < 31; ++i) {
-		this._ordinal_suffixes.push(ordinal_suffixes[i].toString());
+		this._ordinal_suffixes.push(value[i].toString());
 	}
 }
 
 // Method: getShortDayNames
+// Gets a clone of the short names of days, from Sun to Sat, as an *Array* of 7 *Strings*.
 blazegears.formatting.DateFormatter.prototype.getShortDayNames = function() {
 	return this._short_day_names.slice();
 }
 
-// Method: setShortDayNames
-blazegears.formatting.DateFormatter.prototype.setShortDayNames = function(day_names) {
+/*
+Method: setShortDayNames
+	Setter for <getShortDayNames>.
+
+Arguments:
+	value - (*Array*) The value to clone.
+
+Exceptions:
+	blazegears.ArgumentError - *value* isn't an instance of *Array* or doesn't have a *length* of 7.
+*/
+blazegears.formatting.DateFormatter.prototype.setShortDayNames = function(value) {
 	this._short_day_names = [];
+	if (!BlazeGears.isArray(value)) {
+		throw blazegears.ArgumentError._invalidArgumentType("value", "Array");
+	}
+	if (value.length !== 7) {
+		throw blazegears.ArgumentError._invalidArrayLength("value", 7);
+	}
 	for (var i = 0; i < 7; ++i) {
-		this._short_day_names.push(day_names[i].toString());
+		this._short_day_names.push(value[i].toString());
 	}
 }
 
 // Method: getShortLowerMeridiemNames
+// Gets a clone of the short names of lowercase meridiems, from am to pm, as an *Array* of 2 *Strings*.
 blazegears.formatting.DateFormatter.prototype.getShortLowerMeridiemNames = function() {
 	return [this._short_meridiems[2], this._short_meridiems[3]];
 }
 
-// Method: setShortLowerMeridiemNames
-blazegears.formatting.DateFormatter.prototype.setShortLowerMeridiemNames = function(meridiem_names) {
-	this._short_meridiems[2] = meridiem_names[0].toString();
-	this._short_meridiems[3] = meridiem_names[1].toString();
+/*
+Method: setShortLowerMeridiemNames
+	Setter for <getShortLowerMeridiemNames>.
+
+Arguments:
+	value - (*Array*) The value to clone.
+
+Exceptions:
+	blazegears.ArgumentError - *value* isn't an instance of *Array* or doesn't have a *length* of 2.
+*/
+blazegears.formatting.DateFormatter.prototype.setShortLowerMeridiemNames = function(value) {
+	if (!BlazeGears.isArray(value)) {
+		throw blazegears.ArgumentError._invalidArgumentType("value", "Array");
+	}
+	if (value.length !== 2) {
+		throw blazegears.ArgumentError._invalidArrayLength("value", 2);
+	}
+	this._short_meridiems[2] = value[0].toString();
+	this._short_meridiems[3] = value[1].toString();
 }
 
 // Method: getShortUpperMeridiemNames
+// Gets a clone of the short names of upper case meridiems, from AM to PM, as an *Array* of 2 *Strings*.
 blazegears.formatting.DateFormatter.prototype.getShortUpperMeridiemNames = function() {
 	return [this._short_meridiems[0], this._short_meridiems[1]];
 }
 
-// Method: setShortUpperMeridiemNames
-blazegears.formatting.DateFormatter.prototype.setShortUpperMeridiemNames = function(meridiem_names) {
-	this._short_meridiems[0] = meridiem_names[0].toString();
-	this._short_meridiems[1] = meridiem_names[1].toString();
+/*
+Method: setShortUpperMeridiemNames
+	Setter for <getShortUpperMeridiemNames>.
+
+Arguments:
+	value - (*Array*) The value to clone.
+
+Exceptions:
+	blazegears.ArgumentError - *value* isn't an instance of *Array* or doesn't have a *length* of 2.
+*/
+blazegears.formatting.DateFormatter.prototype.setShortUpperMeridiemNames = function(value) {
+	if (!BlazeGears.isArray(value)) {
+		throw blazegears.ArgumentError._invalidArgumentType("value", "Array");
+	}
+	if (value.length !== 2) {
+		throw blazegears.ArgumentError._invalidArrayLength("value", 2);
+	}
+	this._short_meridiems[0] = value[0].toString();
+	this._short_meridiems[1] = value[1].toString();
 }
 
 // Method: getShortMonthNames
+// Gets a clone of the short names of months, from Jan to Dec, as an *Array* of 12 *Strings*.
 blazegears.formatting.DateFormatter.prototype.getShortMonthNames = function() {
 	return this._short_month_names.slice();
 }
 
-// Method: setShortMonthNames
-blazegears.formatting.DateFormatter.prototype.setShortMonthNames = function(month_names) {
+/*
+Method: setShortMonthNames
+	Setter for <getShortMonthNames>.
+
+Arguments:
+	value - (*Array*) The value to clone.
+
+Exceptions:
+	blazegears.ArgumentError - *value* isn't an instance of *Array* or doesn't have a *length* of 12.
+*/
+blazegears.formatting.DateFormatter.prototype.setShortMonthNames = function(value) {
 	this._short_month_names = [];
+	if (!BlazeGears.isArray(value)) {
+		throw blazegears.ArgumentError._invalidArgumentType("value", "Array");
+	}
+	if (value.length !== 12) {
+		throw blazegears.ArgumentError._invalidArrayLength("value", 12);
+	}
 	for (var i = 0; i < 12; ++i) {
-		this._short_month_names.push(month_names[i].toString());
+		this._short_month_names.push(value[i].toString());
 	}
 }
 
-// Method: getTimeZoneOffset
-blazegears.formatting.DateFormatter.prototype.getTimeZoneOffset = function() {
+// Method: getTimeZone
+// Gets the timezone used for date and time formatting as a <blazegears.formatting.TimeZone>. Defaults to <blazegears.formatting.TimeZone>.AUTOMATIC.
+blazegears.formatting.DateFormatter.prototype.getTimeZone = function() {
 	var result = null;
 	
 	if (this._is_utc_time_enabled) {
-		result = blazegears.formatting.TimeZoneOffset.UTC;
+		result = blazegears.formatting.TimeZone.UTC;
 	}
 	
 	return result;
 }
 
-// Method: setTimeZoneOffset
-blazegears.formatting.DateFormatter.prototype.setTimeZoneOffset = function(time_zone_offset) {
-	var TimeZoneOffset = blazegears.formatting.TimeZoneOffset;
+/*
+Method: setTimeZone
+	Setter for <getTimeZone>.
+
+Arguments:
+	value - (<blazegears.formatting.TimeZone>) The new value.
+*/
+blazegears.formatting.DateFormatter.prototype.setTimeZone = function(value) {
+	var TimeZone = blazegears.formatting.TimeZone;
 	
-	if (time_zone_offset === TimeZoneOffset.AUTOMATIC) {
+	if (value === TimeZone.AUTOMATIC) {
 		this._is_utc_time_enabled = false;
-	} else if (time_zone_offset === TimeZoneOffset.UTC) {
+	} else if (value === TimeZone.UTC) {
 		this._is_utc_time_enabled = true;
+	} else {
+		throw blazegears.ArgumentError("value", "blazegears.formatting.TimeZone");
 	}
 }
 
-// Method: formatDate
+/*
+Method: formatDate
+	Formats a date as a *String*.
+
+Arguments:
+	[date = null] - (*Date* / *Number*) The date to format. In case it's a *Number*, it will be treated as a timestamp and converted to a *Date*. Defaults to the current date.
+
+Remarks:
+	It the time of calling this method <getDateFormat> will be parsed into a <DateFormatTemplate> using <parseDateFormat>, if it wasn't before. The formatter itself will be passed as the *context* to the <DateFormatTemplate> for rendering.
+*/
 blazegears.formatting.DateFormatter.prototype.formatDate = function(date) {
 	var result = "";
 	
+	if (date === undefined || date === null) {
+		date = new Date();
+	}
 	date = this._prepareDate(date);
 	if (this._template === null) {
 		this._template = this.parseDateFormat(this._format);
@@ -239,8 +440,17 @@ blazegears.formatting.DateFormatter.prototype.formatDate = function(date) {
 	return result;
 }
 
-// Method: parseDateFormat
-blazegears.formatting.DateFormatter.prototype.parseDateFormat = function(format) {
+/*
+Method: parseDateFormat
+	Parses a date format into a <DateFormatTemplate>.
+
+Arguments:
+	date_format - (*String*) The date format to parse.
+
+Exceptions:
+	blazegears.NotOverriddenError - This method is abstract and will always throw this exception.
+*/
+blazegears.formatting.DateFormatter.prototype.parseDateFormat = function(date_format) {
 	throw blazegears.NotOverriddenError();
 }
 
@@ -494,7 +704,7 @@ blazegears.formatting.DateFormatter.prototype._getTwelveHourHours = function(dat
 	return result;
 }
 
-// short uppercase meridiems (am - pm)
+// short upper case meridiems (am - pm)
 blazegears.formatting.DateFormatter.prototype._getUpperCaseMeridiem = function(date) {
 	return this._short_meridiems[this._getHours(date) < 12 ? 0 : 1];
 }
@@ -523,6 +733,7 @@ blazegears.formatting.DateFormatter.prototype._prepareDate = function(date) {
 }
 
 // Class: blazegears.formatting.NumberFormatter
+// Formats numbers.
 blazegears.formatting.NumberFormatter = function() {
 	this._decimal_delimiter = ".";
 	this._decimal_precision = 0;
@@ -535,7 +746,13 @@ blazegears.formatting.NumberFormatter = function() {
 	this._rounding_callback = Math.round;
 }
 
-// Method: formatNumber
+/*
+Method: formatNumber
+	Formats a number as a *String*.
+
+Arguments:
+	number - (*Number*) The number to format.
+*/
 blazegears.formatting.NumberFormatter.prototype.formatNumber = function(number) {
 	var DecimalVisibility = blazegears.formatting.DecimalVisibility;
 	var decimal_part;
@@ -623,97 +840,174 @@ blazegears.formatting.NumberFormatter.prototype.formatNumber = function(number) 
 	return result;
 }
 
-// Method: enableLeadingZero
-blazegears.formatting.NumberFormatter.prototype.enableLeadingZero = function(enable) {
-	this._is_leading_zero_enabled = enable;
-}
-
-// Method: isLeadingZeroEnabled
+/*
+Method: isLeadingZeroEnabled
+	Determines if the leading zero should be displayed for numbers with an absolute value less than one but greated than zero. Defaults to *true*.
+*/
 blazegears.formatting.NumberFormatter.prototype.isLeadingZeroEnabled = function() {
 	return this._is_leading_zero_enabled;
 }
 
+/*
+Method: enableLeadingZero
+	Setter for <isLeadingZeroEnabled>.
+
+Arguments:
+	enable - (*Boolean*) The new value.
+*/
+blazegears.formatting.NumberFormatter.prototype.enableLeadingZero = function(enable) {
+	this._is_leading_zero_enabled = Boolean(enable);
+}
+
 // Method: getDecimalDelimiter
+// Gets the delimiter that will be used to separate the integer part of a number from its decimal part as a *String*. Defaults to a dot.
 blazegears.formatting.NumberFormatter.prototype.getDecimalDelimiter = function() {
 	return this._decimal_delimiter;
 }
 
-// Method: setDecimalDelimiter
-blazegears.formatting.NumberFormatter.prototype.setDecimalDelimiter = function(decimal_delimiter) {
-	this._decimal_delimiter = decimal_delimiter;
+/*
+Method: setDecimalDelimiter
+	Setter for <getDecimalDelimiter>.
+
+Arguments:
+	value - (*String*) The new value.
+*/
+blazegears.formatting.NumberFormatter.prototype.setDecimalDelimiter = function(value) {
+	this._decimal_delimiter = value === undefined || value === null ? "" : value.toString();
 }
 
 // Method: getDecimalPrecision
+// Gets the maximum number of decimal digits to display as a *Number*. Defaults to zero.
 blazegears.formatting.NumberFormatter.prototype.getDecimalPrecision = function() {
 	return this._decimal_precision;
 }
 
-// Method: setDecimalPrecision
-blazegears.formatting.NumberFormatter.prototype.setDecimalPrecision = function(decimal_precision) {
-	this._decimal_precision = decimal_precision;
+/*
+Method: setDecimalPrecision
+	Setter for <getDecimalPrecision>.
+
+Arguments:
+	value - (*Number*) The new value.
+*/
+blazegears.formatting.NumberFormatter.prototype.setDecimalPrecision = function(value) {
+	this._decimal_precision = blazegears._forceParseInt(value);
 }
 
 // Method: getDecimalVisibility
+// Gets the mode of diplaying the decimal part of numbers as a <blazegears.bgtl.DecimalVisibility>. Defaults to <blazegears.formatting.DecimalVisibility>.FIXED.
 blazegears.formatting.NumberFormatter.prototype.getDecimalPrecision = function() {
 	return this._decimal_visibility;
 }
 
-// Method: setDecimalVisibility
-blazegears.formatting.NumberFormatter.prototype.setDecimalVisibility = function(decimal_visibility) {
-	this._decimal_visibility = decimal_visibility;
+/*
+Method: setDecimalVisibility
+	Setter for <getDecimalVisibility>.
+
+Arguments:
+	value - (<blazegears.bgtl.DecimalVisibility>) The new value.
+*/
+blazegears.formatting.NumberFormatter.prototype.setDecimalVisibility = function(value) {
+	this._decimal_visibility = value;
 }
 
 // Method: getGroupDelimiter
+// Gets the delimiter that will be used to separate the number groups in the integer parts of a number as a *String*. Defaults to a comma.
 blazegears.formatting.NumberFormatter.prototype.getGroupDelimiter = function() {
 	return this._group_delimiter;
 }
 
-// Method: setGroupDelimiter
-blazegears.formatting.NumberFormatter.prototype.setGroupDelimiter = function(group_delimiter) {
-	this._group_delimiter = group_delimiter;
+/*
+Method: setGroupDelimiter
+	Setter for <getGroupDelimiter>.
+
+Arguments:
+	value - (*String*) The new value.
+*/
+blazegears.formatting.NumberFormatter.prototype.setGroupDelimiter = function(value) {
+	this._group_delimiter = value === undefined || value === null ? "" : value.toString();
 }
 
 // Method: getGroupSize
+// Gets the maximum number of digits in a group in the integer part of a number. Defaults to 3.
 blazegears.formatting.NumberFormatter.prototype.getGroupSize = function() {
 	return this._group_size;
 }
 
-// Method: setGroupSize
-blazegears.formatting.NumberFormatter.prototype.setGroupSize = function(group_size) {
-	this._group_size = group_size;
+/*
+Method: setGroupSize
+	Setter for <getGroupSize>.
+
+Arguments:
+	value - (*Number*) The new value.
+*/
+blazegears.formatting.NumberFormatter.prototype.setGroupSize = function(value) {
+	this._group_size = blazegears._forceParseInt(value);
 }
 
 // Method: getNegativePrefix
+// Gets the prefix used for negative numbers as a *String*. Defaults to a minus sign.
 blazegears.formatting.NumberFormatter.prototype.getNegativePrefix = function() {
 	return this._negative_prefix;
 }
 
-// Method: setNegativePrefix
-blazegears.formatting.NumberFormatter.prototype.setNegativePrefix = function(negative_prefix) {
-	this._negative_prefix = negative_prefix;
+/*
+Method: setNegativePrefix
+	Setter for <getNegativePrefix>.
+
+Arguments:
+	value - (*String*) The new value.
+*/
+blazegears.formatting.NumberFormatter.prototype.setNegativePrefix = function(value) {
+	this._negative_prefix = value === undefined || value === null ? "" : value.toString();
 }
 
 // Method: getNegativeSuffix
+// Gets the suffix used for negative numbers as a *String*. Defaults to an empty string.
 blazegears.formatting.NumberFormatter.prototype.getNegativeSuffix = function() {
 	return this._negative_suffix;
 }
 
-// Method: setNegativeSuffix
-blazegears.formatting.NumberFormatter.prototype.setNegativeSuffix = function(negative_suffix) {
-	this._negative_suffix = negative_suffix;
+/*
+Method: setNegativeSuffix
+	Setter for <getNegativeSuffix>.
+
+Arguments:
+	value - (*String*) The new value.
+*/
+blazegears.formatting.NumberFormatter.prototype.setNegativeSuffix = function(value) {
+	this._negative_suffix = value === undefined || value === null ? "" : value.toString();
 }
 
 // Method: getRoundingCallback
+// Gets the callback used for rounding numbers as a *Function*.
 blazegears.formatting.NumberFormatter.prototype.getRoundingCallback = function() {
 	return this._rounding_callback;
 }
 
-// Method: setRoundingCallback
-blazegears.formatting.NumberFormatter.prototype.setRoundingCallback = function(rounding_callback) {
-	this._rounding_callback = rounding_callback;
+/*
+Method: setRoundingCallback
+	Setter for <getRoundingCallback>.
+
+Arguments:
+	value - (*Function*) The new value.
+
+Exceptions:
+	blazegears.ArgumentError - *value* isn't an instance of *Function*.
+*/
+blazegears.formatting.NumberFormatter.prototype.setRoundingCallback = function(value) {
+	if (!BlazeGears.isFunction(value)) {
+		throw blazgears.ArgumentError._invalidArgumentType("value", "Function");
+	}
+	this._rounding_callback = value;
 }
 
-// Class: blazegears.formatting.PHPDateFormatter
+/*
+Class: blazegears.formatting.PHPDateFormatter
+	The implementation of <DateFormatter> that's using the date format syntax of <PHP's date function at http://php.net/manual/en/function.date.php>.
+
+Parent Class:
+	<DateFormatter>
+*/
 blazegears.formatting.PHPDateFormatter = function() {
 	blazegears.formatting.DateFormatter.call(this);
 	this._format = "c";
@@ -721,7 +1015,54 @@ blazegears.formatting.PHPDateFormatter = function() {
 blazegears.formatting.PHPDateFormatter.prototype = new blazegears.formatting.DateFormatter();
 blazegears.formatting.PHPDateFormatter.prototype.constructor = blazegears.formatting.PHPDateFormatter;
 
-// Method: generateDateFormatCache
+/*
+Method: parseDateFormat
+	Parses a date format into a <DateFormatTemplate> using the date format syntax of <PHP's date function at http://php.net/manual/en/function.date.php>.
+
+Arguments:
+	date_format - (*String*) The date format to parse.
+
+Supported Specifiers:
+	A - Abbreviated upper case meridiem: *AM* or *PM*
+	B - Swatch internet time: *000* to *999*
+	D - Abbreviated weekday name: *Sun* to *Sat*
+	F - Full month name: January to December
+	G - 24-hour format hour: *0* to *23*
+	H - Zero padded 24-hour format hour: *00* to *23*
+	L - Is it a leap year: *1* for leap years, *0* otherwise
+	M - Abbreviated month name: *Jan* to *Dec*
+	N - Numeric weekday, starting on Monday: *1* to *7*
+	S - Ordinal suffix for the day of the month: *st*, *nd*, *rd*, or *th*
+	U - Unix timestamp: *0* to *2147483647*
+	W - ISO 8601 week of the year: *01* to *53*
+	Y - Full year: *1970* to *2038*
+	a - Abbreviated lower case meridiems: *am* or *pm*
+	c - ISO 8601 date: Same as *Y-m-d\\TH:i:sP*
+	d - Zero padded day of the month: *01* to *31*
+	g - 12-hour format hour: *1* to *12*
+	h - Zero padded 12-hour format hour: *01* to *12*
+	i - Zero padded minute: *00* to *59*
+	j - Day of the month: *1* to *31*
+	l - Full weekday name: *Sunday* to *Saturday*
+	m - Zero padded numeric month: *01* to *12*
+	n - Numeric month: *1* to *12*
+	o - ISO 8601 full year: *1970* to *2038*
+	r - RFC 2822 date: Same as *D, d M Y H:i:s O*
+	s - Zero padded second: *00* to *59*
+	t - Number of days in the month: *28* to *31*
+	w - Numeric weekday, starting on Sunday: *0* to *6*
+	y - Short year: *00* to *99*
+	z - Day of the year: *0* to *365*
+
+Unsupported Specifiers:
+	I - Is it daylight saving time: *1* for daylight saving time, *0* for standard time, always returns *0*
+	O - Time zone offset in hours and minutes: *-1200* to *+1400*, always returns an empty string
+	P - Time zone offset in hours and minutes with a colon delimiter: *-12:00* to *+14:00*, always returns an empty string
+	T - Abbreviated time zone name: e.g., *UTC*, always returns an empty string
+	Z - Time zone offset in seconds: *-43200* to *50400*, always returns an empty string
+	e - Full time zone name: e.g., *Coordinated Universal Time*, always returns an empty string
+	u - Microseconds: *000000* to *999999*, always returns *000000*
+*/
 blazegears.formatting.PHPDateFormatter.prototype.parseDateFormat = function(format) {
 	var character;
 	var result = new blazegears.formatting.DateFormatTemplate();
@@ -735,146 +1076,146 @@ blazegears.formatting.PHPDateFormatter.prototype.parseDateFormat = function(form
 				result.addLiteral(character);
 				break;
 			
-			case "A": // abbreviated upper-case meridiems (AM - PM)
+			case "A": // abbreviated upper case meridiem
 				result.addCallback(this._getUpperCaseMeridiem);
 				break;
 			
-			case "B": // swatch internet time (000 - 999)
+			case "B": // swatch internet time
 				result.addCallback(this._getSwatchInternetTime);
 				break;
 			
-			case "D": // abbreviated weekday names (Sun - Sat)
+			case "D": // abbreviated weekday name
 				result.addCallback(this._getAbbreviatedDayName);
 				break;
 			
-			case "F": // month names (January - December)
+			case "F": // full month name
 				result.addCallback(this._getMonthName);
 				break;
 			
-			case "G": // international hours (0 - 23)
+			case "G": // 24-hour format hour
 				result.addCallback(this._getHours);
 				break;
 			
-			case "H": // international hours (00 - 23)
+			case "H": // zero padded 24-hour format hour
 				result.addCallback(this._getInternationalHours);
 				break;
 			
-			case "I": // daylight saving time (0 - 1)
+			case "I": // is it daylight saving time
 				result.addLiteral("0");
 				break;
 			
-			case "L": // leap years (0 - 1)
+			case "L": // is it a leap year
 				result.addCallback(this._getLeapYear);
 				break;
 			
-			case "M": // abbreviated month names (Jan - Dec)
+			case "M": // abbreviated month name
 				result.addCallback(this._getAbbreviatedMonthName);
 				break;
 			
-			case "N": // weekdays, starting on monday (1 - 7)
+			case "N": // numeric weekday, starting on monday
 				result.addCallback(this._getDayOfWeek);
 				break;
 			
-			case "O": // time zone offset in hours and minutes (-1200 - +1300)
+			case "O": // time zone offset in hours and minutes
 				break;
 			
-			case "P": // time zone offset in hours and minutes (-12:00 - +13:00)
+			case "P": // time zone offset in hours and minutes with a colon delimiter
 				break;
 			
-			case "S": // ordinals for the days of the month (st, nd, rd, or th)
+			case "S": // ordinal suffix for the day of the month
 				result.addCallback(this._getOrdinalSuffix);
 				break;
 			
-			case "T": // abbreviated time zone names (e.g. UTC)
+			case "T": // abbreviated time zone name
 				break;
 			
 			case "U": // unix timestamp
 				result.addCallback(this._getTimestamp);
 				break;
 			
-			case "W": // iso-8601 weeks (01 - 53)
+			case "W": // iso 8601 week number
 				result.addCallback(this._getPaddedIso8601Week);
 				break;
 			
-			case "Y": // years (1970 - 2038)
+			case "Y": // full year
 				result.addCallback(this._getFullYear);
 				break;
 			
-			case "Z": // time zone offset in seconds (-43200 - 50400)
+			case "Z": // time zone offset in seconds
 				break;
 			
-			case "a": // abbreviated lower-case meridiems (am - pm)
+			case "a": // abbreviated lower case meridiems
 				result.addCallback(this._getLowerCaseMeridiem);
 				break;
 			
-			case "c": // same as "Y-m-d\\TH:i:sP"
+			case "c": // iso 8601 date, same as Y-m-d\\TH:i:sP
 				result.merge(this.parseDateFormat("Y-m-d\\TH:i:sP"));
 				break;
 			
-			case "d": // days (01 - 31)
+			case "d": // zero padded day of month
 				result.addCallback(this._getPaddedDays);
 				break;
 			
-			case "e": // time zone names (e.g. Nuku'alofa)
+			case "e": // full time zone name
 				break;
 			
-			case "g": // hours (1 - 12)
+			case "g": // 12-hour format hour
 				result.addCallback(this._getTwelveHourHours);
 				break;
 			
-			case "h": // hours (01 - 12)
+			case "h": // zero padded 12-hour format hour
 				result.addCallback(this._getPaddedShortHours);
 				break;
 			
-			case "i": // minutes (00 - 59)
+			case "i": // zero padded minute
 				result.addCallback(this._getPaddedMinutes);
 				break;
 			
-			case "j": // days (1 - 31)
+			case "j": // day of month
 				result.addCallback(this._getDate);
 				break;
 			
-			case "l": // weekday names (Sunday - Saturday)
+			case "l": // full weekday name
 				result.addCallback(this._getDayName);
 				break;
 			
-			case "m": // months (01 - 12)
+			case "m": // zero padded numeric month
 				result.addCallback(this._getPaddedMonth);
 				break;
 			
-			case "n": // months (1 - 12)
+			case "n": // numeric month
 				result.addCallback(this._getIncrementedMonth);
 				break;
 			
-			case "o": // iso-8601 years (1970 - 2038)
+			case "o": // iso 8601 year
 				result.addCallback(this._getIso8601Year);
 				break;
 			
-			case "r": // same as "D, d M Y H:i:s O"
+			case "r": // rfc 2822 date, same as D, d M Y H:i:s O
 				result.merge(this.parseDateFormat("D, d M Y H:i:s O"));
 				break;
 			
-			case "s": // seconds (00 - 59)
+			case "s": // zero padded second
 				result.addCallback(this._getPaddedSeconds);
 				break;
 			
-			case "t": // number of days in the month (28 - 31)
+			case "t": // number of days in the month
 				result.addCallback(this._getNumberOfDaysInMonth);
 				break;
 			
-			case "u": // microseconds (000000 - 999999)
+			case "u": // microseconds
 				result.addLiteral("000000");
 				break;
 			
-			case "w": // weekdays, starting on sunday (0 - 6)
+			case "w": // numeric weekday, starting on Sunday
 				result.addCallback(this._getDay);
 				break;
 			
-			case "y": // abbreviated years (00 - 99)
+			case "y": // short year
 				result.addCallback(this._getAbbreviatedYear);
 				break;
 			
-			case "z": // days of the year (0 - 365)
+			case "z": // day of year
 				result.addCallback(this._getDecrementedDayOfYear);
 				break;
 			
@@ -922,27 +1263,99 @@ blazegears.formatting.PHPDateFormatter.prototype._getPaddedShortHours = function
 	return blazegears._padStringLeft(this._getTwelveHourHours(date), "0", 2);
 }
 
-// Class: blazegears.formatting.UnixDateFormatter
+/*
+Class: blazegears.formatting.UnixDateFormatter
+	The implementation of <DateFormatter> that's using the date format syntax of the <date command of Unix-like systems at http://linux.die.net/man/1/date>.
+
+Parent Class:
+	<DateFormatter>
+*/
 blazegears.formatting.UnixDateFormatter = function() {
 	blazegears.formatting.DateFormatter.call(this);
 	this._format = "%Y-%m-%dT%H:%M:%S%z";
+	this._use_deprecated = false;
 }
 blazegears.formatting.UnixDateFormatter.prototype = new blazegears.formatting.DateFormatter();
 blazegears.formatting.UnixDateFormatter.prototype.constructor = blazegears.formatting.UnixDateFormatter;
 
-// Method: generateDateFormatCache
+/*
+Method: parseDateFormat
+	Parses a date format into a <DateFormatTemplate> using the date format syntax of the <date command of Unix-like systems at http://linux.die.net/man/1/date>.
+
+Arguments:
+	date_format - (*String*) The date format to parse.
+
+Supported Specifiers:
+	%A - Full weekday name: *Sunday* to *Saturday*
+	%B - Full weekday name: *Sunday* to *Saturday*
+	%C - Century: *20* - *21*
+	%D - Same as *%m/%d/%y*
+	%F - Same as *%Y-%m-%d*
+	%G - ISO 8601 full year: *1970* to *2038*
+	%H - Zero padded 24-hour format hour: *00* to *23*
+	%I - Zero padded 12-hour format hour: *01* to *12*
+	%M - Zero padded minute: *00* to *59*
+	%P - Abbreviated lower case meridiems: *am* or *pm*
+	%R - Same as *%H:%M*
+	%S - Zero padded second: *00* to *59*
+	%T - Same as %%H:%M:%S% and *%X*
+	%U - Week of the year, starting on Sunday: *01* to *53*
+	%V - ISO 8601 week of the year: *01* to *53*
+	%W - Week of the year, starting on Monday: *01* to *53*
+	%Y - Full year: *1970* to *2038*
+	%a - Abbreviated weekday name: *Sun* to *Sat*
+	%b - Abbreviated month name: *Jan* to *Dec*, same as *%h*
+	%c - Same as *%a %b %_d %H:%M:%S %Y*
+	%d - Zero padded day of the month: *01* to *31*
+	%e - Space padded day of the month: *1* to *31*
+	%g - ISO 8601 short year: *00* to *99*
+	%j - Zero padded day of the year: *001* to *366*
+	%k - Space padded 24-hour format hour: *00* to *23*
+	%l - Space padded 12-hour format hour: *01* to *12*
+	%m - Zero padded numeric month: *01* to *12*
+	%n - Newline character
+	%p - Abbreviated upper case meridiem: *AM* or *PM*
+	%r - Same as *%I:%M:%S %p*
+	%s - Unix timestamp: *0* to *2147483647*
+	%t - Tab character
+	%u - Numeric weekday, starting on Monday: *1* to *7*
+	%w - Numeric weekday, starting on Sunday: *0* to *6*
+	%x - Same as *%m/%d/%y*
+	%y - Short year: *00* to *99*
+
+Supported Modifiers:
+	%- - Disable padding.
+	%_ - Use space padding.
+	%0 - Use zero padding.
+	%^ - Convert to upper case.
+	%# - Convert to opposite case.
+
+Unsupported Specifiers:
+	%N - Nanoseconds: *000000000* to *999999999*, always returns *000000000*
+	%Z - Abbreviated time zone name: e.g., *UTC*, always returns an empty string
+	%z - Time zone offset in hours and minutes: *-1200* to *+1400*, always returns an empty string
+
+Unsupported Modifiers:
+	%: - Increase the precision of the time zone offset representation, can be stacked up to three instances. Doesn't do anything.
+*/
 blazegears.formatting.UnixDateFormatter.prototype.parseDateFormat = function(format) {
 	var character;
 	var closure;
 	var has_padding_modifier = false;
 	var local_date = false;
 	var local_numbers = false;
+	var modifiers = ["-", "_", "0", "^", "#", ":"];
 	var opposite;
 	var padding;
 	var precision;
 	var result = new blazegears.formatting.DateFormatTemplate();
 	var specifier;
 	var upper;
+	
+	if (this._use_deprecated) {
+		modifiers.push("E");
+		modifiers.push("O");
+	}
 	
 	for (var i = 0; i < format.length; i++) {
 		character = format.charAt(i);
@@ -958,7 +1371,7 @@ blazegears.formatting.UnixDateFormatter.prototype.parseDateFormat = function(for
 			upper = false;
 			
 			while (true) {
-				if (BlazeGears.isInArray(character, ["-", "_", "0", "^", "#", "E", "O", ":"])) {
+				if (BlazeGears.isInArray(character, modifiers)) {
 					specifier += character;
 					switch (character) {
 						case "-": // disable padding
@@ -966,17 +1379,17 @@ blazegears.formatting.UnixDateFormatter.prototype.parseDateFormat = function(for
 							padding = "";
 							break;
 						
-						case "_": // pad with spaces
+						case "_": // use space padding
 							has_padding_modifier = true;
 							padding = " ";
 							break;
 						
-						case "0": // pad with zeros
+						case "0": // use zero padding
 							has_padding_modifier = true;
 							padding = "0";
 							break;
 						
-						case "^": // convert to upper-case
+						case "^": // convert to upper case
 							upper = true;
 							break;
 						
@@ -984,15 +1397,15 @@ blazegears.formatting.UnixDateFormatter.prototype.parseDateFormat = function(for
 							opposite = true;
 							break;
 						
-						case "E": // use the locale's alternate representation for date and time
+						case "E": // use the locale's alternate representation for date and time, doesn't do anything
 							local_date = true;
 							break;
 						
-						case "O": // use the locale's alternate numeric symbols for numbers
+						case "O": // use the locale's alternate numeric symbols for numbers, doesn't do anything
 							local_numbers = true;
 							break;
 						
-						case ":":
+						case ":": // increase the precision of the time zone offset representation, doesn't do anything
 							precision++;
 							break;
 					}
@@ -1009,7 +1422,7 @@ blazegears.formatting.UnixDateFormatter.prototype.parseDateFormat = function(for
 					result.addLiteral("%");
 					break;
 				
-				case "A": // weekday names (Sunday - Saturday)
+				case "A": // full weekday name
 					closure = function(upper, opposite) {
 						return function(date) {
 							var result = this._getDayName(date);
@@ -1022,7 +1435,7 @@ blazegears.formatting.UnixDateFormatter.prototype.parseDateFormat = function(for
 					result.addCallback(closure(upper, opposite));
 					break;
 				
-				case "B": // month names (January - December)
+				case "B": // full weekday name
 					closure = function(upper, opposite) {
 						return function(date) {
 							var result = this._getMonthName(date);
@@ -1039,19 +1452,19 @@ blazegears.formatting.UnixDateFormatter.prototype.parseDateFormat = function(for
 					result.addCallback(this._getDecrementedCentury);
 					break;
 				
-				case "D": // same as "%m/%d/%y"
+				case "D": // same as %m/%d/%y
 					result.merge(this.parseDateFormat("%m/%d/%y"));
 					break;
 				
-				case "F": // same as "%Y-%m-%d"
+				case "F": // same as %Y-%m-%d
 					result.merge(this.parseDateFormat("%Y-%m-%d"));
 					break;
 				
-				case "G": // iso-8601 years (1970 - 2038)
+				case "G": // iso 8601 year
 					result.addCallback(this._getIso8601Year);
 					break;
 				
-				case "H": // international hours (00 - 23)
+				case "H": // zero padded 24-hour format hour
 					closure = function(padding) {
 						return function(date) {
 							return blazegears._padStringLeft(this._getHours(date), padding, 2);
@@ -1060,7 +1473,7 @@ blazegears.formatting.UnixDateFormatter.prototype.parseDateFormat = function(for
 					result.addCallback(closure(padding));
 					break;
 				
-				case "I": // hours (01 - 12)
+				case "I": // zero padded 12-hour format hour
 					closure = function(padding) {
 						return function(date) {
 							return blazegears._padStringLeft(this._getTwelveHourHours(date), padding, 2);
@@ -1069,11 +1482,13 @@ blazegears.formatting.UnixDateFormatter.prototype.parseDateFormat = function(for
 					result.addCallback(closure(padding));
 					break;
 				
-				case "L": // leap years (0 - 1)
-					result.addCallback(this._getLeapYear);
+				case "L": // is it a leap year
+					if (this._use_deprecated) {
+						result.addCallback(this._getLeapYear);
+					}
 					break;
 				
-				case "M": // minutes (00 - 59)
+				case "M": // zero padded minute
 					closure = function(padding) {
 						return function(date) {
 							return blazegears._padStringLeft(this._getMinutes(date), padding, 2);
@@ -1082,19 +1497,19 @@ blazegears.formatting.UnixDateFormatter.prototype.parseDateFormat = function(for
 					result.addCallback(closure(padding));
 					break;
 				
-				case "N": // nanoseconds (000000000 - 999999999)
+				case "N": // nanoseconds
 					result.addLiteral("000000000");
 					break;
 				
-				case "P": // abbreviated lower-case meridiems (am - pm)
+				case "P": // abbreviated lower case meridiems
 					result.addCallback(this._getLowerCaseMeridiem);
 					break;
 				
-				case "R": // same as "%H:%M"
+				case "R": // same as %H:%M
 					result.merge(this.parseDateFormat("%H:%M"));
 					break;
 				
-				case "S": // seconds (00 - 59)
+				case "S": // zero padded second
 					closure = function(padding) {
 						return function(date) {
 							return blazegears._padStringLeft(this._getSeconds(date), padding, 2);
@@ -1103,12 +1518,12 @@ blazegears.formatting.UnixDateFormatter.prototype.parseDateFormat = function(for
 					result.addCallback(closure(padding));
 					break;
 				
-				case "T": // same as "%H:%M:%S".
+				case "T": // same as %H:%M:%S
 				case "X":
 					result.merge(this.parseDateFormat("%H:%M:%S"));
 					break;
 				
-				case "U": // weeks, staring on sunday (00 - 53)
+				case "U": // week of year, starting on sunday
 					closure = function(padding) {
 						return function(date) {
 							return blazegears._padStringLeft(this._getSundayWeek(date), padding, 2);
@@ -1117,7 +1532,7 @@ blazegears.formatting.UnixDateFormatter.prototype.parseDateFormat = function(for
 					result.addCallback(closure(padding));
 					break;
 				
-				case "V": // iso-8601 weeks (01 - 53)
+				case "V": // iso 8601 week of year
 					closure = function(padding) {
 						return function(date) {
 							return blazegears._padStringLeft(this._getIso8601Week(date), padding, 2);
@@ -1126,7 +1541,7 @@ blazegears.formatting.UnixDateFormatter.prototype.parseDateFormat = function(for
 					result.addCallback(closure(padding));
 					break;
 				
-				case "W": // weeks, staring on monday (00 - 53)
+				case "W": // week of year, starting on monday
 					closure = function(padding) {
 						return function(date) {
 							return blazegears._padStringLeft(this._getMondayWeek(date), padding, 2);
@@ -1135,14 +1550,14 @@ blazegears.formatting.UnixDateFormatter.prototype.parseDateFormat = function(for
 					result.addCallback(closure(padding));
 					break;
 				
-				case "Y": // years (1970 - 2038)
+				case "Y": // full year
 					result.addCallback(this._getFullYear);
 					break;
 				
-				case "Z": // abbreviated time zone names (e.g. UTC)
+				case "Z": // abbreviated time zone name
 					break;
 				
-				case "a": // abbreviated weekday names (Sun - Sat)
+				case "a": // abbreviated weekday name
 					closure = function(upper, opposite) {
 						return function(date) {
 							var result = this._getAbbreviatedDayName(date);
@@ -1155,7 +1570,7 @@ blazegears.formatting.UnixDateFormatter.prototype.parseDateFormat = function(for
 					result.addCallback(closure(upper, opposite));
 					break;
 				
-				case "b": // abbreviated month names (Jan - Dec)
+				case "b": // abbreviated month name
 				case "h":
 					closure = function(upper, opposite) {
 						return function(date) {
@@ -1182,7 +1597,7 @@ blazegears.formatting.UnixDateFormatter.prototype.parseDateFormat = function(for
 					result.addCallback(closure(this.parseDateFormat("%a %b %_d %H:%M:%S %Y"), upper));
 					break;
 				
-				case "d": // days (01 - 31)
+				case "d": // zero padded day of the month
 					closure = function(padding) {
 						return function(date) {
 							return blazegears._padStringLeft(this._getDate(date), padding, 2);
@@ -1191,7 +1606,7 @@ blazegears.formatting.UnixDateFormatter.prototype.parseDateFormat = function(for
 					result.addCallback(closure(padding));
 					break;
 				
-				case "e": // same as "%_d"
+				case "e": // same as %_d
 					closure = function(padding, has_padding_modifier) {
 						if (!has_padding_modifier) {
 							padding = " ";
@@ -1203,7 +1618,7 @@ blazegears.formatting.UnixDateFormatter.prototype.parseDateFormat = function(for
 					result.addCallback(closure(padding, has_padding_modifier));
 					break;
 				
-				case "g": // abbreviated iso-8601 years (00 - 99)
+				case "g": // iso 8601 short year
 					closure = function(padding) {
 						return function(date) {
 							return blazegears._padStringLeft(this._getIso8601Year(date) % 100, padding, 2);
@@ -1212,7 +1627,7 @@ blazegears.formatting.UnixDateFormatter.prototype.parseDateFormat = function(for
 					result.addCallback(closure(padding));
 					break;
 				
-				case "j": // days of the year (001 - 366)
+				case "j": // zero padded day of the year
 					closure = function(padding) {
 						return function(date) {
 							return blazegears._padStringLeft(this._getDayOfYear(date), padding, 3);
@@ -1221,7 +1636,7 @@ blazegears.formatting.UnixDateFormatter.prototype.parseDateFormat = function(for
 					result.addCallback(closure(padding));
 					break;
 				
-				case "k": // same as "%_H"
+				case "k": // space padded 24-hour format hour
 					closure = function(padding, has_padding_modifier) {
 						if (!has_padding_modifier) {
 							padding = " ";
@@ -1233,7 +1648,7 @@ blazegears.formatting.UnixDateFormatter.prototype.parseDateFormat = function(for
 					result.addCallback(closure(padding, has_padding_modifier));
 					break;
 				
-				case "l": // same as "%_I"
+				case "l": // space padded 12-hour format hour
 					closure = function(padding, has_padding_modifier) {
 						if (!has_padding_modifier) {
 							padding = " ";
@@ -1245,7 +1660,7 @@ blazegears.formatting.UnixDateFormatter.prototype.parseDateFormat = function(for
 					result.addCallback(closure(padding, has_padding_modifier));
 					break;
 				
-				case "m": // months (01 - 12)
+				case "m": // zero padded numeric month
 					closure = function(padding) {
 						return function(date) {
 							return blazegears._padStringLeft(this._getMonth(date) + 1, padding, 2);
@@ -1254,15 +1669,17 @@ blazegears.formatting.UnixDateFormatter.prototype.parseDateFormat = function(for
 					result.addCallback(closure(padding));
 					break;
 				
-				case "n": // newline
+				case "n": // newline character
 					result.addLiteral("\n");
 					break;
 				
-				case "o": // ordinals for the days of the month (st, nd, rd, or th)
-					result.addCallback(this._getOrdinalSuffix);
+				case "o": // ordinal suffix for the day of the month
+					if (this._use_deprecated) {
+						result.addCallback(this._getOrdinalSuffix);
+					}
 					break;
 				
-				case "p": // abbreviated upper-case meridiems (AM - PM)
+				case "p": // abbreviated upper case meridiem
 					closure = function(opposite) {
 						return function(date) {
 							var result = this._getUpperCaseMeridiem(date);
@@ -1275,7 +1692,7 @@ blazegears.formatting.UnixDateFormatter.prototype.parseDateFormat = function(for
 					result.addCallback(closure(opposite));
 					break;
 				
-				case "r": // same as "%I:%M:%S %p"
+				case "r": // same as %I:%M:%S %p
 					result.merge(this.parseDateFormat("%I:%M:%S %p"));
 					break;
 				
@@ -1283,23 +1700,23 @@ blazegears.formatting.UnixDateFormatter.prototype.parseDateFormat = function(for
 					result.addCallback(this._getTimestamp);
 					break;
 				
-				case "t": // tab
+				case "t": // tab character
 					result.addLiteral("\t");
 					break;
 				
-				case "u": // weekdays, starting on monday (1 - 7)
+				case "u": // numeric weekday, starting on monday
 					result.addCallback(this._getDayOfWeek);
 					break;
 				
-				case "w": // weekdays, starting on sunday (0 - 6)
+				case "w": // numeric weekday, starting on sunday
 					result.addCallback(this._getDay);
 					break;
 				
-				case "x": // same as "%m/%d/%y"
+				case "x": // same as %m/%d/%y
 					result.merge(this.parseDateFormat("%m/%d/%y"));
 					break;
 				
-				case "y": // abbreviated years (00 - 99)
+				case "y": // short year
 					closure = function(padding) {
 						return function(date) {
 							return blazegears._padStringLeft(this._getFullYear(date) % 100, padding, 2);
@@ -1333,7 +1750,7 @@ blazegears.formatting.UnixDateFormatter.prototype._getDecrementedCentury = funct
 }
 
 // Class: BlazeGears.Formats [Deprecated]
-// This class has been deprecated, use <blazegears.formatting.NumberFormatter>,  <blazegears.formatting.FileSizeFormatter>,  <blazegears.formatting.PHPDateFormatter>, and <blazegears.formatting.UnixDateFormatter> instead. A singleton class that handles various string formatting tasks.
+// This class has been deprecated, use <blazegears.formatting.NumberFormatter>, <blazegears.formatting.PHPDateFormatter>, and <blazegears.formatting.UnixDateFormatter> instead. A singleton class that handles various string formatting tasks.
 // 
 // Superclasses:
 //   <BlazeGears.BaseClass [Deprecated]>
@@ -1481,6 +1898,7 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 			
 			case "unix":
 				formatter = new blazegears.formatting.UnixDateFormatter();
+				this._use_deprecated = true;
 				break;
 			
 			default:

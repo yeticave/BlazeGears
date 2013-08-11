@@ -26,8 +26,8 @@ Homepage: http://www.yeticave.com
 
 // Namespace: blazegears.bgtl
 // Deals with HTML templating.
-var blazegears = (typeof blazegears === "undefined") ? {} : blazegears;
-blazegears.bgtl = (typeof blazegears.bgtl === "undefined") ? {} : blazegears.bgtl;
+var blazegears = blazegears || {};
+blazegears.bgtl = blazegears.bgtl || {};
 
 /*
 Class: blazegears.bgtl.Compiler
@@ -131,7 +131,7 @@ blazegears.bgtl.Compiler = function() {
 
 /*
 Method: isDebugModeEnabled
-	Determines if debug mode is enabled.
+	Determines if debug mode is enabled. Defaults to *false*.
 
 Return Value:
 	(*Boolean*) *true* if debug mode is enabled, otherwise *false*.
@@ -145,7 +145,7 @@ Method: enableDebugMode
 	Setter for <isDebugModeEnabled>
 
 Arguments:
-	enable - (*Boolean*) If it's *true*, the debug mode will be enabled, otherwise it will be disabled.
+	enable - (*Boolean*) The new value.
 */
 blazegears.bgtl.Compiler.prototype.enableDebugMode = function(enable) {
 	this._is_debug_mode_enabled = Boolean(enable);
@@ -159,6 +159,7 @@ Arguments:
 	lexeme - (*String*) The code to build the template from.
 
 Exceptions:
+	blazegears.ArgumentError - *lexeme* is *undefined* or *null*.
 	blazegears.bgtl.CompilingError - An error occurred during the compiling of the template.
 	blazegears.bgtl.LexingError - An error occurred during the lexical parsing of the template.
 */
@@ -173,7 +174,13 @@ blazegears.bgtl.Compiler.prototype.buildTemplate = function(lexeme) {
 	var result = new blazegears.bgtl.Template();
 	var tokens;
 	
-	tokens = this._lexer.tokenizeLexeme(lexeme);
+	if (lexeme === undefined) {
+		throw new blazegears.ArgumentError._undefinedArgument("lexeme");
+	}
+	if (lexeme === null) {
+		throw new blazegears.ArgumentError._nullArgument("lexeme");
+	}
+	tokens = this._lexer.tokenizeLexeme(lexeme.toString());
 	code_collection = this._compileTemplate(tokens);
 	try {
 		result._render_callback = new Function(code_collection.toString());
@@ -837,13 +844,13 @@ blazegears.bgtl.Error.prototype = new blazegears.Error();
 blazegears.bgtl.Error.prototype.constructor = blazegears.bgtl.Error;
 
 // Method: getColumnNumber
-// Gets the *Number* representation of the column where the error occured.
+// Gets the number of the column where the error occured as a *Number*.
 blazegears.bgtl.Error.prototype.getColumnNumber = function() {
 	return this._column_number;
 }
 
 // Method: getLineNumber
-// Gets the *Number* representation of the line that caused the error.
+// Gets number of the line that caused the error as a *Number*.
 blazegears.bgtl.Error.prototype.getLineNumber = function() {
 	return this._line_number;
 }
