@@ -174,11 +174,8 @@ blazegears.bgtl.Compiler.prototype.buildTemplate = function(lexeme) {
 	var result = new blazegears.bgtl.Template();
 	var tokens;
 	
-	if (lexeme === undefined) {
-		throw new blazegears.ArgumentError._undefinedArgument("lexeme");
-	}
-	if (lexeme === null) {
-		throw new blazegears.ArgumentError._nullArgument("lexeme");
+	if (!blazegears._isStringifyable(lexeme)) {
+		throw blazegears.ArgumentError._nulldefinedArgument("lexeme");
 	}
 	tokens = this._lexer.tokenizeLexeme(lexeme.toString());
 	code_collection = this._compileTemplate(tokens);

@@ -402,6 +402,9 @@ Method: setTimeZone
 
 Arguments:
 	value - (<blazegears.formatting.TimeZone>) The new value.
+
+Exceptions:
+	blazegears.ArgumentError - *value* isn't an acceptable value for <blazegears.formatting.TimeZone>.
 */
 blazegears.formatting.DateFormatter.prototype.setTimeZone = function(value) {
 	var TimeZone = blazegears.formatting.TimeZone;
@@ -411,7 +414,7 @@ blazegears.formatting.DateFormatter.prototype.setTimeZone = function(value) {
 	} else if (value === TimeZone.UTC) {
 		this._is_utc_time_enabled = true;
 	} else {
-		throw blazegears.ArgumentError("value", "blazegears.formatting.TimeZone");
+		throw blazegears.ArgumentError._invalidEnumValue("value", "blazegears.formatting.TimeZone");
 	}
 }
 
@@ -747,100 +750,6 @@ blazegears.formatting.NumberFormatter = function() {
 }
 
 /*
-Method: formatNumber
-	Formats a number as a *String*.
-
-Arguments:
-	number - (*Number*) The number to format.
-*/
-blazegears.formatting.NumberFormatter.prototype.formatNumber = function(number) {
-	var DecimalVisibility = blazegears.formatting.DecimalVisibility;
-	var decimal_part;
-	var decimal_significand;
-	var group_count;
-	var group_offset;
-	var groups;
-	var has_decimal_part = true;
-	var i;
-	var integer_part;
-	var integer_string;
-	var integer_string_length;
-	var is_negative;
-	var result;
-	
-	// validate the number
-	if (!BlazeGears.isNumber(number)) {
-		number = parseFloat(number);
-		if (isNaN(number)) {
-			number = 0;
-		}
-	}
-	is_negative = number < 0;
-	
-	// separate the number into integer and decimal parts
-	integer_part = number > 0 ? Math.floor(number) : Math.ceil(number);
-	decimal_part = number - integer_part;
-	
-	// create the decimal string
-	if (this._decimal_precision > 0) {
-		decimal_significand = Math.abs(this._rounding_callback.call(this, Math.pow(10, this._decimal_precision) * decimal_part)).toString();
-		if (this._decimal_visibility === DecimalVisibility.FIXED) {
-			while (decimal_significand.length < this._decimal_precision) {
-				decimal_significand += "0";
-			}
-		} else {
-			while (decimal_significand.length > 0 && decimal_significand.charAt(decimal_significand.length - 1) === "0") {
-				decimal_significand = decimal_significand.substr(0, decimal_significand.length - 1);
-			}
-		}
-		if (decimal_significand.length === 0 && this._decimal_visibility === DecimalVisibility.MINIMAL) {
-			decimal_significand += "0";
-		}
-	} else {
-		has_decimal_part = false;
-		integer_part = this._rounding_callback.call(this, number);
-	}
-	
-	// separate the integer part into groups
-	integer_string = Math.abs(integer_part).toString();
-	if (this._group_size > 0 && this._group_delimiter.length > 0 && integer_string.length > this._group_delimiter.length) {
-		integer_string_length = integer_string.length;
-		group_count = Math.ceil(integer_string_length / this._group_size);
-		groups = [];
-		
-		for (i = 0; i < group_count; ++i) {
-			group_offset = integer_string_length - this._group_size * (group_count - i);
-			if (group_offset < 0) {
-				groups.push(integer_string.substr(0, this._group_size + group_offset));
-			} else {
-				groups.push(integer_string.substr(group_offset, this._group_size));
-			}
-		}
-		integer_string = groups.join(this._group_delimiter);
-	}
-	
-	// combine the parts into the result
-	if (Math.abs(integer_part) > 0) {
-		result = integer_string;
-	} else if (this._is_leading_zero_enabled) {
-		result = "0";
-	} else {
-		result = "";
-	}
-	if (has_decimal_part && decimal_significand.length > 0) {
-		result += this._decimal_delimiter + decimal_significand;
-	}
-	if (is_negative) {
-		result = this._negative_prefix + result + this._negative_suffix;
-	}
-	if (result.length === 0) {
-		result = "0";
-	}
-	
-	return result;
-}
-
-/*
 Method: isLeadingZeroEnabled
 	Determines if the leading zero should be displayed for numbers with an absolute value less than one but greated than zero. Defaults to *true*.
 */
@@ -894,8 +803,8 @@ blazegears.formatting.NumberFormatter.prototype.setDecimalPrecision = function(v
 }
 
 // Method: getDecimalVisibility
-// Gets the mode of diplaying the decimal part of numbers as a <blazegears.bgtl.DecimalVisibility>. Defaults to <blazegears.formatting.DecimalVisibility>.FIXED.
-blazegears.formatting.NumberFormatter.prototype.getDecimalPrecision = function() {
+// Gets the mode of diplaying the decimal part of numbers as a <blazegears.formatting.DecimalVisibility>. Defaults to <blazegears.formatting.DecimalVisibility>.FIXED.
+blazegears.formatting.NumberFormatter.prototype.getDecimalVisibility = function() {
 	return this._decimal_visibility;
 }
 
@@ -904,10 +813,17 @@ Method: setDecimalVisibility
 	Setter for <getDecimalVisibility>.
 
 Arguments:
-	value - (<blazegears.bgtl.DecimalVisibility>) The new value.
+	value - (<blazegears.formatting.DecimalVisibility>) The new value.
+
+Exceptions:
+	blazegears.ArgumentError - *value* isn't an acceptable value for <blazegears.formatting.DecimalVisibility>.
 */
 blazegears.formatting.NumberFormatter.prototype.setDecimalVisibility = function(value) {
-	this._decimal_visibility = value;
+	if (BlazeGears.isNumber(value) && value > 0 && value < 4) {
+		this._decimal_visibility = value;
+	} else {
+		throw blazegears.ArgumentError._invalidEnumValue("value", "blazegears.formatting.DecimalVisibility");
+	}
 }
 
 // Method: getGroupDelimiter
@@ -999,6 +915,100 @@ blazegears.formatting.NumberFormatter.prototype.setRoundingCallback = function(v
 		throw blazgears.ArgumentError._invalidArgumentType("value", "Function");
 	}
 	this._rounding_callback = value;
+}
+
+/*
+Method: formatNumber
+	Formats a number as a *String*.
+
+Arguments:
+	number - (*Number*) The number to format.
+*/
+blazegears.formatting.NumberFormatter.prototype.formatNumber = function(number) {
+	var DecimalVisibility = blazegears.formatting.DecimalVisibility;
+	var decimal_part;
+	var decimal_significand;
+	var group_count;
+	var group_offset;
+	var groups;
+	var has_decimal_part = true;
+	var i;
+	var integer_part;
+	var integer_string;
+	var integer_string_length;
+	var is_negative;
+	var result;
+	
+	// validate the number
+	if (!BlazeGears.isNumber(number)) {
+		number = parseFloat(number);
+		if (isNaN(number)) {
+			number = 0;
+		}
+	}
+	is_negative = number < 0;
+	
+	// separate the number into integer and decimal parts
+	integer_part = number > 0 ? Math.floor(number) : Math.ceil(number);
+	decimal_part = number - integer_part;
+	
+	// create the decimal string
+	if (this._decimal_precision > 0) {
+		decimal_significand = Math.abs(this._rounding_callback.call(this, Math.pow(10, this._decimal_precision) * decimal_part)).toString();
+		if (this._decimal_visibility === DecimalVisibility.FIXED) {
+			while (decimal_significand.length < this._decimal_precision) {
+				decimal_significand += "0";
+			}
+		} else {
+			while (decimal_significand.length > 0 && decimal_significand.charAt(decimal_significand.length - 1) === "0") {
+				decimal_significand = decimal_significand.substr(0, decimal_significand.length - 1);
+			}
+		}
+		if (decimal_significand.length === 0 && this._decimal_visibility === DecimalVisibility.MINIMAL) {
+			decimal_significand += "0";
+		}
+	} else {
+		has_decimal_part = false;
+		integer_part = this._rounding_callback.call(this, number);
+	}
+	
+	// separate the integer part into groups
+	integer_string = Math.abs(integer_part).toString();
+	if (this._group_size > 0 && this._group_delimiter.length > 0 && integer_string.length > this._group_delimiter.length) {
+		integer_string_length = integer_string.length;
+		group_count = Math.ceil(integer_string_length / this._group_size);
+		groups = [];
+		
+		for (i = 0; i < group_count; ++i) {
+			group_offset = integer_string_length - this._group_size * (group_count - i);
+			if (group_offset < 0) {
+				groups.push(integer_string.substr(0, this._group_size + group_offset));
+			} else {
+				groups.push(integer_string.substr(group_offset, this._group_size));
+			}
+		}
+		integer_string = groups.join(this._group_delimiter);
+	}
+	
+	// combine the parts into the result
+	if (Math.abs(integer_part) > 0) {
+		result = integer_string;
+	} else if (this._is_leading_zero_enabled) {
+		result = "0";
+	} else {
+		result = "";
+	}
+	if (has_decimal_part && decimal_significand.length > 0) {
+		result += this._decimal_delimiter + decimal_significand;
+	}
+	if (is_negative) {
+		result = this._negative_prefix + result + this._negative_suffix;
+	}
+	if (result.length === 0) {
+		result = "0";
+	}
+	
+	return result;
 }
 
 /*

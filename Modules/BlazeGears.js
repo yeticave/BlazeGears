@@ -106,6 +106,11 @@ blazegears._forceParseInt = function(value, default_value) {
 	return result;
 }
 
+blazegears._forceParseString = function(value, default_value) {
+	if (default_value === undefined) default_value = null;
+	return blazegears._isStringifyable(value) ? value.toString() : default_value;
+}
+
 blazegears._getColumnNumber = function(string, offset) {
 	var last_line_break;
 	var result;
@@ -128,6 +133,10 @@ blazegears._getLineNumber = function(string, offset) {
 	result = blazegears._countStringOccurrences("\n", string) + 1;
 	
 	return result;
+}
+
+blazegears._isStringifyable = function(variable) {
+	return variable !== undefined && variable !== null;
 }
 
 blazegears._padStringLeft = function(string, padding, expected_width) {
@@ -281,6 +290,11 @@ blazegears.ArgumentError._nullArgument = function(argument_name) {
 	return new blazegears.ArgumentError(argument_name, "The <" + argument_name + "> argument can't be <null>.");
 }
 
+// generates the message for an undefined or null argument
+blazegears.ArgumentError._nulldefinedArgument = function(argument_name) {
+	return new blazegears.ArgumentError(argument_name, "The <" + argument_name + "> argument is required and can't be <null>.");
+}
+
 // generates the message for a missing argument
 blazegears.ArgumentError._undefinedArgument = function(argument_name) {
 	return new blazegears.ArgumentError(argument_name, "The <" + argument_name + "> argument is required.");
@@ -331,7 +345,7 @@ blazegears.Event.prototype.removeCallback = function(context, callback) {
 	var result = false;
 	
 	if (!BlazeGears.isFunction(callback)) {
-		throw new blazegears.ArgumentError("callback");
+		throw blazegears.ArgumentError._invalidArgumentType("callback", "Function");
 	}
 	for (i = 0; i < callback_count; ++i) {
 		if (context === callbacks[i][0] && callback === callbacks[i][1]) {

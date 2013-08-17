@@ -25,16 +25,25 @@ Homepage: http://www.yeticave.com
 */
 
 // Namespace: blazegears.fragvars
+// Deals with storing variables in the fragment part of the current URL.
 var blazegears = blazegears || {};
 blazegears.fragvars = blazegears.fragvars || {};
 
-// Enum: blazegears.fragvars.HistoryMode
+/*
+Enum: blazegears.fragvars.HistoryMode
+	Specifies the possible ways of handling browser history.
+
+Values:
+	AUTOMATIC - The appropriate history mode will be determined automatically. The functionality of this mode might change fundamentally between releases.
+	NONE - The browser history won't be manipulated at all.
+*/
 blazegears.fragvars.HistoryMode = {
 	AUTOMATIC: null,
-	NONE: 1
+	NONE: 0
 };
 
 // Class: blazegears.fragvars.FragVar
+// Represents a signle variable stored in the fragment part of the current URL. Instances of this class shouldn't be created manually, but through the <Manager> class.
 blazegears.fragvars.FragVar = function(id, value) {
 	if (value === undefined) value = null;
 	this._id = id;
@@ -43,24 +52,37 @@ blazegears.fragvars.FragVar = function(id, value) {
 }
 
 // Method: getId
+// Gets the ID of the FragVar as a *String*.
 blazegears.fragvars.FragVar.prototype.getId = function() {
 	return this._id;
 }
 
 // Method: getValue
+// Gets the value of the FragVar as a *String*. Defaults to *null*.
 blazegears.fragvars.FragVar.prototype.getValue = function() {
-	return blazegears.fragvars.Manager.getFragVarValue(this._id);
+	var value = blazegears.fragvars.Manager.getFragVarValue(this._id)
+	return value === undefined || value === null ? null : value.toString();
 }
 
-// Method: setValue
+/*
+Method: setValue
+	Setter for <getValue>.
+
+Arguments:
+	value - (*String*) The new value. If it's *null*, the FragVar will be unset.
+
+See Also:
+	<getValueChangedEvent>
+*/
 blazegears.fragvars.FragVar.prototype.setValue = function(value) {
 	if (value !== this._value) {
 		this._value = value;
-		blazegears.fragvars.Manager.setFragVarValue(this._id, value);
+		blazegears.fragvars.Manager.setFragVarValue(this._id, value === undefined || value === null ? null : value.toString());
 	}
 }
 
 // Method: getValueChangedEvent
+// Gets the event that will be raised when <getValue> changes as an <Event>.
 blazegears.fragvars.FragVar.prototype.getValueChangedEvent = function() {
 	return this._value_changed_event;
 }
@@ -70,6 +92,7 @@ blazegears.fragvars.FragVar.prototype._updateValue = function(value) {
 }
 
 // Class: blazegears.fragvars.Manager
+// Manages FragVars stored in the fragment part of the current URL.
 blazegears.fragvars.Manager = {};
 
 blazegears.fragvars.Manager._fragvar_values = {};
@@ -78,20 +101,45 @@ blazegears.fragvars.Manager._history_mode = blazegears.fragvars.HistoryMode.NONE
 blazegears.fragvars.Manager._manager = null;
 
 // Method: getHistoryMode
+// Gets the method of handling browser history as a <blazegears.fragvars.HistoryMode>. Defaults to <blazegears.fragvars.HistoryMode>.NONE
 blazegears.fragvars.Manager.getHistoryMode = function() {
 	return blazegears.fragvars.Manager._history_mode;
 }
 
-// Method: setHistoryMode
-blazegears.fragvars.Manager.setHistoryMode = function(history_mode) {
+/*
+Method: setHistoryMode
+	Setter for <getHistoryMode>.
+
+Arguments:
+	value - (<blazegears.fragvars.HistoryMode>) The new value.
+
+Exceptions:
+	blazegears.ArgumentError - *value* isn't an acceptable value for <blazegears.fragvars.HistoryMode>.
+*/
+blazegears.fragvars.Manager.setHistoryMode = function(value) {
+	var HistoryMode = blazegears.fragvars.HistoryMode;
 	var Manager = blazegears.fragvars.Manager;
-	Manager._history_mode = history_mode;
-	if (Manager._manager !== null) {
-		Manager._manager.ie_history = history_mode === blazegears.fragvars.HistoryMode.AUTOMATIC;
+	
+	if (value === null || value === 0) {
+		Manager._history_mode = value;
+		if (Manager._manager !== null) {
+			Manager._manager.ie_history = value === blazegears.fragvars.HistoryMode.AUTOMATIC;
+		}
+	} else {
+		throw blazegears.ArgumentError._invalidEnumValue("value", "blazegears.fragvars.HistoryMode");
 	}
 }
 
-// Method: createFragVar
+/*
+Method: createFragVar
+	Tries to look up a <FragVar> by ID or creates a new one if it doesn't exist yet.
+
+Arguments:
+	id - (*String*) The ID of the <FragVar>.
+
+Return Value:
+	(<FragVar>) The <FragVar> with the matching ID, if it already exists, otherwise a new <FragVar>.
+*/
 blazegears.fragvars.Manager.createFragVar = function(id) {
 	var Manager = blazegears.fragvars.Manager;
 	var fragvar;
@@ -110,7 +158,16 @@ blazegears.fragvars.Manager.createFragVar = function(id) {
 	return result;
 }
 
-// Method: getFragVar
+/*
+Method: getFragVar
+	Looks up a <FragVar> by ID.
+
+Arguments:
+	id - (*String*) The ID of the <FragVar>.
+
+Return Value:
+	(<FragVar>) The <FragVar> with the matching ID, if it already exists, otherwise *null*.
+*/
 blazegears.fragvars.Manager.getFragVar = function(id) {
 	var fragvars = blazegears.fragvars.Manager._fragvars;
 	var result = null;
@@ -122,7 +179,16 @@ blazegears.fragvars.Manager.getFragVar = function(id) {
 	return result;
 }
 
-// Method: getFragVarValue
+/*
+Method: getFragVarValue
+	Gets the value of a <FragVar>.
+
+Arguments:
+	id - (*String*) The ID of the <FragVar>.
+
+Return Value:
+	(*String*) The value of the <FragVar>, if it exists and has a value, otherwise *null*.
+*/
 blazegears.fragvars.Manager.getFragVarValue = function(id) {
 	var values = blazegears.fragvars.Manager._manager.getFragVarValues();
 	var result = null;
@@ -134,20 +200,46 @@ blazegears.fragvars.Manager.getFragVarValue = function(id) {
 	return result;
 }
 
-// Method: getFragVarValues
+/*
+Method: getFragVarValues
+	Gets the values of all <FragVars>.
+
+Return Value:
+	(*Object*) A dictionary where the keys are the <FragVars>' IDs and values are the <FragVars>' values.
+*/
 blazegears.fragvars.Manager.getFragVarValues = function() {
 	blazegears.fragvars.Manager._initialize();
 	return blazegears.fragvars.Manager._manager.getFragVarValues();
 }
 
-// Method: setFragVarValue
+/*
+Method: setFragVarValue
+	Sets the value of a <FragVar>.
+
+Arguments:
+	id - (*String*) The ID of the <FragVar>.
+	value - (*String*) The new value of the <FragVar>.
+
+Exceptions:
+	blazegears.ArgumentError - *id* is *undefined* or *null*.
+*/
 blazegears.fragvars.Manager.setFragVarValue = function(id, value) {
 	var values = {};
-	values[id] = value;
+	
+	if (!blazegears._isStringifyable(id)) {
+		throw blazegears.ArgumentError._nulldefinedArgument("id");
+	}
+	values[id] = blazegears._forceParseString(value);
 	blazegears.fragvars.Manager.setFragVarValues(values);
 }
 
-// Method: setFragVarValues
+/*
+Method: setFragVarValues
+	Sets the values of a selection of <FragVars>.
+
+Arguments:
+	values - (*Object*) A dictionary where the keys are the <FragVars>' IDs and the values are the <FragVars>' new values.
+*/
 blazegears.fragvars.Manager.setFragVarValues = function(values) {
 	var Manager = blazegears.fragvars.Manager;
 	var i;
