@@ -746,6 +746,8 @@ blazegears.formatting.NumberFormatter = function() {
 	this._is_leading_zero_enabled = true;
 	this._negative_prefix = "-";
 	this._negative_suffix = "";
+	this._positive_prefix = "";
+	this._positive_suffix = "";
 	this._rounding_callback = Math.round;
 }
 
@@ -894,6 +896,40 @@ blazegears.formatting.NumberFormatter.prototype.setNegativeSuffix = function(val
 	this._negative_suffix = value === undefined || value === null ? "" : value.toString();
 }
 
+// Method: getPositivePrefix
+// Gets the prefix used for positive numbers as a *String*. Defaults to an empty string.
+blazegears.formatting.NumberFormatter.prototype.getPositivePrefix = function() {
+	return this._positive_prefix;
+}
+
+/*
+Method: setPositivePrefix
+	Setter for <getPositivePrefix>.
+
+Arguments:
+	value - (*String*) The new value.
+*/
+blazegears.formatting.NumberFormatter.prototype.setPositivePrefix = function(value) {
+	this._positive_prefix = value === undefined || value === null ? "" : value.toString();
+}
+
+// Method: getPositiveSuffix
+// Gets the suffix used for positive numbers as a *String*. Defaults to an empty string.
+blazegears.formatting.NumberFormatter.prototype.getPositiveSuffix = function() {
+	return this._positive_suffix;
+}
+
+/*
+Method: setPositiveSuffix
+	Setter for <getPositiveSuffix>.
+
+Arguments:
+	value - (*String*) The new value.
+*/
+blazegears.formatting.NumberFormatter.prototype.setPositiveSuffix = function(value) {
+	this._positive_suffix = value === undefined || value === null ? "" : value.toString();
+}
+
 // Method: getRoundingCallback
 // Gets the callback used for rounding numbers as a *Function*.
 blazegears.formatting.NumberFormatter.prototype.getRoundingCallback = function() {
@@ -1003,6 +1039,8 @@ blazegears.formatting.NumberFormatter.prototype.formatNumber = function(number) 
 	}
 	if (is_negative) {
 		result = this._negative_prefix + result + this._negative_suffix;
+	} else {
+		result = this._positive_prefix + result + this._positive_suffix;
 	}
 	if (result.length === 0) {
 		result = "0";

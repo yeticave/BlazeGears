@@ -157,6 +157,15 @@ blazegears.formatting.tests.numberFormattingTest = function() {
 	formatter.setNegativePrefix("-");
 	formatter.setNegativeSuffix("");
 	
+	// positive affixes
+	formatter.setPositivePrefix("x");
+	strictEqual(formatter.formatNumber(1), "x1.00", "Set the positive prefix.");
+	formatter.setPositivePrefix("");
+	formatter.setPositiveSuffix("x");
+	strictEqual(formatter.formatNumber(1), "1.00x", "Set the positive suffix.");
+	formatter.setPositivePrefix("");
+	formatter.setPositiveSuffix("");
+	
 	// decimal rounding
 	formatter.setDecimalPrecision(1);
 	formatter.setRoundingCallback(Math.round);
