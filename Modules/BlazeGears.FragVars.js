@@ -266,11 +266,34 @@ blazegears.fragvars.Manager._internalOnChange = function() {
 	fragvar._updateValue(this.getValue());
 }
 
-// Class: BlazeGears.FragVars [Deprecated]
-// This class has been deprecated, use <blazegears.fragvars.Manager> instead. A singleton class that handles variables stored in the fragment section of the current URL.
-// 
-// Superclasses:
-//   <BlazeGears.Styles [Deprecated]>
+/*
+Class: BlazeGears.FragVars [Deprecated]
+	This class has been deprecated, use <blazegears.fragvars.Manager> instead. A singleton class that handles variables stored in the fragment section of the current URL.
+
+Superclasses:
+	<BlazeGears.Styles [Deprecated]>
+
+Remarks:
+	FragVars are variables stored in the fragment section of the current URL. FragVars are stored as ID-value pairs, support event listeners, and still provide an interface to use URL fragments for their original purpose.
+
+Examples:
+	(code)
+		<a name="my_anchor"></a>
+		<script type="text/javascript">
+			// <![CDATA[
+			fragvars = new BlazeGears.FragVars();
+			my_fragvar = fragvars.createFragVar("my_id");
+			my_fragvar.onChange = function(self) {
+				alert("My new value is: " + self.getValue());
+			}
+			// ]]>
+		</script>
+		<div><a href="javascript:;" onclick="my_fragvar.add(-1);">Decrease the Value</a></div>
+		<div><a href="javascript:;" onclick="my_fragvar.setValue(0);">Reset the Value</a></div>
+		<div><a href="javascript:;" onclick="my_fragvar.add(1);">Increase the Value</a></div>
+		<div><a href="#my_anchor" onclick="return fragvars.goToAnchor(this);">Scroll to an Anchor</a></div>
+	(end)
+*/
 BlazeGears.FragVars = BlazeGears.Classes.declareSingleton(BlazeGears.Styles, {
 	// Field: ie_history
 	// If it's true, upon updating the URL the changes will be saved to an iframe, so the the forward and back buttons will properly work under Internet Explorer.

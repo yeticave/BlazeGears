@@ -24,19 +24,138 @@ Email: info@yeticave.com
 Homepage: http://www.yeticave.com
 */
 
-// Class: BlazeGears.Classes [Deprecated]
-// This namespace has been deprecated and its functionality will be completely removed. Contains the functions and interfaces that can be used declare classes that has some advantages (and some drawbacks) over regular JavaScript classes.
-// 
-// The declaration of a class is being done by passing an object to one of the class declaring functions. 
-// 
-// Declaration Object Notes:
-//   - Each key of the object will be a member of the class.
-//   - Every key must be unique, not even keys of different types (public or static) are allowed to match. This doesn't effect magical keys, as they are special to begin with.
-//   - Every method must have "self" as their first argument. This argument will be pushed to the front of the argument list, and it's guaranteed, that it will point either to the instance for instance methods or to the class for static methods.
-//   - Keys starting with the dollar sign (e.g. "$static") are created as static members of the class.
-//   - Keys starting with an underscore (e.g. "_protected") are considered protected by convention. Members like these in BlazeGears are not documented, meant to be used only internally, and might change without warning or notice.
-//   - Keys starting and ending with double underscores (e.g. the constructor) are considered magical. Using keys like these for declaring your own functionality is not advised.
-//   - Objects should never be initialized in the declaration of the class, as the constructor will try to create a copy of every object member.
+/*
+Class: BlazeGears.Classes [Deprecated]
+	This class has been deprecated and its functionality will be completely removed. Contains the functions and interfaces that can be used declare classes that has some advantages (and some drawbacks) over regular JavaScript classes.
+	
+	The declaration of a class is being done by passing an object to one of the class declaring functions. 
+
+Remarks:
+	The BlazeGears class declaration interface is largely based on the concepts used by the Python language. It supports constructors, self-references, singletons, regular and multiple inheritance, superclass searching, and static members.
+
+Declaration Object Notes:
+	- Each key of the object will be a member of the class.
+	- Every key must be unique, not even keys of different types (public or static) are allowed to match. This doesn't effect magical keys, as they are special to begin with.
+	- Every method must have "self" as their first argument. This argument will be pushed to the front of the argument list, and it's guaranteed, that it will point either to the instance for instance methods or to the class for static methods.
+	- Keys starting with the dollar sign (e.g. "$static") are created as static members of the class.
+	- Keys starting with an underscore (e.g. "_protected") are considered protected by convention. Members like these in BlazeGears are not documented, meant to be used only internally, and might change without warning or notice.
+	- Keys starting and ending with double underscores (e.g. the constructor) are considered magical. Using keys like these for declaring your own functionality is not advised.
+	- Objects should never be initialized in the declaration of the class, as the constructor will try to create a copy of every object member.
+
+Declaring a Class:
+	The class declaring method handles arguments dynamically. The last argument must a dictionary, this will be the declaration, and all the prior ones will be the superclasses of the class.
+	
+	The example below will show the usage of constructors and self-references.
+	
+	(code)
+		MyClass = BlazeGears.Classes.declareClass({
+			my_property: null, // property
+			
+			// the constructor, sets the value of the property
+			__init__: function(self, my_argument) {
+				self.my_property = my_argument;
+			},
+			
+			// tells the value of the property
+			myMethod: function(self) { // method
+				alert(self.my_property);
+			}
+		});
+		
+		my_obj = MyClass("I'm a class!");
+		my_obj.myMethod(); // I'm a class!
+	(end)
+	
+	The constructor method of the class is a magical member and will be called each time an instance of the class is created. Magical members can be recognized from the double underscores surrounding their names.
+	
+	Self-references are meant to replace the *this* keyword, because its value might change depending on the context where the method's called from. When a method is called, the self-reference will be pushed in the front of its argument list by a wrapper. These arguments are called "self" in all the standard BlazeGears methods.
+
+Singletons:
+	Singletons work almost the same as regular classes do, but upon trying to create a second instance, the reference to the for the first instance will be returned instead.
+	
+	(code)
+		MySingleton = BlazeGears.Classes.declareSingleton({
+			my_property: "I'm a class!"
+		});
+		
+		my_obj_1 = MySingleton();
+		my_obj_2 = MySingleton();
+		my_obj_1.my_property = "I'm a singleton!";
+		alert(my_obj_2.my_property); // I'm a singleton!
+	(end)
+
+Regular and Multiple Inheritance:
+	Besides regular inheritance, BlazeGears also supports multiple inheritance. For multiple inheritance the list of superclasses must be provided in an order of descending priority. In case there are multiple members of the same name inherited from different superclasses, the one with the highest priority will be used.
+	
+	There's a magical method available to all instances, called "super", which will search the superclasses in order of priority for a method, and calls it if it's available.
+	
+	(code)
+		Canine = BlazeGears.Classes.declareClass({
+			__init__: function(self, name) {
+				self.name = name;
+			},
+			
+			bark: function(self) {
+				alert("Aroo!");
+			},
+			
+			greet: function(self) {
+				alert("Hey! My name's " + self.name + "!");
+			}
+		});
+		
+		Fox = BlazeGears.Classes.declareClass(Canine, { // regular inheritance
+			greet: function(self) {
+				alert("Hi there! I'm a fox!");
+			}
+		});
+		
+		Dog = BlazeGears.Classes.declareClass({
+			bark: function(self) {
+				alert("Woof!");
+			}
+		});
+		
+		Hellhound = BlazeGears.Classes.declareClass(Dog, Canine, { // multiple inheritance
+			__init__: function(self, name, type) {
+				self.__super__("__init__", name); // calling the super's constructor
+				self.bark();
+			}
+		});
+		
+		foxy = new Fox("Foxy");
+		foxy.greet(); // Hi there! I'm a fox!
+		cerb = new Hellhound("Cerberus"); // Woof!
+		cerb.greet(); // Hey! My name's Cerberus!
+	(end)
+
+Static Members:
+	To make a member static the dollar sign prefix must be used. In the case of static methods the self-references will point to the class itself instead of the instance. The same reference is also available for the regular methods through the use of a magical property, called "class".
+	
+	(code)
+		MyClass = BlazeGears.Classes.declareClass({
+			$my_static_property: 5, // static property
+			
+			// calls the static method and tells the value of the static property
+			myMethod: function(self) {
+				self.myStaticMethod()
+				alert(self.__class__.my_static_property);
+			},
+			
+			// increases the static propertie's value by one
+			$myStaticMethod: function(class_reference, my_argument) {
+				class_reference.my_static_property++;
+			}
+		});
+		
+		alert(MyClass.my_static_property); // 5
+		MyClass.myStaticMethod();
+		alert(MyClass.my_static_property); // 6
+		my_obj = new MyClass();
+		my_obj.myMethod(); // 7
+		my_obj.myMethod(); // 8
+	(end)
+*/
 BlazeGears.Classes = new function() {
 	var self = this;
 	var bg = BlazeGears;

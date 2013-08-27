@@ -1759,11 +1759,43 @@ blazegears.formatting.UnixDateFormatter.prototype._getDecrementedCentury = funct
 	return this._getCentury(date) - 1;
 }
 
-// Class: BlazeGears.Formats [Deprecated]
-// This class has been deprecated, use <blazegears.formatting.NumberFormatter>, <blazegears.formatting.PHPDateFormatter>, and <blazegears.formatting.UnixDateFormatter> instead. A singleton class that handles various string formatting tasks.
-// 
-// Superclasses:
-//   <BlazeGears.BaseClass [Deprecated]>
+/*
+Class: BlazeGears.Formats [Deprecated]
+	This class has been deprecated, use <blazegears.formatting.NumberFormatter>, <blazegears.formatting.PHPDateFormatter>, and <blazegears.formatting.UnixDateFormatter> instead. A singleton class that handles various string formatting tasks.
+
+Superclasses:
+	<BlazeGears.BaseClass [Deprecated]>
+
+Date Formatting:
+	Dates can be formatted based either on the syntax of the <date at http://unixhelp.ed.ac.uk/CGI/man-cgi?date> command of the Unix-like systems, or the <date at http://php.net/manual/en/function.date.php> function's of PHP. The syntax can be provided on-the-fly, but there's always a fallback configuration that will be used if it isn't.
+	
+	(code)
+		formats = new BlazeGears.Formats();
+		now = new Date();
+		
+		date_format = {parser: "unix", syntax: "%B %-d%o, %Y"};
+		time_format = {parser: "unix", syntax: "%-I:%M%P"};
+		
+		alert(formats.formatDate(now)); // fallback configuration, August 27th, 2011 6:32pm
+		alert(formats.formatDate(now, date_format)); // August 27th, 2011
+		alert(formats.formatDate(now, time_format)); // 6:32pm
+	(end)
+
+Number Formatting:
+	Number formatting works in a way very similar to the date formatting.
+	
+	(code)
+		formats = new BlazeGears.Formats();
+		number = 1234567.89
+		
+		float_format = {decimal_length: 3, force_decimals: true};
+		money_format = {decimal_length: 2, force_decimals: true, prefix: "$"};
+		
+		alert(formats.formatNumber(number)); // fallback configuration, 1,234,567
+		alert(formats.formatNumber(number, float_format)); // 1,234,567.890
+		alert(formats.formatNumber(number, money_format)); // $1,234,567.89
+	(end)
+*/
 BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 	// Field: date_format
 	// The default date format dictionary used by <formatDate>.

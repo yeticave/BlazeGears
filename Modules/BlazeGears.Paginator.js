@@ -24,15 +24,36 @@ Email: info@yeticave.com
 Homepage: http://www.yeticave.com
 */
 
-// Class: BlazeGears.Paginator [Deprecated]
-// This class has been deprecated and its functionality will be completely removed. Represents a pagination control widget.
-// 
-// Superclasses:
-//   <BlazeGears.BaseClass [Deprecated]>
-// 
-// Dependencies:
-//   - <BlazeGears.BGTL [Deprecated]>
-//   - <BlazeGears.FragVars [Deprecated]>
+/*
+Class: BlazeGears.Paginator [Deprecated]
+	This class has been deprecated and its functionality will be completely removed. Represents a pagination control widget.
+
+Superclasses:
+	<BlazeGears.BaseClass [Deprecated]>
+
+Dependencies:
+	- <BlazeGears.BGTL [Deprecated]>
+	- <BlazeGears.FragVars [Deprecated]>
+
+Remarks:
+	The Paginator class is technically a cooperation between a managed FragVar and a BGTL template. The class will render an interface from a BGTL template, where the current page number can be manipulated, and the FragVar will store the changes. Whenever the page number changes, an event listener will be fired, and the interface will be re-rendered using the new page number.
+
+Examples:
+	(code)
+		<div id="paginator_container"></div>
+		<script type="text/javascript">
+			// <![CDATA[
+			paginator = new BlazeGears.Paginator("page");
+			paginator.element = "paginator_container";
+			paginator.onChange = function(self) {
+				alert("The current page number is: " + self.getPage());
+			}
+			paginator.setPages(10);
+			paginator.render();
+			// ]]>
+		</script>
+	(end)
+*/
 BlazeGears.Paginator = BlazeGears.Classes.declareClass(BlazeGears.BaseClass, {
 	// Group: Variables
 	

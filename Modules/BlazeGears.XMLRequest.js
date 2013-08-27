@@ -24,11 +24,45 @@ Email: info@yeticave.com
 Homepage: http://www.yeticave.com
 */
 
-// Class: BlazeGears.XMLRequest [Deprecated]
-// This class has been deprecated and its functionality will be completely removed. Can be used for making AJAX requests.
-// 
-// Superclasses:
-//   <BlazeGears.BaseClass [Deprecated]>
+/*
+Class: BlazeGears.XMLRequest [Deprecated]
+	This class has been deprecated and its functionality will be completely removed. Can be used for making AJAX requests.
+
+Superclasses:
+	<BlazeGears.BaseClass [Deprecated]>
+
+Remarks:
+	XML request are done by a wrapper around either the XMLHttpRequest object or an ActiveX component, depending on the browser.
+
+Examples:
+	(code)
+		xml_request = new BlazeGears.XMLRequest();
+		
+		xml_request.onAbort = function(self) {
+			alert("Request aborted!");
+		}
+		
+		xml_request.onError = function(self) {
+			alert("Error code: " + self.getStatus());
+		}
+		
+		xml_request.onSend = function(self) {
+			alert("Request started!");
+		}
+		
+		xml_request.onSuccess = function(self) {
+			alert(self.getResponse(false)); // alerts the result in plain text format
+		}
+		
+		xml_request.url = "http://www.example.com/fetch_data.php"; // the url sans the query
+		xml_request.query = { // the query part of the url
+			category: "news&rumors",
+			order_by: "date",
+			page: 5
+		}; // after escaping it will look like this: ?category=news%26rumors&order_by=date&page=5
+		xml_request.send();
+	(end)
+*/
 BlazeGears.XMLRequest = BlazeGears.Classes.declareClass(BlazeGears.BaseClass, {
 	// Group: Variables
 	

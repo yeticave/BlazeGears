@@ -1002,21 +1002,49 @@ blazegears.bgtl.Template.prototype.render = function(context) {
 	return this._render_callback.call(context);
 }
 
-// Class: BlazeGears.BGTL [Deprecated]
-// This class has been deprecated, use <blazegears.bgtl.Compiler> instead. A singleton class that compiles HTML templates written in the BlazeGears Templating Language.
-// 
-// The language's syntax is based on a mix of JavaScript and <BottlePy's Simple Template at http://bottlepy.org/docs/dev/stpl.html>.
-// 
-// Superclasses:
-//   <BlazeGears.BaseClass>
-// 
-// Control Tags:
-//   There are three different control tags available:
-//     - Statements are surround with percentage marks. (e.g. "%alert('This is a statement!');%")
-//     - Escaped output is using the "{{" opening tag and the "}}" closing tag. (e.g. "{{escaped_output}}")
-//     - Unescaped output is the same as the escaped one, but must have an exclamation mark in front of the input. (e.g. "{{!unescaped_output}}")
-// 	
-//   Apart from the closing tags, tags can be terminated by line breaks, too.
+/*
+Class: BlazeGears.BGTL [Deprecated]
+	This class has been deprecated, use <blazegears.bgtl.Compiler> instead. A singleton class that compiles HTML templates written in the BlazeGears Templating Language.
+	
+	The language's syntax is based on a mix of JavaScript and <BottlePy's Simple Template at http://bottlepy.org/docs/dev/stpl.html>.
+
+Superclasses:
+	<BlazeGears.BaseClass>
+
+Control Tags:
+	There are three different control tags available:
+		- Statements are surround with percentage marks. (e.g. "%alert('This is a statement!');%")
+		- Escaped output is using the "{{" opening tag and the "}}" closing tag. (e.g. "{{escaped_output}}")
+		- Unescaped output is the same as the escaped one, but must have an exclamation mark in front of the input. (e.g. "{{!unescaped_output}}")
+	  
+	Apart from the closing tags, tags can be terminated by line breaks, too.
+
+HTML Templating:
+	The HTML templating class uses the BlazeGears Templating Language, which is based on a mix of JavaScript and <BottlePy's Simple Template at http://bottlepy.org/docs/dev/stpl.html>. Parsing a BGTL template will return an object, which can be rendered with some provided data.
+	
+	There are three different control tags available: statements, escaped output, and unescaped output. Each of these has an opening and a closing tag, but the closing tags can be replaced by line breaks.
+	
+	The example below uses both the opening and closing tags for all three control tags.
+	
+	(code)
+		bgtl = new BlazeGears.BGTL();
+		
+		template = "%for (var i in entries) {%"; // statement
+		template += "<h1>{{entries[i].title}}</h1>"; // escaped output
+		template += "<p>{{!entries[i].content}}</p>"; // unescaped output
+		template += "%}%";
+		
+		entries = [
+			{title: "Entry #1", content: "This is some plain text content."},
+			{title: "Entry #2", content: "This is some content with a <a href='http://www.blazegears.com'>link</a>."}
+		];
+		
+		parsed_template = bgtl.compileTemplate(template);
+		alert(parsed_template.render(entries));
+	(end)
+	
+	Templates can be parsed and rendered in a single command, too, but this is only useful for templates that are going to be rendered only once.
+*/
 BlazeGears.BGTL = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 	_parameters_var: "bgtl_parameters",
 	_result_variable: "bgtl_result",

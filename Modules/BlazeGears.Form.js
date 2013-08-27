@@ -24,14 +24,74 @@ Email: info@yeticave.com
 Homepage: http://www.yeticave.com
 */
 
-// Class: BlazeGears.Form [Deprecated]
-// This class has been deprecated and its functionality will be completely removed. Represents an HTML form in an object-oriented way.
-// 
-// Superclasses:
-//   <BlazeGears.BaseClass [Deprecated]>
-// 
-// Dependencies:
-//   <BlazeGears.BGTL [Deprecated]>
+/*
+Class: BlazeGears.Form [Deprecated]
+	This class has been deprecated and its functionality will be completely removed. Represents an HTML form in an object-oriented way.
+
+Superclasses:
+	<BlazeGears.BaseClass [Deprecated]>
+
+Dependencies:
+	<BlazeGears.BGTL [Deprecated]>
+
+Remarks:
+	The Form class puts HTML forms into an object-oriented context. It operates on three levels of abstraction: forms, fields, and options. It also adds the functionality of input validation, either through regular expressions or callback functions.
+
+Examples:
+	(code)
+		<div id="form_container"></div>
+		<script type="text/javascript">
+			// <![CDATA[
+			form = new BlazeGears.Form();
+			form.action = "process.php";
+			form.element = "form_container";
+			
+			field = form.createField("title", "text"); // create a text field
+			field.label = "Movie Title:";
+			field.attribs.maxlength = 20;
+			field.events.click = "alert('Enter the movie title here!');";
+			field.createRule(/^.{3,}$/, "Titles must be longer than 3 characters!"); // regexp rule
+			field.createRule(/^.{0,16}$/, "Titles must be shorter than 16 characters!");
+			
+			field = form.createField("genre", "radios"); // create a group of radio buttons
+			field.label = "Genre:";
+			field.createRule( // callback rule
+				function(self) { // makes sure that something's selected
+					var element;
+					var options = self.getOptions();
+					var result = false;
+					
+					for (var i in options) {
+						element = document.getElementById(options[i].getElementId());
+						if (element != null && element.checked) {
+							result = true;
+							break;
+						}
+					}
+					
+					return result;
+				},
+				"You must select something!",
+				"Good choice!"
+			);
+			
+			option = field.createOption("action");
+			option.label = "Action";
+			
+			option = field.createOption("comedy");
+			option.label = "Comedy";
+			
+			option = field.createOption("drama");
+			option.label = "Drama";
+			
+			field = form.createField("submit", "submit");
+			field.value = "Submit";
+			
+			form.render();
+			// ]]>
+		</script>
+	(end)
+*/
 BlazeGears.Form = BlazeGears.Classes.declareClass(BlazeGears.BaseClass, {
 	// Field: action
 	// The action attribute of the form.
