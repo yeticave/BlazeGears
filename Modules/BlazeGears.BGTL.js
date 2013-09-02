@@ -145,7 +145,7 @@ Method: enableDebugMode
 	Setter for <isDebugModeEnabled>
 
 Arguments:
-	enable - (*Boolean*) The new value.
+	[enable = false] - (*Boolean*) The new value.
 */
 blazegears.bgtl.Compiler.prototype.enableDebugMode = function(enable) {
 	this._is_debug_mode_enabled = Boolean(enable);
@@ -156,10 +156,9 @@ Method: buildTemplate
 	Builds a <Template> from BGTLv2 code.
 
 Arguments:
-	lexeme - (*String*) The code to build the template from.
+	[lexeme = ""] - (*String*) The code to build the template from.
 
 Exceptions:
-	blazegears.ArgumentError - *lexeme* is *undefined* or *null*.
 	blazegears.bgtl.CompilingError - An error occurred during the compiling of the template.
 	blazegears.bgtl.LexingError - An error occurred during the lexical parsing of the template.
 */
@@ -174,10 +173,7 @@ blazegears.bgtl.Compiler.prototype.buildTemplate = function(lexeme) {
 	var result = new blazegears.bgtl.Template();
 	var tokens;
 	
-	if (!blazegears._isStringifyable(lexeme)) {
-		throw blazegears.ArgumentError._nulldefinedArgument("lexeme");
-	}
-	tokens = this._lexer.tokenizeLexeme(lexeme.toString());
+	tokens = this._lexer.tokenizeLexeme(blazegears._forceParseString(lexeme));
 	code_collection = this._compileTemplate(tokens);
 	try {
 		result._render_callback = new Function(code_collection.toString());
@@ -825,10 +821,13 @@ Parent Class:
 	<Error>
 
 Arguments:
-	line_number - (*Number*) Setter for <getLineNumber>.
-	column_number - (*Number*) Setter for <getColumnNumber>.
-	message - (*String*) Will be chained to <Error>'s constructor.
-	inner_error - (*Error*) Will be chained to <Error>'s constructor.
+	[line_number = 0] - (*Number*) Setter for <getLineNumber>.
+	[column_number = 0] - (*Number*) Setter for <getColumnNumber>.
+	[message = null] - (*String*) Will be chained to <Error>'s constructor.
+	[inner_error = null] - (*Error*) Will be chained to <Error>'s constructor.
+
+Exceptions:
+	blazegears.ArgumentError - *inner_error* isn't an instance of *Error* or *null*.
 */
 blazegears.bgtl.Error = function(line_number, column_number, message, inner_error) {
 	blazegears.Error.call(this, message, inner_error);
@@ -860,10 +859,13 @@ Parent Class:
 	<bgtl.Error>
 
 Arguments:
-	line_number - (*Number*) Will be chained to <bgtl.Error>'s constructor.
-	column_number - (*Number*) Will be chained to <bgtl.Error>'s constructor.
-	message - (*String*) Will be chained to <bgtl.Error>'s constructor.
-	inner_error - (*Error*) Will be chained to <bgtl.Error>'s constructor.
+	[line_number = 0] - (*Number*) Will be chained to <bgtl.Error>'s constructor.
+	[column_number = 0] - (*Number*) Will be chained to <bgtl.Error>'s constructor.
+	[message = null] - (*String*) Will be chained to <bgtl.Error>'s constructor.
+	[inner_error = null] - (*Error*) Will be chained to <bgtl.Error>'s constructor.
+
+Exceptions:
+	blazegears.ArgumentError - *inner_error* isn't an instance of *Error* or *null*.
 */
 blazegears.bgtl.CompilingError = function(line_number, column_number, message, inner_error) {
 	blazegears.bgtl.Error.call(this, line_number, column_number, message, inner_error);
@@ -891,10 +893,13 @@ Parent Class:
 	<bgtl.Error>
 
 Arguments:
-	line_number - (*Number*) Will be chained to <bgtl.Error>'s constructor.
-	column_number - (*Number*) Will be chained to <bgtl.Error>'s constructor.
-	message - (*String*) Will be chained to <bgtl.Error>'s constructor.
-	inner_error - (*Error*) Will be chained to <bgtl.Error>'s constructor.
+	[line_number = 0] - (*Number*) Will be chained to <bgtl.Error>'s constructor.
+	[column_number = 0] - (*Number*) Will be chained to <bgtl.Error>'s constructor.
+	[message = null] - (*String*) Will be chained to <bgtl.Error>'s constructor.
+	[inner_error = null] - (*Error*) Will be chained to <bgtl.Error>'s constructor.
+
+Exceptions:
+	blazegears.ArgumentError - *inner_error* isn't an instance of *Error* or *null*.
 */
 blazegears.bgtl.LexingError = function(line_number, column_number, message, inner_error) {
 	blazegears.bgtl.Error.call(this, line_number, column_number, message, inner_error);
@@ -937,10 +942,13 @@ Parent Class:
 	<bgtl.Error>
 
 Arguments:
-	line_number - (*Number*) Will be chained to <bgtl.Error>'s constructor.
-	column_number - (*Number*) Will be chained to <bgtl.Error>'s constructor.
-	message - (*String*) Will be chained to <bgtl.Error>'s constructor.
-	inner_error - (*Error*) Will be chained to <bgtl.Error>'s constructor.
+	[line_number = 0] - (*Number*) Will be chained to <bgtl.Error>'s constructor.
+	[column_number = 0] - (*Number*) Will be chained to <bgtl.Error>'s constructor.
+	[message = null] - (*String*) Will be chained to <bgtl.Error>'s constructor.
+	[inner_error = null] - (*Error*) Will be chained to <bgtl.Error>'s constructor.
+
+Exceptions:
+	blazegears.ArgumentError - *inner_error* isn't an instance of *Error* or *null*.
 */
 blazegears.bgtl.RenderingError = function(line_number, column_number, message, inner_error) {
 	blazegears.bgtl.Error.call(this, line_number, column_number, message, inner_error);
@@ -988,7 +996,7 @@ blazegears.bgtl.RenderingError._variableRenderingFailed = function(line_number, 
 // Class: blazegears.bgtl.Template
 // Represents a renderable template.
 blazegears.bgtl.Template = function() {
-	this._render_callback = null;
+	this._render_callback = blazegears.bgtl.Template._default_render_callback;
 }
 
 /*
@@ -997,9 +1005,16 @@ Method: render
 
 Arguments:
 	context - (*Object*) The object that will be assigned to *this* when rendering the template. Primitive objects will be boxed.
+
+Exceptions:
+	blazegears.bgtl.RenderingError - The rendering of the template failed.
 */
 blazegears.bgtl.Template.prototype.render = function(context) {
 	return this._render_callback.call(context);
+}
+
+blazegears.bgtl.Template._default_render_callback = function() {
+	return "";
 }
 
 /*

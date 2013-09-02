@@ -85,14 +85,13 @@ Method: addLiteral
 	Adds a literal to the collection that will be added to the rendered output.
 
 Arguments:
-	literal - (*String*) The literal to add to the collection.
+	[literal = ""] - (*String*) The literal to add to the collection.
 */
 blazegears.formatting.DateFormatTemplate.prototype.addLiteral = function(literal) {
-	literal = literal === undefined || literal === null ? "" : literal.toString();
 	if (this._tokens.length === 0 || BlazeGears.isFunction(this._tokens[this._tokens.length - 1])) {
-		this._tokens.push(literal);
+		this._tokens.push(blazegears._forceParseString(literal));
 	} else {
-		this._tokens[this._tokens.length - 1] += literal;
+		this._tokens[this._tokens.length - 1] += blazegears._forceParseString(literal);
 	}
 }
 
@@ -111,8 +110,8 @@ blazegears.formatting.DateFormatTemplate.prototype.merge = function(date_format_
 	var token_count;
 	var tokens;
 	
-	if (date_format_template === undefined || date_format_template === null || !(date_format_template instanceof blazegears.formatting.DateFormatTemplate)) {
-		throw blazegears.ArgumentError._invalidArgumentType("date_format_template", "blazegears.formatting.DateFormat");
+	if (!(date_format_template instanceof blazegears.formatting.DateFormatTemplate)) {
+		throw blazegears.ArgumentError._invalidArgumentType("date_format_template", "blazegears.formatting.DateFormatTemplate");
 	}
 	token_count = date_format_template._tokens.length;
 	tokens = date_format_template._tokens;
@@ -127,13 +126,14 @@ Method: render
 
 Arguments:
 	context - (*Object*) The object that will be assigned to *this* when calling the callbacks. Primitive objects will be boxed.
-	date - (*Date* / *Number*) The date that will be passed to the callback as their first argument. In case it's a *Number*, it will be treated as a timestamp and converted to a *Date*. Defaults to the current date.
+	[date = new Date()] - (*Date* / *Number*) The date that will be passed to the callback as their first argument. In case it's a *Number*, it will be treated as a timestamp and converted to a *Date*.
 
 Return Value:
 	(*String*) Concatenates the return values of the callbacks and the literals in the order which they were added to the collection.
 */
 blazegears.formatting.DateFormatTemplate.prototype.render = function(context, date) {
 	var i;
+	var prepared_date = this._prepareDate(date);
 	var result = "";
 	var token;
 	var tokens = this._tokens;
@@ -142,10 +142,25 @@ blazegears.formatting.DateFormatTemplate.prototype.render = function(context, da
 	for (i = 0; i < token_count; ++i) {
 		token = tokens[i];
 		if (BlazeGears.isFunction(token)) {
-			result += token.call(context, date).toString();
+			result += token.call(context, prepared_date).toString();
 		} else {
 			result += token.toString();
 		}
+	}
+	
+	return result;
+}
+
+// creates a date object from the provided value
+blazegears.formatting.DateFormatTemplate.prototype._prepareDate = function(date) {
+	var result = null;
+	
+	if (BlazeGears.isDate(date)) {
+		result = date;
+	} else if (BlazeGears.isNumber(date)) {
+		result = new Date(date);
+	} else {
+		result = new Date();
 	}
 	
 	return result;
@@ -166,7 +181,7 @@ blazegears.formatting.DateFormatter = function() {
 }
 
 // Method: getDateFormat
-// Gets the date format as a *String*. Defaults to the syntax that's the closest to ISO 8601 and the implementation can produce.
+// Gets the date format as a *String*. Defaults to the format that's the closest to ISO 8601 that the implementation can produce.
 blazegears.formatting.DateFormatter.prototype.getDateFormat = function() {
 	return this._format;
 }
@@ -176,11 +191,11 @@ Method: setDateFormat
 	Setter for <getDateFormat>.
 
 Arguments:
-	value - (*String*) The new value that will be lazily parsed into a <DateFormatTemplate>.
+	[value = ""] - (*String*) The new value that will be lazily parsed into a <DateFormatTemplate>.
 */
 blazegears.formatting.DateFormatter.prototype.setDateFormat = function(value) {
 	if (value !== this._format) {
-		this._format = value === undefined || value === null ? "" : value.toString();
+		this._format = blazegears._forceParseString(value);
 		this._template = null;
 	}
 }
@@ -423,7 +438,7 @@ Method: formatDate
 	Formats a date as a *String*.
 
 Arguments:
-	[date = null] - (*Date* / *Number*) The date to format. In case it's a *Number*, it will be treated as a timestamp and converted to a *Date*. Defaults to the current date.
+	[date = new Date()] - (*Date* / *Number*) The date to format. In case it's a *Number*, it will be treated as a timestamp and converted to a *Date*.
 
 Remarks:
 	It the time of calling this method <getDateFormat> will be parsed into a <DateFormatTemplate> using <parseDateFormat>, if it wasn't before. The formatter itself will be passed as the *context* to the <DateFormatTemplate> for rendering.
@@ -431,10 +446,6 @@ Remarks:
 blazegears.formatting.DateFormatter.prototype.formatDate = function(date) {
 	var result = "";
 	
-	if (date === undefined || date === null) {
-		date = new Date();
-	}
-	date = this._prepareDate(date);
 	if (this._template === null) {
 		this._template = this.parseDateFormat(this._format);
 	}
@@ -448,13 +459,13 @@ Method: parseDateFormat
 	Parses a date format into a <DateFormatTemplate>.
 
 Arguments:
-	date_format - (*String*) The date format to parse.
+	[date_format = ""] - (*String*) The date format to parse.
 
 Exceptions:
 	blazegears.NotOverriddenError - This method is abstract and will always throw this exception.
 */
 blazegears.formatting.DateFormatter.prototype.parseDateFormat = function(date_format) {
-	throw blazegears.NotOverriddenError();
+	throw new blazegears.NotOverriddenError();
 }
 
 // short names of days (sun - sat)
@@ -719,22 +730,6 @@ blazegears.formatting.DateFormatter.prototype._isLeapYear = function(date) {
 	return ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0);
 }
 
-// creates a date object from the provided value
-blazegears.formatting.DateFormatter.prototype._prepareDate = function(date) {
-	var result;
-	var timestamp;
-	
-	if (BlazeGears.isDate(date)) {
-		result = date;
-	} else if (BlazeGears.isNumber(date)) {
-		result = new Date(date);
-	} else {
-		result = new Date();
-	}
-	
-	return result;
-}
-
 // Class: blazegears.formatting.NumberFormatter
 // Formats numbers.
 blazegears.formatting.NumberFormatter = function() {
@@ -784,7 +779,7 @@ Arguments:
 	value - (*String*) The new value.
 */
 blazegears.formatting.NumberFormatter.prototype.setDecimalDelimiter = function(value) {
-	this._decimal_delimiter = value === undefined || value === null ? "" : value.toString();
+	this._decimal_delimiter = blazegears._forceParseString(value);
 }
 
 // Method: getDecimalPrecision
@@ -842,7 +837,7 @@ Arguments:
 	value - (*String*) The new value.
 */
 blazegears.formatting.NumberFormatter.prototype.setGroupDelimiter = function(value) {
-	this._group_delimiter = value === undefined || value === null ? "" : value.toString();
+	this._group_delimiter = blazegears._forceParseString(value);
 }
 
 // Method: getGroupSize
@@ -876,7 +871,7 @@ Arguments:
 	value - (*String*) The new value.
 */
 blazegears.formatting.NumberFormatter.prototype.setNegativePrefix = function(value) {
-	this._negative_prefix = value === undefined || value === null ? "" : value.toString();
+	this._negative_prefix = blazegears._forceParseString(value);
 }
 
 // Method: getNegativeSuffix
@@ -893,7 +888,7 @@ Arguments:
 	value - (*String*) The new value.
 */
 blazegears.formatting.NumberFormatter.prototype.setNegativeSuffix = function(value) {
-	this._negative_suffix = value === undefined || value === null ? "" : value.toString();
+	this._negative_suffix = blazegears._forceParseString(value);
 }
 
 // Method: getPositivePrefix
@@ -910,7 +905,7 @@ Arguments:
 	value - (*String*) The new value.
 */
 blazegears.formatting.NumberFormatter.prototype.setPositivePrefix = function(value) {
-	this._positive_prefix = value === undefined || value === null ? "" : value.toString();
+	this._positive_prefix = blazegears._forceParseString(value);
 }
 
 // Method: getPositiveSuffix
@@ -927,7 +922,7 @@ Arguments:
 	value - (*String*) The new value.
 */
 blazegears.formatting.NumberFormatter.prototype.setPositiveSuffix = function(value) {
-	this._positive_suffix = value === undefined || value === null ? "" : value.toString();
+	this._positive_suffix = blazegears._forceParseString(value);
 }
 
 // Method: getRoundingCallback
@@ -1068,7 +1063,7 @@ Method: parseDateFormat
 	Parses a date format into a <DateFormatTemplate> using the date format syntax of <PHP's date function at http://php.net/manual/en/function.date.php>.
 
 Arguments:
-	date_format - (*String*) The date format to parse.
+	[date_format = ""] - (*String*) The date format to parse.
 
 Supported Specifiers:
 	A - Abbreviated upper case meridiem: *AM* or *PM*
@@ -1115,6 +1110,7 @@ blazegears.formatting.PHPDateFormatter.prototype.parseDateFormat = function(form
 	var character;
 	var result = new blazegears.formatting.DateFormatTemplate();
 	
+	format = blazegears._forceParseString(format);
 	for (var i = 0; i < format.length; i++) {
 		character = format.charAt(i);
 		switch(character) {
@@ -1331,7 +1327,7 @@ Method: parseDateFormat
 	Parses a date format into a <DateFormatTemplate> using the date format syntax of the <date command of Unix-like systems at http://linux.die.net/man/1/date>.
 
 Arguments:
-	date_format - (*String*) The date format to parse.
+	[date_format = ""] - (*String*) The date format to parse.
 
 Supported Specifiers:
 	%A - Full weekday name: *Sunday* to *Saturday*
@@ -1346,7 +1342,7 @@ Supported Specifiers:
 	%P - Abbreviated lower case meridiems: *am* or *pm*
 	%R - Same as *%H:%M*
 	%S - Zero padded second: *00* to *59*
-	%T - Same as %%H:%M:%S% and *%X*
+	%T - Same as *%H:%M:%S* and *%X*
 	%U - Week of the year, starting on Sunday: *01* to *53*
 	%V - ISO 8601 week of the year: *01* to *53*
 	%W - Week of the year, starting on Monday: *01* to *53*
@@ -1405,6 +1401,7 @@ blazegears.formatting.UnixDateFormatter.prototype.parseDateFormat = function(for
 		modifiers.push("O");
 	}
 	
+	format = blazegears._forceParseString(format);
 	for (var i = 0; i < format.length; i++) {
 		character = format.charAt(i);
 		if (character == "%") {

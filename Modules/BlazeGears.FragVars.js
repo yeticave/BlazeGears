@@ -42,11 +42,21 @@ blazegears.fragvars.HistoryMode = {
 	NONE: 0
 };
 
-// Class: blazegears.fragvars.FragVar
-// Represents a signle variable stored in the fragment part of the current URL. Instances of this class shouldn't be created manually, but through the <Manager> class.
+/*
+Class: blazegears.fragvars.FragVar
+	Represents a single variable stored in the fragment part of the current URL.
+
+Remarks:
+	This constructor is only meant to be used internally, use <Manager.createFragVar> to declare new FragVars.
+	FragVar IDs are case-insensitive, have to be valid JavaScript property names, must start with a letter, and can only be composed of letters, digits, and underscores.
+*/
 blazegears.fragvars.FragVar = function(id, value) {
 	if (value === undefined) value = null;
-	this._id = id;
+	
+	this._id = id.toLowerCase();
+	if (!blazegears.fragvars.FragVar._ID_FORMAT.test(this._id)) {
+		throw blazegears.ArgumentError._invalidFormat("id");
+	}
 	this._value = this.getValue();
 	this._value_changed_event = new blazegears.Event();
 }
@@ -61,7 +71,7 @@ blazegears.fragvars.FragVar.prototype.getId = function() {
 // Gets the value of the FragVar as a *String*. Defaults to *null*.
 blazegears.fragvars.FragVar.prototype.getValue = function() {
 	var value = blazegears.fragvars.Manager.getFragVarValue(this._id)
-	return value === undefined || value === null ? null : value.toString();
+	return blazegears._forceParseString(value, null);
 }
 
 /*
@@ -69,15 +79,16 @@ Method: setValue
 	Setter for <getValue>.
 
 Arguments:
-	value - (*String*) The new value. If it's *null*, the FragVar will be unset.
+	[value = null] - (*String*) The new value. If it's *null*, the FragVar will be unset.
 
 See Also:
 	<getValueChangedEvent>
 */
 blazegears.fragvars.FragVar.prototype.setValue = function(value) {
+	value = blazegears._forceParseString(value, null);
 	if (value !== this._value) {
 		this._value = value;
-		blazegears.fragvars.Manager.setFragVarValue(this._id, value === undefined || value === null ? null : value.toString());
+		blazegears.fragvars.Manager.setFragVarValue(this._id, value);
 	}
 }
 
@@ -90,6 +101,8 @@ blazegears.fragvars.FragVar.prototype.getValueChangedEvent = function() {
 blazegears.fragvars.FragVar.prototype._updateValue = function(value) {
 	this._value_changed_event.raise(this);
 }
+
+blazegears.fragvars.FragVar._ID_FORMAT = /^[A-Za-z][A-Za-z0-9_]*$/;
 
 // Class: blazegears.fragvars.Manager
 // Manages FragVars stored in the fragment part of the current URL.
@@ -139,15 +152,16 @@ Arguments:
 
 Return Value:
 	(<FragVar>) The <FragVar> with the matching ID, if it already exists, otherwise a new <FragVar>.
+
+Exceptions:
+	blazegears.ArgumentError - *id* isn't a valid <FragVar> ID.
 */
 blazegears.fragvars.Manager.createFragVar = function(id) {
 	var Manager = blazegears.fragvars.Manager;
 	var fragvar;
-	var result;
+	var result = Manager.getFragVar(id);
 	
-	if (Manager._fragvars.hasOwnProperty(id)) {
-		result = Manager._fragvars[id];
-	} else {
+	if (result === null) {
 		Manager._initialize();
 		fragvar = Manager._manager.createFragVar(id);
 		fragvar._internalOnChange = Manager._internalOnChange;
@@ -167,11 +181,18 @@ Arguments:
 
 Return Value:
 	(<FragVar>) The <FragVar> with the matching ID, if it already exists, otherwise *null*.
+
+Exceptions:
+	blazegears.ArgumentError - *id* isn't a valid <FragVar> ID.
 */
 blazegears.fragvars.Manager.getFragVar = function(id) {
 	var fragvars = blazegears.fragvars.Manager._fragvars;
 	var result = null;
 	
+	id = blazegears._forceParseString(id).toLowerCase();
+	if (!blazegears.fragvars.FragVar._ID_FORMAT.test(id)) {
+		throw blazegears.ArgumentError._invalidFormat("id");
+	}
 	if (fragvars.hasOwnProperty(id)) {
 		result = fragvars[id];
 	}
@@ -188,11 +209,18 @@ Arguments:
 
 Return Value:
 	(*String*) The value of the <FragVar>, if it exists and has a value, otherwise *null*.
+
+Exceptions:
+	blazegears.ArgumentError - *id* isn't a valid <FragVar> ID.
 */
 blazegears.fragvars.Manager.getFragVarValue = function(id) {
 	var values = blazegears.fragvars.Manager._manager.getFragVarValues();
 	var result = null;
 	
+	id = blazegears._forceParseString(id).toLowerCase();
+	if (!blazegears.fragvars.FragVar._ID_FORMAT.test(id)) {
+		throw blazegears.ArgumentError._invalidFormat("id");
+	}
 	if (values.hasOwnProperty(id)) {
 		result = values[id].toString();
 	}
@@ -218,18 +246,14 @@ Method: setFragVarValue
 
 Arguments:
 	id - (*String*) The ID of the <FragVar>.
-	value - (*String*) The new value of the <FragVar>.
+	[value = null] - (*String*) The new value of the <FragVar>.
 
 Exceptions:
-	blazegears.ArgumentError - *id* is *undefined* or *null*.
+	blazegears.ArgumentError - *id* isn't a valid <FragVar> ID.
 */
 blazegears.fragvars.Manager.setFragVarValue = function(id, value) {
 	var values = {};
-	
-	if (!blazegears._isStringifyable(id)) {
-		throw blazegears.ArgumentError._nulldefinedArgument("id");
-	}
-	values[id] = blazegears._forceParseString(value);
+	values[id] = blazegears._forceParseString(value, null);
 	blazegears.fragvars.Manager.setFragVarValues(values);
 }
 
@@ -239,6 +263,9 @@ Method: setFragVarValues
 
 Arguments:
 	values - (*Object*) A dictionary where the keys are the <FragVars>' IDs and the values are the <FragVars>' new values.
+
+Exceptions:
+	blazegears.ArgumentError - One of the keys of *values* isn't a valid <FragVar> ID.
 */
 blazegears.fragvars.Manager.setFragVarValues = function(values) {
 	var Manager = blazegears.fragvars.Manager;

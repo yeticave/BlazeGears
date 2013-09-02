@@ -37,7 +37,7 @@ Method: getVersion
 	Gets the API's version number.
 
 Return Value:
-	An *Array* of three *Numbers*, representing the major, minor, and patch versions of the API.
+	An *Array* of three *Numbers*, representing the major, minor, and patch version numbers of the API.
 
 Remarks:
 	Starting from v2.0.0, the API versioning will follow the <Semantic Versioning v2.0.0 specifications at http://semver.org/spec/v2.0.0.html>.
@@ -49,7 +49,7 @@ Examples:
 	(end)
 */
 blazegears.Core.getVersion = function() {
-	return [1, 1, 0, 0];
+	return [1, 1, 0];
 }
 
 /*
@@ -107,8 +107,7 @@ blazegears._forceParseInt = function(value, default_value) {
 }
 
 blazegears._forceParseString = function(value, default_value) {
-	if (default_value === undefined) default_value = null;
-	return blazegears._isStringifyable(value) ? value.toString() : default_value;
+	return blazegears._isStringifyable(value) ? value.toString() : (default_value === undefined ? "" : default_value);
 }
 
 blazegears._getColumnNumber = function(string, offset) {
@@ -163,7 +162,7 @@ Arguments:
 	[inner_error = null] - (*Error*) Setter for <getInnerError>.
 
 Exceptions:
-	blazegears.ArgumentError - *inner_error* isn't an instance of *Error* and isn't *null*.
+	blazegears.ArgumentError - *inner_error* isn't an instance of *Error* or *null*.
 
 Examples:
 	(begin code)
@@ -220,19 +219,15 @@ blazegears.Error.prototype.getMessage = function() {
 blazegears.Error._composeMessage = function(default_message, message, inner_error) {
 	var result;
 	
-	if (message === undefined || message === null) {
-		result = default_message;
-		if (inner_error === undefined || inner_error === null) {
-			result += ".";
-		} else {
-			if (inner_error instanceof Error) {
-				result += ": " + inner_error.message.toString();
-			} else {
-				result += ": " + inner_error.toString();
-			}
-		}
-	} else {
+	if (blazegears._isStringifyable(message)) {
 		result = message.toString();
+	} else {
+		result = default_message;
+		if (blazegears._isStringifyable(inner_error)) {
+			result += ": " + inner_error.message.toString();
+		} else {
+			result += ".";
+		}
 	}
 	
 	return result;
@@ -246,18 +241,21 @@ Parent Class:
 	<Error>
 
 Arguments:
-	argument_name - (*String*) Setter for <getArgumentName>.
+	[argument_name = null] - (*String*) Setter for <getArgumentName>.
 	[message = null] - (*String*) Will be chained to <Error>'s constructor.
 	[inner_error = null] - (*Error*) Will be chained to <Error>'s constructor.
+
+Exceptions:
+	blazegears.ArgumentError - *inner_error* isn't an instance of *Error* or *null*.
 */
 blazegears.ArgumentError = function(argument_name, message, inner_error) {
 	blazegears.Error.call(this, message, inner_error);
-	if (argument_name === undefined || argument_name === null) {
-		this._argument_name = null;
-		this.message = blazegears.Error._composeMessage("An argument is invalid", message, inner_error);
-	} else {	
+	if (blazegears._isStringifyable(argument_name)) {
 		this._argument_name = argument_name.toString();
 		this.message = blazegears.Error._composeMessage("The <" + this._argument_name + "> argument is invalid", message, inner_error);
+	} else {
+		this._argument_name = null;
+		this.message = blazegears.Error._composeMessage("An argument is invalid", message, inner_error);
 	}
 	this.name = "blazegears.ArgumentError";
 }
@@ -271,8 +269,22 @@ blazegears.ArgumentError.prototype.getArgumentName = function() {
 }
 
 // generates the message for an invalid argument type
-blazegears.ArgumentError._invalidArgumentType = function(argument_name, expected_type) {
-	return new blazegears.ArgumentError(argument_name, "The <" + argument_name + "> argument is expected to be an instance of <" + expected_type + ">.");
+blazegears.ArgumentError._invalidArgumentType = function(argument_name) {
+	var expected_type_count;
+	var expected_type_list;
+	var expected_types = Array.prototype.slice.call(arguments, 1);
+	var i;
+	
+	expected_type_count = expected_types.length;
+	for (i = 0; i < expected_type_count; ++i) {
+		expected_types[i] = "<" + expected_types[i] + ">";
+	}
+	if (expected_type_count > 1) {
+		expected_types[expected_type_count - 1] = "or " + expected_types[expected_type_count - 1];
+	}
+	expected_type_list = expected_types.join(expected_type_count > 2 ? ", " : " ");
+	
+	return new blazegears.ArgumentError(argument_name, "The <" + argument_name + "> argument is expected to be an instance of " + expected_type_list + ".");
 }
 
 // generates the message for an invalid array length
@@ -293,6 +305,10 @@ blazegears.ArgumentError._nullArgument = function(argument_name) {
 // generates the message for an undefined or null argument
 blazegears.ArgumentError._nulldefinedArgument = function(argument_name) {
 	return new blazegears.ArgumentError(argument_name, "The <" + argument_name + "> argument is required and can't be <null>.");
+}
+
+blazegears.ArgumentError._invalidFormat = function(argument_name) {
+	return new blazegears.ArgumentError(argument_name, "The <" + argument_name + "> argument isn't in the correct format.");
 }
 
 // generates the message for a missing argument
@@ -319,7 +335,7 @@ Exceptions:
 */
 blazegears.Event.prototype.addCallback = function(context, callback) {
 	if (!BlazeGears.isFunction(callback)) {
-		throw blazegears.ArgumentError("callback", "Function");
+		throw blazegears.ArgumentError._invalidArgumentType("callback", "Function");
 	}
 	this._callbacks.push([context, callback]);
 }
@@ -335,7 +351,7 @@ Arguments:
 Return Value:
 	(Boolean) *true* if the callback was found and removed, otherwise *false*.
 
-Errors:
+Exceptions:
 	blazegears.ArgumentError - *callback* is not an instance of *Function*.
 */
 blazegears.Event.prototype.removeCallback = function(context, callback) {
@@ -409,12 +425,14 @@ Parent Class:
 Arguments:
 	[message = null] - (*String*) Will be chained to <Error>'s constructor.
 	[inner_error = null] - (*Error*) Will be chained to <Error>'s constructor.
+
+Exceptions:
+	blazegears.ArgumentError - *inner_error* isn't an instance of *Error* or *null*.
 */
 blazegears.NotOverriddenError = function(message, inner_error) {
 	blazegears.Error(this, message, inner_error);
 	this.message = blazegears.Error._composeMessage("This method has to be overridden by a child class", message, inner_error);
 	this.name = "blazegears.NotOverriddenError";
-	this._argument_name = argument_name;
 }
 blazegears.NotOverriddenError.prototype = new blazegears.Error();
 blazegears.NotOverriddenError.prototype.constructor = blazegears.NotOverriddenError;
