@@ -227,12 +227,12 @@ blazegears.bgtl.Compiler.prototype._compileTemplate = function(tokens) {
 	return result;
 }
 
-// registers a new code generator callback that corresponds to a token keyword
+// creates a new code generator callback that corresponds to a token keyword
 blazegears.bgtl.Compiler.prototype._createConstruct = function(name, callback) {
 	this._constructs.push(new blazegears.bgtl._Construct(name, callback));
 }
 
-// escapes that should be avoided in a javascript string literal
+// escapes the characters that should be avoided in a javascript string literal
 blazegears.bgtl.Compiler.prototype._escapeLiteral = function(literal) {
 	var code;
 	var i;
@@ -498,11 +498,6 @@ blazegears.bgtl._CodeCollection.prototype.toString = function() {
 	return this._lines.join("\n");
 }
 
-// joins the lines of codes
-blazegears.bgtl._CodeCollection.prototype.toString = function() {
-	return this._lines.join("\n");
-}
-
 // stores the code generator callback for a construct token
 blazegears.bgtl._Construct = function(name, callback) {
 	this.callback = callback;
@@ -515,7 +510,7 @@ blazegears.bgtl._DelimiterMatch = function(delimiter, offset) {
 	this.offset = offset;
 }
 
-// represents a valid keyword parser keyword
+// represents a lexer keyword
 blazegears.bgtl._Keyword = function(name, requires_argument, is_block, end_keyword) {
 	if (end_keyword === undefined) end_keyword = null;
 	if (is_block === undefined) is_block = false;
@@ -875,11 +870,13 @@ blazegears.bgtl.CompilingError = function(line_number, column_number, message, i
 blazegears.bgtl.CompilingError.prototype = new blazegears.bgtl.Error();
 blazegears.bgtl.CompilingError.prototype.constructor = blazegears.bgtl.CompilingError;
 
+// generates the message for an invalid argument
 blazegears.bgtl.CompilingError._invalidArgument = function(token) {
 	var message = blazegears.Error._composeMessage("Invalid construct argument on line " + token.line_number + " at column " + token.column_number, null, token.argument);
 	return new blazegears.bgtl.CompilingError(token.line_number, token.column_number, message);
 }
 
+// generates the message for an invalid construct
 blazegears.bgtl.CompilingError._invalidConstruct = function(token) {
 	var message = "Invalid construct on line " + token.line_number + " at column " + token.column_number + ".";
 	return new blazegears.bgtl.CompilingError(token.line_number, token.column_number, message);
@@ -909,26 +906,31 @@ blazegears.bgtl.LexingError = function(line_number, column_number, message, inne
 blazegears.bgtl.LexingError.prototype = new blazegears.bgtl.Error();
 blazegears.bgtl.LexingError.prototype.constructor = blazegears.bgtl.LexingError;
 
+// generates the message for an invalid construct syntax
 blazegears.bgtl.LexingError._invalidConstructSyntax = function(line_number, column_number) {
 	var message = "Invalid construct syntax on line " + line_number + " at column " + column_number + ".";
 	return new blazegears.bgtl.LexingError(line_number, column_number, message);
 }
 
+// generates the message for an invalid keyword
 blazegears.bgtl.LexingError._invalidKeyword = function(keyword, line_number, column_number) {
 	var message = "Invalid keyword on line " + line_number + " at column " + column_number + ": " + keyword;
 	return new blazegears.bgtl.LexingError(line_number, column_number, message);
 }
 
+// generates the message for a missing argument
 blazegears.bgtl.LexingError._missingArgument = function(line_number, column_number) {
 	var message = "Missing argument on line " + line_number + " at column " + column_number + ".";
 	return new blazegears.bgtl.LexingError(line_number, column_number, message);
 }
 
+// generates the message for a missing closing construct
 blazegears.bgtl.LexingError._missingClosingConstruct = function(line_number, column_number) {
 	var message = "Missing closing construct on line " + line_number + " at column " + column_number + ".";
 	return new blazegears.bgtl.LexingError(line_number, column_number, message);
 }
 
+// generates the message for a missing delimiter
 blazegears.bgtl.LexingError._missingDelimiter = function(delimiter, line_number, column_number) {
 	var message = "Missing " + delimiter + " on line " + line_number + " at column " + column_number + ".";
 	return new blazegears.bgtl.LexingError(line_number, column_number, message);
@@ -958,36 +960,43 @@ blazegears.bgtl.RenderingError = function(line_number, column_number, message, i
 blazegears.bgtl.RenderingError.prototype = new blazegears.bgtl.Error();
 blazegears.bgtl.RenderingError.prototype.constructor = blazegears.bgtl.RenderingError;
 
+// generates the message for a failed elif rendering
 blazegears.bgtl.RenderingError._elifRenderingFailed = function(line_number, column_number, inner_error) {
 	var message = blazegears.Error._composeMessage("Elif rendering failed on line " + line_number + " at column " + column_number, null, inner_error);
 	return new blazegears.bgtl.RenderingError(line_number, column_number, message, inner_error);
 }
 
+// generates the message for a failed foreach rendering
 blazegears.bgtl.RenderingError._foreachRenderingFailed = function(line_number, column_number, inner_error) {
 	var message = blazegears.Error._composeMessage("Foreach rendering failed on line " + line_number + " at column " + column_number, null, inner_error);
 	return new blazegears.bgtl.RenderingError(line_number, column_number, message, inner_error);
 }
 
+// generates the message for a failed if rendering
 blazegears.bgtl.RenderingError._ifRenderingFailed = function(line_number, column_number, inner_error) {
 	var message = blazegears.Error._composeMessage("If rendering failed on line " + line_number + " at column " + column_number, null, inner_error);
 	return new blazegears.bgtl.RenderingError(line_number, column_number, message, inner_error);
 }
 
+// generates the message for a failed raw rendering
 blazegears.bgtl.RenderingError._rawRenderingFailed = function(line_number, column_number, inner_error) {
 	var message = blazegears.Error._composeMessage("Raw rendering failed on line " + line_number + " at column " + column_number, null, inner_error);
 	return new blazegears.bgtl.RenderingError(line_number, column_number, message, inner_error);
 }
 
+// generates the message for a failed rendering
 blazegears.bgtl.RenderingError._renderingFailed = function(inner_error) {
 	var message = blazegears.Error._composeMessage("Rendering failed", null, inner_error);
 	return new blazegears.bgtl.RenderingError(0, 0, message, inner_error);
 }
 
+// generates the message for a failed markup rendering
 blazegears.bgtl.RenderingError._markupRenderingFailed = function(line_number, column_number, inner_error) {
 	var message = blazegears.Error._composeMessage("Markup rendering failed on line " + line_number + " at column " + column_number, null, inner_error);
 	return new blazegears.bgtl.RenderingError(line_number, column_number, message, inner_error);
 }
 
+// generates the message for a failed variable rendering
 blazegears.bgtl.RenderingError._variableRenderingFailed = function(line_number, column_number, inner_error) {
 	var message = blazegears.Error._composeMessage("Variable rendering failed on line " + line_number + " at column " + column_number, null, inner_error);
 	return new blazegears.bgtl.RenderingError(line_number, column_number, message, inner_error);
@@ -1013,6 +1022,7 @@ blazegears.bgtl.Template.prototype.render = function(context) {
 	return this._render_callback.call(context);
 }
 
+// the default rendering callback to avoid null errors on manually created templates
 blazegears.bgtl.Template._default_render_callback = function() {
 	return "";
 }

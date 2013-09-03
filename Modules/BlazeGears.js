@@ -72,6 +72,7 @@ blazegears.Core.getVersionMetadata = function() {
 	return "-s.1";
 }
 
+// counts the occurrences of a string in another string
 blazegears._countStringOccurrences = function(needle, haystack) {
 	var length;
 	var position;
@@ -96,6 +97,7 @@ blazegears._countStringOccurrences = function(needle, haystack) {
 	return result;
 }
 
+// parses an integer and reverts to a default value if it fails
 blazegears._forceParseInt = function(value, default_value) {
 	var result = parseInt(value);
 	
@@ -106,10 +108,12 @@ blazegears._forceParseInt = function(value, default_value) {
 	return result;
 }
 
+// parses a string and reverts to a default value if it fails
 blazegears._forceParseString = function(value, default_value) {
 	return blazegears._isStringifyable(value) ? value.toString() : (default_value === undefined ? "" : default_value);
 }
 
+// determines a column number of an offset in a string
 blazegears._getColumnNumber = function(string, offset) {
 	var last_line_break;
 	var result;
@@ -123,6 +127,7 @@ blazegears._getColumnNumber = function(string, offset) {
 	return result;
 }
 
+// determines a line number of an offset in a string
 blazegears._getLineNumber = function(string, offset) {
 	var result;
 	
@@ -134,10 +139,12 @@ blazegears._getLineNumber = function(string, offset) {
 	return result;
 }
 
+// verifies that a variable is not undefined or null
 blazegears._isStringifyable = function(variable) {
 	return variable !== undefined && variable !== null;
 }
 
+// pads a string from the left
 blazegears._padStringLeft = function(string, padding, expected_width) {
 	var result = string.toString();
 	
@@ -190,7 +197,7 @@ Examples:
 blazegears.Error = function(message, inner_error) {
 	if (inner_error === undefined) inner_error = null;
 	if (inner_error !== null && !(inner_error instanceof Error)) {
-		throw blazegears.ArgumentError._invalidArgumentType("inner_error", "Error");
+		throw blazegears.ArgumentError._invalidType("inner_error", "Error");
 	}
 	
 	Error.call(this);
@@ -215,7 +222,7 @@ blazegears.Error.prototype.getMessage = function() {
 	return this.message;
 }
 
-// composes the message for the error depending on if there's a message or inner error available
+// composes a message for an error
 blazegears.Error._composeMessage = function(default_message, message, inner_error) {
 	var result;
 	
@@ -268,8 +275,8 @@ blazegears.ArgumentError.prototype.getArgumentName = function() {
 	return this._argument_name;
 }
 
-// generates the message for an invalid argument type
-blazegears.ArgumentError._invalidArgumentType = function(argument_name) {
+// generates the message for an invalid type
+blazegears.ArgumentError._invalidType = function(argument_name) {
 	var expected_type_count;
 	var expected_type_list;
 	var expected_types = Array.prototype.slice.call(arguments, 1);
@@ -287,33 +294,19 @@ blazegears.ArgumentError._invalidArgumentType = function(argument_name) {
 	return new blazegears.ArgumentError(argument_name, "The <" + argument_name + "> argument is expected to be an instance of " + expected_type_list + ".");
 }
 
-// generates the message for an invalid array length
+// generates the message for an array with an invalid length
 blazegears.ArgumentError._invalidArrayLength = function(argument_name, expected_length) {
 	return new blazegears.ArgumentError(argument_name, "The <" + argument_name + "> argument is expected to be an instance of <Array> with a length of " + expected_length + ".");
 }
 
-// generates the message for an invalid enum value
+// generates the message for an enum that has an invalid value
 blazegears.ArgumentError._invalidEnumValue = function(argument_name, enum_type) {
 	return new blazegears.ArgumentError(argument_name, "The <" + argument_name + "> argument is expected to be one of the possible values of <" + enum_type + ">.");
 }
 
-// generates the message for a null argument
-blazegears.ArgumentError._nullArgument = function(argument_name) {
-	return new blazegears.ArgumentError(argument_name, "The <" + argument_name + "> argument can't be <null>.");
-}
-
-// generates the message for an undefined or null argument
-blazegears.ArgumentError._nulldefinedArgument = function(argument_name) {
-	return new blazegears.ArgumentError(argument_name, "The <" + argument_name + "> argument is required and can't be <null>.");
-}
-
+// generates the message for a string that's in an invalid format
 blazegears.ArgumentError._invalidFormat = function(argument_name) {
 	return new blazegears.ArgumentError(argument_name, "The <" + argument_name + "> argument isn't in the correct format.");
-}
-
-// generates the message for a missing argument
-blazegears.ArgumentError._undefinedArgument = function(argument_name) {
-	return new blazegears.ArgumentError(argument_name, "The <" + argument_name + "> argument is required.");
 }
 
 // Class: Event
@@ -335,7 +328,7 @@ Exceptions:
 */
 blazegears.Event.prototype.addCallback = function(context, callback) {
 	if (!BlazeGears.isFunction(callback)) {
-		throw blazegears.ArgumentError._invalidArgumentType("callback", "Function");
+		throw blazegears.ArgumentError._invalidType("callback", "Function");
 	}
 	this._callbacks.push([context, callback]);
 }
@@ -361,7 +354,7 @@ blazegears.Event.prototype.removeCallback = function(context, callback) {
 	var result = false;
 	
 	if (!BlazeGears.isFunction(callback)) {
-		throw blazegears.ArgumentError._invalidArgumentType("callback", "Function");
+		throw blazegears.ArgumentError._invalidType("callback", "Function");
 	}
 	for (i = 0; i < callback_count; ++i) {
 		if (context === callbacks[i][0] && callback === callbacks[i][1]) {

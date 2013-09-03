@@ -98,6 +98,7 @@ blazegears.fragvars.FragVar.prototype.getValueChangedEvent = function() {
 	return this._value_changed_event;
 }
 
+// updates the fragvar's value
 blazegears.fragvars.FragVar.prototype._updateValue = function(value) {
 	this._value_changed_event.raise(this);
 }
@@ -108,9 +109,16 @@ blazegears.fragvars.FragVar._ID_FORMAT = /^[A-Za-z][A-Za-z0-9_]*$/;
 // Manages FragVars stored in the fragment part of the current URL.
 blazegears.fragvars.Manager = {};
 
+// dictionary for the fragvars' values
 blazegears.fragvars.Manager._fragvar_values = {};
+
+// dictionary for the fragvars
 blazegears.fragvars.Manager._fragvars = {};
+
+// storage for getHistoryMode
 blazegears.fragvars.Manager._history_mode = blazegears.fragvars.HistoryMode.NONE;
+
+// the internal reference to the old fragvar manager
 blazegears.fragvars.Manager._manager = null;
 
 // Method: getHistoryMode
@@ -280,6 +288,7 @@ blazegears.fragvars.Manager.setFragVarValues = function(values) {
 	Manager._manager.setFragVarValues(values);
 }
 
+// initializes the internal reference to the old fragvar manager
 blazegears.fragvars.Manager._initialize = function() {
 	var Manager = blazegears.fragvars.Manager;
 	if (Manager._manager === null) {
@@ -288,6 +297,7 @@ blazegears.fragvars.Manager._initialize = function() {
 	}
 }
 
+// used internally for monitoring a fragvar's value
 blazegears.fragvars.Manager._internalOnChange = function() {
 	var fragvar = blazegears.fragvars.Manager.getFragVar(this._id);
 	fragvar._updateValue(this.getValue());

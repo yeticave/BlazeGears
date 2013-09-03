@@ -57,9 +57,9 @@ blazegears.formatting.TimeZone = {
 	UTC: 0
 };
 
-// Class: blazegears.formatting.DateFormatTemplate
+// Class: blazegears.formatting.DateTemplate
 // A collection of callbacks and literals for formatting date.
-blazegears.formatting.DateFormatTemplate = function() {
+blazegears.formatting.DateTemplate = function() {
 	this._tokens = [];
 }
 
@@ -73,9 +73,9 @@ Arguments:
 Exceptions:
 	blazegears.ArgumentError - *callback* ins't an instance of *Function*.
 */
-blazegears.formatting.DateFormatTemplate.prototype.addCallback = function(callback) {
+blazegears.formatting.DateTemplate.prototype.addCallback = function(callback) {
 	if (!BlazeGears.isFunction(callback)) {
-		throw blazegears.ArgumentError._invalidArgumentType("callback", "Function");
+		throw blazegears.ArgumentError._invalidType("callback", "Function");
 	}
 	this._tokens.push(callback);
 }
@@ -87,7 +87,7 @@ Method: addLiteral
 Arguments:
 	[literal = ""] - (*String*) The literal to add to the collection.
 */
-blazegears.formatting.DateFormatTemplate.prototype.addLiteral = function(literal) {
+blazegears.formatting.DateTemplate.prototype.addLiteral = function(literal) {
 	if (this._tokens.length === 0 || BlazeGears.isFunction(this._tokens[this._tokens.length - 1])) {
 		this._tokens.push(blazegears._forceParseString(literal));
 	} else {
@@ -97,24 +97,24 @@ blazegears.formatting.DateFormatTemplate.prototype.addLiteral = function(literal
 
 /*
 Method: merge
-	Merges the callbacks and literals of another <DateFormatTemplate> into the current one.
+	Merges the callbacks and literals of another <DateTemplate> into the current one.
 
 Arguments:
-	date_format_template - (<DateFormatTemplate>) The collection to merge in.
+	date_template - (<DateTemplate>) The collection to merge in.
 
 Exceptions:
-	blazegears.ArgumentError - *date_format_template* is not an instance of <DateFormatTemplate>.
+	blazegears.ArgumentError - *date_template* is not an instance of <DateTemplate>.
 */
-blazegears.formatting.DateFormatTemplate.prototype.merge = function(date_format_template) {
+blazegears.formatting.DateTemplate.prototype.merge = function(date_template) {
 	var i;
 	var token_count;
 	var tokens;
 	
-	if (!(date_format_template instanceof blazegears.formatting.DateFormatTemplate)) {
-		throw blazegears.ArgumentError._invalidArgumentType("date_format_template", "blazegears.formatting.DateFormatTemplate");
+	if (!(date_template instanceof blazegears.formatting.DateTemplate)) {
+		throw blazegears.ArgumentError._invalidType("date_template", "blazegears.formatting.DateTemplate");
 	}
-	token_count = date_format_template._tokens.length;
-	tokens = date_format_template._tokens;
+	token_count = date_template._tokens.length;
+	tokens = date_template._tokens;
 	for (i = 0; i < token_count; ++i) {
 		this._tokens.push(tokens[i]);
 	}
@@ -131,7 +131,7 @@ Arguments:
 Return Value:
 	(*String*) Concatenates the return values of the callbacks and the literals in the order which they were added to the collection.
 */
-blazegears.formatting.DateFormatTemplate.prototype.render = function(context, date) {
+blazegears.formatting.DateTemplate.prototype.render = function(context, date) {
 	var i;
 	var prepared_date = this._prepareDate(date);
 	var result = "";
@@ -152,7 +152,7 @@ blazegears.formatting.DateFormatTemplate.prototype.render = function(context, da
 }
 
 // creates a date object from the provided value
-blazegears.formatting.DateFormatTemplate.prototype._prepareDate = function(date) {
+blazegears.formatting.DateTemplate.prototype._prepareDate = function(date) {
 	var result = null;
 	
 	if (BlazeGears.isDate(date)) {
@@ -191,7 +191,7 @@ Method: setDateFormat
 	Setter for <getDateFormat>.
 
 Arguments:
-	[value = ""] - (*String*) The new value that will be lazily parsed into a <DateFormatTemplate>.
+	[value = ""] - (*String*) The new value that will be lazily parsed into a <DateTemplate>.
 */
 blazegears.formatting.DateFormatter.prototype.setDateFormat = function(value) {
 	if (value !== this._format) {
@@ -219,7 +219,7 @@ Exceptions:
 blazegears.formatting.DateFormatter.prototype.setFullDayNames = function(value) {
 	this._full_day_names = [];
 	if (!BlazeGears.isArray(value)) {
-		throw blazegears.ArgumentError._invalidArgumentType("value", "Array");
+		throw blazegears.ArgumentError._invalidType("value", "Array");
 	}
 	if (value.length !== 7) {
 		throw blazegears.ArgumentError._invalidArrayLength("value", 7);
@@ -248,7 +248,7 @@ Exceptions:
 blazegears.formatting.DateFormatter.prototype.setFullMonthNames = function(value) {
 	this._full_month_names = [];
 	if (!BlazeGears.isArray(value)) {
-		throw blazegears.ArgumentError._invalidArgumentType("value", "Array");
+		throw blazegears.ArgumentError._invalidType("value", "Array");
 	}
 	if (value.length !== 12) {
 		throw blazegears.ArgumentError._invalidArrayLength("value", 12);
@@ -277,7 +277,7 @@ Exceptions:
 blazegears.formatting.DateFormatter.prototype.setOrdinalSuffixes = function(value) {
 	this._ordinal_suffixes = [];
 	if (!BlazeGears.isArray(value)) {
-		throw blazegears.ArgumentError._invalidArgumentType("value", "Array");
+		throw blazegears.ArgumentError._invalidType("value", "Array");
 	}
 	if (value.length !== 31) {
 		throw blazegears.ArgumentError._invalidArrayLength("value", 31);
@@ -306,7 +306,7 @@ Exceptions:
 blazegears.formatting.DateFormatter.prototype.setShortDayNames = function(value) {
 	this._short_day_names = [];
 	if (!BlazeGears.isArray(value)) {
-		throw blazegears.ArgumentError._invalidArgumentType("value", "Array");
+		throw blazegears.ArgumentError._invalidType("value", "Array");
 	}
 	if (value.length !== 7) {
 		throw blazegears.ArgumentError._invalidArrayLength("value", 7);
@@ -334,7 +334,7 @@ Exceptions:
 */
 blazegears.formatting.DateFormatter.prototype.setShortLowerMeridiemNames = function(value) {
 	if (!BlazeGears.isArray(value)) {
-		throw blazegears.ArgumentError._invalidArgumentType("value", "Array");
+		throw blazegears.ArgumentError._invalidType("value", "Array");
 	}
 	if (value.length !== 2) {
 		throw blazegears.ArgumentError._invalidArrayLength("value", 2);
@@ -361,7 +361,7 @@ Exceptions:
 */
 blazegears.formatting.DateFormatter.prototype.setShortUpperMeridiemNames = function(value) {
 	if (!BlazeGears.isArray(value)) {
-		throw blazegears.ArgumentError._invalidArgumentType("value", "Array");
+		throw blazegears.ArgumentError._invalidType("value", "Array");
 	}
 	if (value.length !== 2) {
 		throw blazegears.ArgumentError._invalidArrayLength("value", 2);
@@ -389,7 +389,7 @@ Exceptions:
 blazegears.formatting.DateFormatter.prototype.setShortMonthNames = function(value) {
 	this._short_month_names = [];
 	if (!BlazeGears.isArray(value)) {
-		throw blazegears.ArgumentError._invalidArgumentType("value", "Array");
+		throw blazegears.ArgumentError._invalidType("value", "Array");
 	}
 	if (value.length !== 12) {
 		throw blazegears.ArgumentError._invalidArrayLength("value", 12);
@@ -441,7 +441,7 @@ Arguments:
 	[date = new Date()] - (*Date* / *Number*) The date to format. In case it's a *Number*, it will be treated as a timestamp and converted to a *Date*.
 
 Remarks:
-	It the time of calling this method <getDateFormat> will be parsed into a <DateFormatTemplate> using <parseDateFormat>, if it wasn't before. The formatter itself will be passed as the *context* to the <DateFormatTemplate> for rendering.
+	It the time of calling this method <getDateFormat> will be parsed into a <DateTemplate> using <parseDateFormat>, if it wasn't before. The formatter itself will be passed as the *context* to the <DateTemplate> for rendering.
 */
 blazegears.formatting.DateFormatter.prototype.formatDate = function(date) {
 	var result = "";
@@ -456,7 +456,7 @@ blazegears.formatting.DateFormatter.prototype.formatDate = function(date) {
 
 /*
 Method: parseDateFormat
-	Parses a date format into a <DateFormatTemplate>.
+	Parses a date format into a <DateTemplate>.
 
 Arguments:
 	[date_format = ""] - (*String*) The date format to parse.
@@ -1060,7 +1060,7 @@ blazegears.formatting.PHPDateFormatter.prototype.constructor = blazegears.format
 
 /*
 Method: parseDateFormat
-	Parses a date format into a <DateFormatTemplate> using the date format syntax of <PHP's date function at http://php.net/manual/en/function.date.php>.
+	Parses a date format into a <DateTemplate> using the date format syntax of <PHP's date function at http://php.net/manual/en/function.date.php>.
 
 Arguments:
 	[date_format = ""] - (*String*) The date format to parse.
@@ -1108,7 +1108,7 @@ Unsupported Specifiers:
 */
 blazegears.formatting.PHPDateFormatter.prototype.parseDateFormat = function(format) {
 	var character;
-	var result = new blazegears.formatting.DateFormatTemplate();
+	var result = new blazegears.formatting.DateTemplate();
 	
 	format = blazegears._forceParseString(format);
 	for (var i = 0; i < format.length; i++) {
@@ -1271,38 +1271,47 @@ blazegears.formatting.PHPDateFormatter.prototype.parseDateFormat = function(form
 	return result;
 }
 
+// days of the year (0 - 365)
 blazegears.formatting.PHPDateFormatter.prototype._getDecrementedDayOfYear = function(date) {
 	return this._getDayOfYear(date) - 1;
 }
 
+// zero-padded international hours (00 - 23)
 blazegears.formatting.PHPDateFormatter.prototype._getInternationalHours = function(date) {
 	return blazegears._padStringLeft(this._getHours(date), "0", 2);
 }
 
+// months (1 - 12)
 blazegears.formatting.PHPDateFormatter.prototype._getIncrementedMonth = function(date) {
 	return this._getMonth(date) + 1;
 }
 
+// zero-padded days of the month (01 - 31)
 blazegears.formatting.PHPDateFormatter.prototype._getPaddedDays = function(date) {
 	return blazegears._padStringLeft(this._getDate(date), "0", 2);
 }
 
+// zero-padded iso-8601 weeks of the year (01 - 53)
 blazegears.formatting.PHPDateFormatter.prototype._getPaddedIso8601Week = function(date) {
 	return blazegears._padStringLeft(this._getIso8601Week(date), "0", 2);
 }
 
+// zero-padded minutes (00 - 59)
 blazegears.formatting.PHPDateFormatter.prototype._getPaddedMinutes = function(date) {
 	return blazegears._padStringLeft(this._getMinutes(date), "0", 2);
 }
 
+// zero-padded months (01 - 12)
 blazegears.formatting.PHPDateFormatter.prototype._getPaddedMonth = function(date) {
 	return blazegears._padStringLeft(this._getMonth(date) + 1, "0", 2);
 }
 
+// zero-padded seconds (00 - 59)
 blazegears.formatting.PHPDateFormatter.prototype._getPaddedSeconds = function(date) {
 	return blazegears._padStringLeft(this._getSeconds(date), "0", 2);
 }
 
+// zero padded hours (01 - 12)
 blazegears.formatting.PHPDateFormatter.prototype._getPaddedShortHours = function(date) {
 	return blazegears._padStringLeft(this._getTwelveHourHours(date), "0", 2);
 }
@@ -1324,7 +1333,7 @@ blazegears.formatting.UnixDateFormatter.prototype.constructor = blazegears.forma
 
 /*
 Method: parseDateFormat
-	Parses a date format into a <DateFormatTemplate> using the date format syntax of the <date command of Unix-like systems at http://linux.die.net/man/1/date>.
+	Parses a date format into a <DateTemplate> using the date format syntax of the <date command of Unix-like systems at http://linux.die.net/man/1/date>.
 
 Arguments:
 	[date_format = ""] - (*String*) The date format to parse.
@@ -1392,7 +1401,7 @@ blazegears.formatting.UnixDateFormatter.prototype.parseDateFormat = function(for
 	var opposite;
 	var padding;
 	var precision;
-	var result = new blazegears.formatting.DateFormatTemplate();
+	var result = new blazegears.formatting.DateTemplate();
 	var specifier;
 	var upper;
 	
@@ -1790,6 +1799,7 @@ blazegears.formatting.UnixDateFormatter.prototype.parseDateFormat = function(for
 	return result;
 }
 
+// centuries (0 - 99)
 blazegears.formatting.UnixDateFormatter.prototype._getDecrementedCentury = function(date) {
 	return this._getCentury(date) - 1;
 }
