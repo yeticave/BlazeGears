@@ -30,7 +30,7 @@ var blazegears = blazegears || {};
 blazegears.fragvars = blazegears.fragvars || {};
 
 /*
-Enum: blazegears.fragvars.HistoryMode
+Enum: HistoryMode
 	Specifies the possible ways of handling browser history.
 
 Values:
@@ -122,7 +122,7 @@ blazegears.fragvars.Manager._history_mode = blazegears.fragvars.HistoryMode.NONE
 blazegears.fragvars.Manager._manager = null;
 
 // Method: getHistoryMode
-// Gets the method of handling browser history as a <blazegears.fragvars.HistoryMode>. Defaults to <blazegears.fragvars.HistoryMode>.NONE
+// Gets the method of handling browser history as a <HistoryMode>. Defaults to <HistoryMode>.NONE
 blazegears.fragvars.Manager.getHistoryMode = function() {
 	return blazegears.fragvars.Manager._history_mode;
 }
@@ -132,10 +132,10 @@ Method: setHistoryMode
 	Setter for <getHistoryMode>.
 
 Arguments:
-	value - (<blazegears.fragvars.HistoryMode>) The new value.
+	value - (<HistoryMode>) The new value.
 
 Exceptions:
-	blazegears.ArgumentError - *value* isn't an acceptable value for <blazegears.fragvars.HistoryMode>.
+	blazegears.ArgumentError - *value* isn't an acceptable value for <HistoryMode>.
 */
 blazegears.fragvars.Manager.setHistoryMode = function(value) {
 	var HistoryMode = blazegears.fragvars.HistoryMode;
