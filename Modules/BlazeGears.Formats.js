@@ -45,6 +45,21 @@ blazegears.formatting.DecimalVisibility = {
 };
 
 /*
+Enum: LetterCase
+	Specifies the possible methods of letter casing.
+
+Values:
+	DEFAULT - Represents the default casing.
+	UPPER_CASE - Represents the all caps casing.
+	LOWER_CASE - Represents the all minuscule casing.
+*/
+blazegears.formatting.LetterCase = {
+	DEFAULT: 0,
+	UPPER_CASE: 1,
+	LOWER_CASE: 2
+};
+
+/*
 Enum: TimeZone
 	Specifies the usable time zones for date and time formatting.
 
@@ -301,7 +316,8 @@ blazegears.formatting.DateTemplate.prototype._getLeapYear = function(settings, d
 
 // short lowercase meridiems (am - pm)
 blazegears.formatting.DateTemplate.prototype._getLowerCaseMeridiem = function(settings, date) {
-	return settings._short_meridiems[this._getHours(settings, date) < 12 ? 2 : 3];
+	var meridiems = settings.getShortMeridiemNames(blazegears.formatting.LetterCase.LOWER_CASE);
+	return meridiems[this._getHours(settings, date) < 12 ? 0 : 1];
 }
 
 // minutes (0 - 59)
@@ -423,7 +439,8 @@ blazegears.formatting.DateTemplate.prototype._getTwelveHourHours = function(sett
 
 // short upper case meridiems (am - pm)
 blazegears.formatting.DateTemplate.prototype._getUpperCaseMeridiem = function(settings, date) {
-	return settings._short_meridiems[this._getHours(settings, date) < 12 ? 0 : 1];
+	var meridiems = settings.getShortMeridiemNames(blazegears.formatting.LetterCase.UPPER_CASE);
+	return meridiems[this._getHours(settings, date) < 12 ? 0 : 1];
 }
 
 // leap years (0 - 1)
@@ -535,13 +552,20 @@ blazegears.formatting.DateFormatter.prototype.parseDateFormat = function(date_fo
 
 // Class: blazegears.formatting.DateFormatSettings
 blazegears.formatting.DateFormatSettings = function() {
+	var LetterCase = blazegears.formatting.LetterCase;
+	
 	this._is_utc_time_enabled = false;
 	this._full_day_names = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 	this._full_month_names = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-	this._short_meridiems = ["AM", "PM", "am", "pm"];
 	this._ordinal_suffixes = ["st", "nd", "rd", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th", "th", "st"];
 	this._short_day_names = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 	this._short_month_names = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+	
+	this._short_meridiem_fallbacks = [];
+	this._short_meridiems = [];
+	this.setShortMeridiemNames(["AM", "PM"], LetterCase.DEFAULT);
+	this.setShortMeridiemNames(null, LetterCase.UPPER_CASE);
+	this.setShortMeridiemNames(null, LetterCase.LOWER_CASE);
 }
 
 // Method: getFullDayNames
@@ -660,58 +684,89 @@ blazegears.formatting.DateFormatSettings.prototype.setShortDayNames = function(v
 	}
 }
 
-// Method: getShortLowerMeridiemNames
-// Gets a clone of the short names of lowercase meridiems, from am to pm, as an *Array* of 2 *Strings*.
-blazegears.formatting.DateFormatSettings.prototype.getShortLowerMeridiemNames = function() {
-	return [this._short_meridiems[2], this._short_meridiems[3]];
+/*
+Method: getShortMeridiemNames
+	Gets a clone of the short names of meridiems.
+
+Arguments:
+	[letter_case = LetterCase.DEFAULT] - (<LetterCase>) The casing in which the names are expected.
+
+Return Value:
+	(*Array*) An array with two items (AM and PM) in the requested casing. If the names aren't defined with the requested casing, the default casing will be used.
+
+Exceptions:
+	blazegears.ArgumentError - *letter_case* isn't an acceptable value for <LetterCase>.
+*/
+blazegears.formatting.DateFormatSettings.prototype.getShortMeridiemNames = function(letter_case) {
+	if (letter_case === undefined) letter_case = blazegears.formatting.LetterCase.DEFAULT;
+	var result;
+	
+	if (letter_case < 0 || letter_case > 2) {
+		throw blazegears.ArgumentError._invalidEnumValue("letter_case", "blazegears.formatting.LetterCase");
+	}
+	
+	result = this._short_meridiems[letter_case];
+	if (result === null) {
+		result = this._short_meridiem_fallbacks[letter_case - 1];
+	}
+	
+	return result.slice();
 }
 
 /*
-Method: setShortLowerMeridiemNames
-	Setter for <getShortLowerMeridiemNames>.
+Method: setShortMeridiemNames
+	Setter for <getShortMeridiemNames>.
 
 Arguments:
 	value - (*Array*) The value to clone.
+	[letter_case = LetterCase.DEFAULT] - (<LetterCase>) The casing in which the names are provided.
 
 Exceptions:
-	blazegears.ArgumentError - *value* isn't an instance of *Array* or doesn't have a *length* of 2.
+	blazegears.ArgumentError - *value* isn't an instance of *Array* or doesn't have a *length* of 2 or *value* is *null* / *undefined* and *letter_case* is <LetterCase>.DEFAULT.
 */
-blazegears.formatting.DateFormatSettings.prototype.setShortLowerMeridiemNames = function(value) {
-	if (!BlazeGears.isArray(value)) {
-		throw blazegears.ArgumentError._invalidType("value", "Array");
+blazegears.formatting.DateFormatSettings.prototype.setShortMeridiemNames = function(value, letter_case) {
+	var LetterCase = blazegears.formatting.LetterCase;
+	var fallback_result;
+	var i;
+	var result;
+	
+	if (letter_case === undefined) {
+		letter_case = LetterCase.DEFAULT;
 	}
-	if (value.length !== 2) {
-		throw blazegears.ArgumentError._invalidArrayLength("value", 2);
+	
+	if (value === null) {
+		if (letter_case === blazegears.formatting.LetterCase.DEFAULT) {
+			throw new blazegears.ArgumentError("value", "The default casing can't be <null>.");
+		}
+	} else {
+		if (!BlazeGears.isArray(value)) {
+			throw blazegears.ArgumentError._invalidType("value", "Array");
+		}
+		if (value.length !== 2) {
+			throw blazegears.ArgumentError._invalidArrayLength("value", 2);
+		}
 	}
-	this._short_meridiems[2] = value[0].toString();
-	this._short_meridiems[3] = value[1].toString();
-}
-
-// Method: getShortUpperMeridiemNames
-// Gets a clone of the short names of upper case meridiems, from AM to PM, as an *Array* of 2 *Strings*.
-blazegears.formatting.DateFormatSettings.prototype.getShortUpperMeridiemNames = function() {
-	return [this._short_meridiems[0], this._short_meridiems[1]];
-}
-
-/*
-Method: setShortUpperMeridiemNames
-	Setter for <getShortUpperMeridiemNames>.
-
-Arguments:
-	value - (*Array*) The value to clone.
-
-Exceptions:
-	blazegears.ArgumentError - *value* isn't an instance of *Array* or doesn't have a *length* of 2.
-*/
-blazegears.formatting.DateFormatSettings.prototype.setShortUpperMeridiemNames = function(value) {
-	if (!BlazeGears.isArray(value)) {
-		throw blazegears.ArgumentError._invalidType("value", "Array");
+	
+	if (value !== null) {
+		result = [];
+		result.push(blazegears._forceParseString(value[0]));
+		result.push(blazegears._forceParseString(value[1]));
+		this._short_meridiems[letter_case] = result;
+	} else {
+		this._short_meridiems[letter_case] = null;
 	}
-	if (value.length !== 2) {
-		throw blazegears.ArgumentError._invalidArrayLength("value", 2);
+	
+	if (letter_case === LetterCase.DEFAULT) {
+		fallback_result = [];
+		fallback_result.push(blazegears._forceParseString(value[0]).toUpperCase());
+		fallback_result.push(blazegears._forceParseString(value[1]).toUpperCase());
+		this._short_meridiem_fallbacks[LetterCase.UPPER_CASE - 1] = fallback_result;
+		
+		fallback_result = [];
+		fallback_result.push(blazegears._forceParseString(value[0]).toLowerCase());
+		fallback_result.push(blazegears._forceParseString(value[1]).toLowerCase());
+		this._short_meridiem_fallbacks[LetterCase.LOWER_CASE - 1] = fallback_result;
 	}
-	this._short_meridiems[0] = value[0].toString();
-	this._short_meridiems[1] = value[1].toString();
 }
 
 // Method: getShortMonthNames
@@ -2012,6 +2067,7 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 		if (!self.is(date)) date = new Date();
 		if (!self.is(configuration)) configuration = {};
 		
+		var LetterCase = blazegears.formatting.LetterCase;
 		var formatter = null;
 		var properties = ["syntax", "parser"];
 		var result;
@@ -2059,11 +2115,14 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 			settings = formatter.getDateFormatSettings();
 			settings._is_utc_time_enabled = this._is_utc_time_enabled;
 			settings._short_day_names = self.texts.short_days;
-			settings._short_meridiems = [self.texts.short_upper_meridiems[0], self.texts.short_upper_meridiems[1], self.texts.short_lower_meridiems[0], self.texts.short_lower_meridiems[1]];
 			settings._short_month_names = self.texts.short_months;
 			settings._full_day_names = self.texts.full_days;
 			settings._full_month_names = self.texts.full_months;
 			settings._ordinal_suffixes = self.texts.ordinal_suffixes;
+			
+			settings.setShortMeridiemNames(self.texts.short_upper_meridiems, LetterCase.UPPER_CASE);
+			settings.setShortMeridiemNames(self.texts.short_lower_meridiems, LetterCase.LOWER_CASE);
+			
 			formatter.setDateFormat(configuration.syntax);
 			result = formatter.formatDate(date);
 		}
