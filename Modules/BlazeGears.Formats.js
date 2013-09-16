@@ -551,6 +551,7 @@ blazegears.formatting.DateFormatter.prototype.parseDateFormat = function(date_fo
 }
 
 // Class: blazegears.formatting.DateFormatSettings
+// Localization settings for date formatting.
 blazegears.formatting.DateFormatSettings = function() {
 	var LetterCase = blazegears.formatting.LetterCase;
 	
@@ -834,220 +835,37 @@ blazegears.formatting.DateFormatSettings.prototype.setTimeZone = function(value)
 
 // Class: blazegears.formatting.NumberFormatter
 // Formats numbers.
-blazegears.formatting.NumberFormatter = function() {
-	this._decimal_delimiter = ".";
-	this._decimal_precision = 0;
-	this._decimal_visibility = blazegears.formatting.DecimalVisibility.FIXED;
-	this._group_delimiter = ",";
-	this._group_size = 3;
-	this._is_leading_zero_enabled = true;
-	this._negative_prefix = "-";
-	this._negative_suffix = "";
-	this._positive_prefix = "";
-	this._positive_suffix = "";
-	this._rounding_callback = Math.round;
+blazegears.formatting.NumberFormatter = function(number_format_settings) {
+	var NumberFormatSettings = blazegears.formatting.NumberFormatSettings;
+	
+	if (number_format_settings !== undefined && !(number_format_settings instanceof NumberFormatSettings)) {
+		throw blazegears.ArgumentError._invalidType("number_format_settings", "blazegears.formatting.NumberFormatSettings");
+	}
+	
+	this._settings = number_format_settings || new NumberFormatSettings();
+}
+
+// Method: getNumberFormatSettings
+// Gets the settings that will be used for <formatNumber>.
+blazegears.formatting.NumberFormatter.prototype.getNumberFormatSettings = function() {
+	return this._settings;
 }
 
 /*
-Method: isLeadingZeroEnabled
-	Determines if the leading zero should be displayed for numbers with an absolute value less than one but greated than zero. Defaults to *true*.
-*/
-blazegears.formatting.NumberFormatter.prototype.isLeadingZeroEnabled = function() {
-	return this._is_leading_zero_enabled;
-}
-
-/*
-Method: enableLeadingZero
-	Setter for <isLeadingZeroEnabled>.
+Method: setNumberFormatSettings
+	Setter for <getNumberFormatSettings>.
 
 Arguments:
-	enable - (*Boolean*) The new value.
-*/
-blazegears.formatting.NumberFormatter.prototype.enableLeadingZero = function(enable) {
-	this._is_leading_zero_enabled = Boolean(enable);
-}
-
-// Method: getDecimalDelimiter
-// Gets the delimiter that will be used to separate the integer part of a number from its decimal part as a *String*. Defaults to a dot.
-blazegears.formatting.NumberFormatter.prototype.getDecimalDelimiter = function() {
-	return this._decimal_delimiter;
-}
-
-/*
-Method: setDecimalDelimiter
-	Setter for <getDecimalDelimiter>.
-
-Arguments:
-	value - (*String*) The new value.
-*/
-blazegears.formatting.NumberFormatter.prototype.setDecimalDelimiter = function(value) {
-	this._decimal_delimiter = blazegears._forceParseString(value);
-}
-
-// Method: getDecimalPrecision
-// Gets the maximum number of decimal digits to display as a *Number*. Defaults to zero.
-blazegears.formatting.NumberFormatter.prototype.getDecimalPrecision = function() {
-	return this._decimal_precision;
-}
-
-/*
-Method: setDecimalPrecision
-	Setter for <getDecimalPrecision>.
-
-Arguments:
-	value - (*Number*) The new value.
-*/
-blazegears.formatting.NumberFormatter.prototype.setDecimalPrecision = function(value) {
-	this._decimal_precision = blazegears._forceParseInt(value);
-}
-
-// Method: getDecimalVisibility
-// Gets the mode of diplaying the decimal part of numbers as a <DecimalVisibility>. Defaults to <DecimalVisibility>.FIXED.
-blazegears.formatting.NumberFormatter.prototype.getDecimalVisibility = function() {
-	return this._decimal_visibility;
-}
-
-/*
-Method: setDecimalVisibility
-	Setter for <getDecimalVisibility>.
-
-Arguments:
-	value - (<DecimalVisibility>) The new value.
+	value - (<NumberFormatSettings>) The new value.
 
 Exceptions:
-	blazegears.ArgumentError - *value* isn't an acceptable value for <DecimalVisibility>.
+	blazegears.ArgumentError - *value* ins't an instance of <NumberFormatSettings>.
 */
-blazegears.formatting.NumberFormatter.prototype.setDecimalVisibility = function(value) {
-	if (BlazeGears.isNumber(value) && value > 0 && value < 4) {
-		this._decimal_visibility = value;
-	} else {
-		throw blazegears.ArgumentError._invalidEnumValue("value", "blazegears.formatting.DecimalVisibility");
+blazegears.formatting.NumberFormatter.prototype.setNumberFormatSettings = function(value) {
+	if (!(value instanceof blazegears.formatting.NumberFormatSettings)) {
+		throw blazegears.ArgumentError._invalidType("value", "blazegears.formatting.NumberFormatSettings");
 	}
-}
-
-// Method: getGroupDelimiter
-// Gets the delimiter that will be used to separate the number groups in the integer parts of a number as a *String*. Defaults to a comma.
-blazegears.formatting.NumberFormatter.prototype.getGroupDelimiter = function() {
-	return this._group_delimiter;
-}
-
-/*
-Method: setGroupDelimiter
-	Setter for <getGroupDelimiter>.
-
-Arguments:
-	value - (*String*) The new value.
-*/
-blazegears.formatting.NumberFormatter.prototype.setGroupDelimiter = function(value) {
-	this._group_delimiter = blazegears._forceParseString(value);
-}
-
-// Method: getGroupSize
-// Gets the maximum number of digits in a group in the integer part of a number. Defaults to 3.
-blazegears.formatting.NumberFormatter.prototype.getGroupSize = function() {
-	return this._group_size;
-}
-
-/*
-Method: setGroupSize
-	Setter for <getGroupSize>.
-
-Arguments:
-	value - (*Number*) The new value.
-*/
-blazegears.formatting.NumberFormatter.prototype.setGroupSize = function(value) {
-	this._group_size = blazegears._forceParseInt(value);
-}
-
-// Method: getNegativePrefix
-// Gets the prefix used for negative numbers as a *String*. Defaults to a minus sign.
-blazegears.formatting.NumberFormatter.prototype.getNegativePrefix = function() {
-	return this._negative_prefix;
-}
-
-/*
-Method: setNegativePrefix
-	Setter for <getNegativePrefix>.
-
-Arguments:
-	value - (*String*) The new value.
-*/
-blazegears.formatting.NumberFormatter.prototype.setNegativePrefix = function(value) {
-	this._negative_prefix = blazegears._forceParseString(value);
-}
-
-// Method: getNegativeSuffix
-// Gets the suffix used for negative numbers as a *String*. Defaults to an empty string.
-blazegears.formatting.NumberFormatter.prototype.getNegativeSuffix = function() {
-	return this._negative_suffix;
-}
-
-/*
-Method: setNegativeSuffix
-	Setter for <getNegativeSuffix>.
-
-Arguments:
-	value - (*String*) The new value.
-*/
-blazegears.formatting.NumberFormatter.prototype.setNegativeSuffix = function(value) {
-	this._negative_suffix = blazegears._forceParseString(value);
-}
-
-// Method: getPositivePrefix
-// Gets the prefix used for positive numbers as a *String*. Defaults to an empty string.
-blazegears.formatting.NumberFormatter.prototype.getPositivePrefix = function() {
-	return this._positive_prefix;
-}
-
-/*
-Method: setPositivePrefix
-	Setter for <getPositivePrefix>.
-
-Arguments:
-	value - (*String*) The new value.
-*/
-blazegears.formatting.NumberFormatter.prototype.setPositivePrefix = function(value) {
-	this._positive_prefix = blazegears._forceParseString(value);
-}
-
-// Method: getPositiveSuffix
-// Gets the suffix used for positive numbers as a *String*. Defaults to an empty string.
-blazegears.formatting.NumberFormatter.prototype.getPositiveSuffix = function() {
-	return this._positive_suffix;
-}
-
-/*
-Method: setPositiveSuffix
-	Setter for <getPositiveSuffix>.
-
-Arguments:
-	value - (*String*) The new value.
-*/
-blazegears.formatting.NumberFormatter.prototype.setPositiveSuffix = function(value) {
-	this._positive_suffix = blazegears._forceParseString(value);
-}
-
-// Method: getRoundingCallback
-// Gets the callback used for rounding numbers as a *Function*.
-blazegears.formatting.NumberFormatter.prototype.getRoundingCallback = function() {
-	return this._rounding_callback;
-}
-
-/*
-Method: setRoundingCallback
-	Setter for <getRoundingCallback>.
-
-Arguments:
-	value - (*Function*) The new value.
-
-Exceptions:
-	blazegears.ArgumentError - *value* isn't an instance of *Function*.
-*/
-blazegears.formatting.NumberFormatter.prototype.setRoundingCallback = function(value) {
-	if (!BlazeGears.isFunction(value)) {
-		throw blazgears.ArgumentError._invalidArgumentType("value", "Function");
-	}
-	this._rounding_callback = value;
+	this._settings = value;
 }
 
 /*
@@ -1073,12 +891,7 @@ blazegears.formatting.NumberFormatter.prototype.formatNumber = function(number) 
 	var result;
 	
 	// validate the number
-	if (!BlazeGears.isNumber(number)) {
-		number = parseFloat(number);
-		if (isNaN(number)) {
-			number = 0;
-		}
-	}
+	number = blazegears._forceParseFloat(number);
 	is_negative = number < 0;
 	
 	// separate the number into integer and decimal parts
@@ -1086,10 +899,10 @@ blazegears.formatting.NumberFormatter.prototype.formatNumber = function(number) 
 	decimal_part = number - integer_part;
 	
 	// create the decimal string
-	if (this._decimal_precision > 0) {
-		decimal_significand = Math.abs(this._rounding_callback.call(this, Math.pow(10, this._decimal_precision) * decimal_part)).toString();
-		if (this._decimal_visibility === DecimalVisibility.FIXED) {
-			while (decimal_significand.length < this._decimal_precision) {
+	if (this._settings._decimal_precision > 0) {
+		decimal_significand = Math.abs(this._settings._rounding_callback.call(this._settings, Math.pow(10, this._settings._decimal_precision) * decimal_part)).toString();
+		if (this._settings._decimal_visibility === DecimalVisibility.FIXED) {
+			while (decimal_significand.length < this._settings._decimal_precision) {
 				decimal_significand += "0";
 			}
 		} else {
@@ -1097,53 +910,271 @@ blazegears.formatting.NumberFormatter.prototype.formatNumber = function(number) 
 				decimal_significand = decimal_significand.substr(0, decimal_significand.length - 1);
 			}
 		}
-		if (decimal_significand.length === 0 && this._decimal_visibility === DecimalVisibility.MINIMAL) {
+		if (decimal_significand.length === 0 && this._settings._decimal_visibility === DecimalVisibility.MINIMAL) {
 			decimal_significand += "0";
 		}
 	} else {
 		has_decimal_part = false;
-		integer_part = this._rounding_callback.call(this, number);
+		integer_part = this._settings._rounding_callback.call(this._settings, number);
 	}
 	
 	// separate the integer part into groups
 	integer_string = Math.abs(integer_part).toString();
-	if (this._group_size > 0 && this._group_delimiter.length > 0 && integer_string.length > this._group_delimiter.length) {
+	if (this._settings._group_size > 0 && this._settings._group_delimiter.length > 0 && integer_string.length > this._settings._group_delimiter.length) {
 		integer_string_length = integer_string.length;
-		group_count = Math.ceil(integer_string_length / this._group_size);
+		group_count = Math.ceil(integer_string_length / this._settings._group_size);
 		groups = [];
 		
 		for (i = 0; i < group_count; ++i) {
-			group_offset = integer_string_length - this._group_size * (group_count - i);
+			group_offset = integer_string_length - this._settings._group_size * (group_count - i);
 			if (group_offset < 0) {
-				groups.push(integer_string.substr(0, this._group_size + group_offset));
+				groups.push(integer_string.substr(0, this._settings._group_size + group_offset));
 			} else {
-				groups.push(integer_string.substr(group_offset, this._group_size));
+				groups.push(integer_string.substr(group_offset, this._settings._group_size));
 			}
 		}
-		integer_string = groups.join(this._group_delimiter);
+		integer_string = groups.join(this._settings._group_delimiter);
 	}
 	
 	// combine the parts into the result
 	if (Math.abs(integer_part) > 0) {
 		result = integer_string;
-	} else if (this._is_leading_zero_enabled) {
+	} else if (this._settings._is_leading_zero_enabled) {
 		result = "0";
 	} else {
 		result = "";
 	}
 	if (has_decimal_part && decimal_significand.length > 0) {
-		result += this._decimal_delimiter + decimal_significand;
+		result += this._settings._decimal_delimiter + decimal_significand;
 	}
 	if (is_negative) {
-		result = this._negative_prefix + result + this._negative_suffix;
+		result = this._settings._negative_prefix + result + this._settings._negative_suffix;
 	} else {
-		result = this._positive_prefix + result + this._positive_suffix;
+		result = this._settings._positive_prefix + result + this._settings._positive_suffix;
 	}
 	if (result.length === 0) {
 		result = "0";
 	}
 	
 	return result;
+}
+
+// Class: blazegears.formatting.NumberFormatSettings
+// Localization settings for number formatting.
+blazegears.formatting.NumberFormatSettings = function() {
+	this._decimal_delimiter = ".";
+	this._decimal_precision = 0;
+	this._decimal_visibility = blazegears.formatting.DecimalVisibility.FIXED;
+	this._group_delimiter = ",";
+	this._group_size = 3;
+	this._is_leading_zero_enabled = true;
+	this._negative_prefix = "-";
+	this._negative_suffix = "";
+	this._positive_prefix = "";
+	this._positive_suffix = "";
+	this._rounding_callback = Math.round;
+}
+
+/*
+Method: isLeadingZeroEnabled
+	Determines if the leading zero should be displayed for numbers with an absolute value less than one but greater than zero. Defaults to *true*.
+*/
+blazegears.formatting.NumberFormatSettings.prototype.isLeadingZeroEnabled = function() {
+	return this._is_leading_zero_enabled;
+}
+
+/*
+Method: enableLeadingZero
+	Setter for <isLeadingZeroEnabled>.
+
+Arguments:
+	enable - (*Boolean*) The new value.
+*/
+blazegears.formatting.NumberFormatSettings.prototype.enableLeadingZero = function(enable) {
+	this._is_leading_zero_enabled = Boolean(enable);
+}
+
+// Method: getDecimalDelimiter
+// Gets the delimiter that will be used to separate the integer part of a number from its decimal part as a *String*. Defaults to a dot.
+blazegears.formatting.NumberFormatSettings.prototype.getDecimalDelimiter = function() {
+	return this._decimal_delimiter;
+}
+
+/*
+Method: setDecimalDelimiter
+	Setter for <getDecimalDelimiter>.
+
+Arguments:
+	value - (*String*) The new value.
+*/
+blazegears.formatting.NumberFormatSettings.prototype.setDecimalDelimiter = function(value) {
+	this._decimal_delimiter = blazegears._forceParseString(value);
+}
+
+// Method: getDecimalPrecision
+// Gets the maximum number of decimal digits to display as a *Number*. Defaults to zero.
+blazegears.formatting.NumberFormatSettings.prototype.getDecimalPrecision = function() {
+	return this._decimal_precision;
+}
+
+/*
+Method: setDecimalPrecision
+	Setter for <getDecimalPrecision>.
+
+Arguments:
+	value - (*Number*) The new value.
+*/
+blazegears.formatting.NumberFormatSettings.prototype.setDecimalPrecision = function(value) {
+	this._decimal_precision = blazegears._forceParseInt(value);
+}
+
+// Method: getDecimalVisibility
+// Gets the mode of diplaying the decimal part of numbers as a <DecimalVisibility>. Defaults to <DecimalVisibility>.FIXED.
+blazegears.formatting.NumberFormatSettings.prototype.getDecimalVisibility = function() {
+	return this._decimal_visibility;
+}
+
+/*
+Method: setDecimalVisibility
+	Setter for <getDecimalVisibility>.
+
+Arguments:
+	value - (<DecimalVisibility>) The new value.
+
+Exceptions:
+	blazegears.ArgumentError - *value* isn't an acceptable value for <DecimalVisibility>.
+*/
+blazegears.formatting.NumberFormatSettings.prototype.setDecimalVisibility = function(value) {
+	if (BlazeGears.isNumber(value) && value > 0 && value < 4) {
+		this._decimal_visibility = value;
+	} else {
+		throw blazegears.ArgumentError._invalidEnumValue("value", "blazegears.formatting.DecimalVisibility");
+	}
+}
+
+// Method: getGroupDelimiter
+// Gets the delimiter that will be used to separate the number groups in the integer parts of a number as a *String*. Defaults to a comma.
+blazegears.formatting.NumberFormatSettings.prototype.getGroupDelimiter = function() {
+	return this._group_delimiter;
+}
+
+/*
+Method: setGroupDelimiter
+	Setter for <getGroupDelimiter>.
+
+Arguments:
+	value - (*String*) The new value.
+*/
+blazegears.formatting.NumberFormatSettings.prototype.setGroupDelimiter = function(value) {
+	this._group_delimiter = blazegears._forceParseString(value);
+}
+
+// Method: getGroupSize
+// Gets the maximum number of digits in a group in the integer part of a number. Defaults to 3.
+blazegears.formatting.NumberFormatSettings.prototype.getGroupSize = function() {
+	return this._group_size;
+}
+
+/*
+Method: setGroupSize
+	Setter for <getGroupSize>.
+
+Arguments:
+	value - (*Number*) The new value.
+*/
+blazegears.formatting.NumberFormatSettings.prototype.setGroupSize = function(value) {
+	this._group_size = blazegears._forceParseInt(value);
+}
+
+// Method: getNegativePrefix
+// Gets the prefix used for negative numbers as a *String*. Defaults to a minus sign.
+blazegears.formatting.NumberFormatSettings.prototype.getNegativePrefix = function() {
+	return this._negative_prefix;
+}
+
+/*
+Method: setNegativePrefix
+	Setter for <getNegativePrefix>.
+
+Arguments:
+	value - (*String*) The new value.
+*/
+blazegears.formatting.NumberFormatSettings.prototype.setNegativePrefix = function(value) {
+	this._negative_prefix = blazegears._forceParseString(value);
+}
+
+// Method: getNegativeSuffix
+// Gets the suffix used for negative numbers as a *String*. Defaults to an empty string.
+blazegears.formatting.NumberFormatSettings.prototype.getNegativeSuffix = function() {
+	return this._negative_suffix;
+}
+
+/*
+Method: setNegativeSuffix
+	Setter for <getNegativeSuffix>.
+
+Arguments:
+	value - (*String*) The new value.
+*/
+blazegears.formatting.NumberFormatSettings.prototype.setNegativeSuffix = function(value) {
+	this._negative_suffix = blazegears._forceParseString(value);
+}
+
+// Method: getPositivePrefix
+// Gets the prefix used for positive numbers as a *String*. Defaults to an empty string.
+blazegears.formatting.NumberFormatSettings.prototype.getPositivePrefix = function() {
+	return this._positive_prefix;
+}
+
+/*
+Method: setPositivePrefix
+	Setter for <getPositivePrefix>.
+
+Arguments:
+	value - (*String*) The new value.
+*/
+blazegears.formatting.NumberFormatSettings.prototype.setPositivePrefix = function(value) {
+	this._positive_prefix = blazegears._forceParseString(value);
+}
+
+// Method: getPositiveSuffix
+// Gets the suffix used for positive numbers as a *String*. Defaults to an empty string.
+blazegears.formatting.NumberFormatSettings.prototype.getPositiveSuffix = function() {
+	return this._positive_suffix;
+}
+
+/*
+Method: setPositiveSuffix
+	Setter for <getPositiveSuffix>.
+
+Arguments:
+	value - (*String*) The new value.
+*/
+blazegears.formatting.NumberFormatSettings.prototype.setPositiveSuffix = function(value) {
+	this._positive_suffix = blazegears._forceParseString(value);
+}
+
+// Method: getRoundingCallback
+// Gets the callback used for rounding numbers as a *Function*.
+blazegears.formatting.NumberFormatSettings.prototype.getRoundingCallback = function() {
+	return this._rounding_callback;
+}
+
+/*
+Method: setRoundingCallback
+	Setter for <getRoundingCallback>.
+
+Arguments:
+	value - (*Function*) The new value.
+
+Exceptions:
+	blazegears.ArgumentError - *value* isn't an instance of *Function*.
+*/
+blazegears.formatting.NumberFormatSettings.prototype.setRoundingCallback = function(value) {
+	if (!BlazeGears.isFunction(value)) {
+		throw blazgears.ArgumentError._invalidArgumentType("value", "Function");
+	}
+	this._rounding_callback = value;
 }
 
 /*
@@ -2184,6 +2215,7 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 		var negative = false;
 		var properties = ["decimal_delimiter", "decimal_length", "force_decimals", "group_delimiter", "group_length", "leading_zero", "negative_prefix", "negative_suffix", "negatives_first", "prefix", "suffix"];
 		var result;
+		var settings = formatter.getNumberFormatSettings();
 		
 		// default the missing configuration keys
 		for (var i in properties) {
@@ -2200,15 +2232,15 @@ BlazeGears.Formats = BlazeGears.Classes.declareSingleton(BlazeGears.BaseClass, {
 			negative = true;
 		}
 		decimal_visibility = configuration.force_decimals ? DecimalVisibility.FIXED : DecimalVisibility.TRUNCATED;
-		formatter.enableLeadingZero(configuration.leading_zero);
-		formatter.setDecimalDelimiter(configuration.decimal_delimiter);
-		formatter.setDecimalPrecision(configuration.decimal_length);
-		formatter.setDecimalVisibility(decimal_visibility);
-		formatter.setGroupDelimiter(configuration.group_delimiter);
-		formatter.setGroupSize(configuration.group_length);
-		formatter.setNegativePrefix("");
-		formatter.setNegativeSuffix("");
-		formatter.setRoundingCallback(Math.round);
+		settings.enableLeadingZero(configuration.leading_zero);
+		settings.setDecimalDelimiter(configuration.decimal_delimiter);
+		settings.setDecimalPrecision(configuration.decimal_length);
+		settings.setDecimalVisibility(decimal_visibility);
+		settings.setGroupDelimiter(configuration.group_delimiter);
+		settings.setGroupSize(configuration.group_length);
+		settings.setNegativePrefix("");
+		settings.setNegativeSuffix("");
+		settings.setRoundingCallback(Math.round);
 		result = formatter.formatNumber(number);
 		
 		// apply the affixes

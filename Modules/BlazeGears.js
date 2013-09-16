@@ -97,6 +97,17 @@ blazegears._countStringOccurrences = function(needle, haystack) {
 	return result;
 }
 
+// parses an float and reverts to a default value if it fails
+blazegears._forceParseFloat = function(value, default_value) {
+	var result = parseFloat(value);
+	
+	if (isNaN(result)) {
+		result = default_value === undefined ? 0 : default_value;
+	}
+	
+	return result;
+}
+
 // parses an integer and reverts to a default value if it fails
 blazegears._forceParseInt = function(value, default_value) {
 	var result = parseInt(value);
