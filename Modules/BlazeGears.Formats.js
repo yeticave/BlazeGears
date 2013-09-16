@@ -593,7 +593,7 @@ blazegears.formatting.DateFormatSettings.prototype.setFullDayNames = function(va
 		throw blazegears.ArgumentError._invalidArrayLength("value", 7);
 	}
 	for (var i = 0; i < 7; ++i) {
-		this._full_day_names.push(value[i].toString());
+		this._full_day_names.push(blazegears._forceParseString(value[i]));
 	}
 }
 
@@ -622,7 +622,7 @@ blazegears.formatting.DateFormatSettings.prototype.setFullMonthNames = function(
 		throw blazegears.ArgumentError._invalidArrayLength("value", 12);
 	}
 	for (var i = 0; i < 12; ++i) {
-		this._full_month_names.push(value[i].toString());
+		this._full_month_names.push(blazegears._forceParseString(value[i]));
 	}
 }
 
@@ -651,7 +651,7 @@ blazegears.formatting.DateFormatSettings.prototype.setOrdinalSuffixes = function
 		throw blazegears.ArgumentError._invalidArrayLength("value", 31);
 	}
 	for (var i = 0; i < 31; ++i) {
-		this._ordinal_suffixes.push(value[i].toString());
+		this._ordinal_suffixes.push(blazegears._forceParseString(value[i]));
 	}
 }
 
@@ -680,7 +680,7 @@ blazegears.formatting.DateFormatSettings.prototype.setShortDayNames = function(v
 		throw blazegears.ArgumentError._invalidArrayLength("value", 7);
 	}
 	for (var i = 0; i < 7; ++i) {
-		this._short_day_names.push(value[i].toString());
+		this._short_day_names.push(blazegears._forceParseString(value[i]));
 	}
 }
 
@@ -794,7 +794,7 @@ blazegears.formatting.DateFormatSettings.prototype.setShortMonthNames = function
 		throw blazegears.ArgumentError._invalidArrayLength("value", 12);
 	}
 	for (var i = 0; i < 12; ++i) {
-		this._short_month_names.push(value[i].toString());
+		this._short_month_names.push(blazegears._forceParseString(value[i]));
 	}
 }
 
